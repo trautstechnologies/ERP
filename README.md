@@ -1,5 +1,15 @@
 # TRAUTS ERP
 
+## User guide
+
+The plain-language guide covers every app page, ordinary-worker and manager permissions, daily tasks, payments including Mobile Money, batch/expiry controls, returns/refunds/voids, and common errors.
+
+- [Printable PDF](public/user-guide.pdf)
+- [Browser-readable guide](public/user-guide.html)
+- [Editable guide source](docs/USER_GUIDE.md)
+
+After deployment, open `/user-guide.html` on the Netlify site to read it or download the PDF. The app's footer also links to the guide. To rebuild the documents after editing the source, install `requirements-docs.txt` in a Python environment and run `python scripts/build_user_guide.py`. Netlify builds use the committed output and do not need Python or ReportLab.
+
 This repository now includes the TRAUTS browser frontend adapted from the supplied `ERP.txt` export. It uses Vite and vanilla JavaScript ES modules, Supabase Auth/REST/RPC, decimal arithmetic, and packaged Lucide icons. The original navy/blue colors, left navigation, card layout and tables are retained. Legacy demo data and business-data localStorage are not used by the application. Supabase Auth still persists its session normally.
 
 ## Run the frontend
