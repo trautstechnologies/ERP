@@ -1,6 +1,6 @@
 import { list, insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
 import { $, e, badge, short, timestamp, options, select, field, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
-import { price } from '../lib/domain.js';
+import { price, paymentLabel } from '../lib/domain.js';
 import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, payOptions, lineEditor, setupLines, parseLines, detailLines } from './shared.js';
 
 async function transactionDetails(ctx, sale, products, isPurchase = false) {
@@ -14,8 +14,8 @@ async function transactionDetails(ctx, sale, products, isPurchase = false) {
 
 export async function sales(ctx) {
   const [data, products, units] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), list('selling_units')]);
-  const render = search => table(['Sale / request ID', 'Date', 'Payment', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).filter(s => matches(s, search)).map(s => row([
-    `<code>${e(s.sale_id)}</code>`, e(timestamp(s.sale_date, ctx.store.time_zone)), e(s.payment_method), badge(s.status), e(ctx.money(s.total_amount)), `<div class="actions">${button('Details', 'details', s.sale_id)}${ctx.manager && s.status === 'completed' ? button('Cancel sale', 'reverse', s.sale_id) : ''}</div>`,
+  const render = search => table(['Sale / request ID', 'Date', 'Payment', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).filter(s => matches({ ...s, payment_label: paymentLabel(s.payment_method) }, search)).map(s => row([
+    `<code>${e(s.sale_id)}</code>`, e(timestamp(s.sale_date, ctx.store.time_zone)), e(paymentLabel(s.payment_method)), badge(s.status), e(ctx.money(s.total_amount)), `<div class="actions">${button('Details', 'details', s.sale_id)}${ctx.manager && s.status === 'completed' ? button('Cancel sale', 'reverse', s.sale_id) : ''}</div>`,
   ])));
   const root = ctx.mount(`${heading('Sales', ctx.manager ? 'Store sales, original item history and cancellations' : 'Record a sale and review your transactions', button('Record sale', 'add', '', false))}${panel('Sales history', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
@@ -82,8 +82,8 @@ export async function purchases(ctx) {
 export async function expenses(ctx) {
   const data = await scoped(ctx, 'expenses');
   const enabled = import.meta.env.VITE_ENABLE_EXPENSE_CANCELLATION === 'true';
-  const render = search => table(['Expense ID', 'Date', 'Category', 'Description', 'Amount', 'Status', ...(enabled ? ['Actions'] : [])], data.filter(x => matches(x, search)).map(x => row([
-    `<code>${e(x.expense_id)}</code>`, e(timestamp(x.expense_date, ctx.store.time_zone)), e(x.category), e(x.description), e(ctx.money(x.amount)), badge(x.status), ...(enabled ? [x.status === 'recorded' ? button('Cancel', 'cancel', x.expense_id) : '—'] : []),
+  const render = search => table(['Expense ID', 'Date', 'Category', 'Description', 'Payment', 'Amount', 'Status', ...(enabled ? ['Actions'] : [])], data.filter(x => matches({ ...x, payment_label: paymentLabel(x.payment_method) }, search)).map(x => row([
+    `<code>${e(x.expense_id)}</code>`, e(timestamp(x.expense_date, ctx.store.time_zone)), e(x.category), e(x.description), e(paymentLabel(x.payment_method)), e(ctx.money(x.amount)), badge(x.status), ...(enabled ? [x.status === 'recorded' ? button('Cancel', 'cancel', x.expense_id) : '—'] : []),
   ])));
   const root = ctx.mount(`${heading('Expenses', 'Record store expenses and preserve transaction history.', button('Record expense', 'add', '', false))}${!enabled ? note('Expense cancellation is unavailable until the deployed cancellation RPC signature has been verified. Recorded expenses cannot be deleted here.') : ''}${panel('Expenses', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;

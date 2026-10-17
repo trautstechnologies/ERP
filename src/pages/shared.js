@@ -1,12 +1,12 @@
 import { list, rpc } from '../lib/api.js';
 import { $, e, options, select, field, button, notify, table, row } from '../lib/ui.js';
-import { quantity, price } from '../lib/domain.js';
+import { quantity, price, paymentMethods, paymentLabel } from '../lib/domain.js';
 
 export const scoped = (ctx, tableName, extra = {}) => list(tableName, { scope: ctx.profile.store_id, ...extra });
 export const nameOf = (rows, id, key = 'product_id', label = 'product_name') => rows.find(r => r[key] === id)?.[label] || id || '—';
 export const heading = (title, subtitle, actions = '') => `<div class="toolbar"><div><h2>${e(title)}</h2><p>${e(subtitle)}</p></div><div class="actions">${actions}</div></div>`;
 export const reason = () => field('Reason', 'reason', { maxLength: 1000 });
-export const payOptions = () => ['cash', 'card', 'bank_transfer', 'other'].map(v => `<option value="${v}">${e(v.replace('_', ' '))}</option>`).join('');
+export const payOptions = () => paymentMethods.map(v => `<option value="${v}">${e(paymentLabel(v))}</option>`).join('');
 
 export function bind(root, handlers) {
   root.addEventListener('click', async event => {

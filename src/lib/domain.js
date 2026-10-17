@@ -1,6 +1,8 @@
 import Decimal from 'decimal.js';
 
-export const paymentMethods = ['cash', 'card', 'bank_transfer', 'other'];
+export const paymentMethods = ['cash', 'card', 'bank_transfer', 'mobile_money', 'other'];
+export const paymentLabels = { cash: 'Cash', card: 'Card', bank_transfer: 'Bank transfer', mobile_money: 'Mobile Money', other: 'Other' };
+export const paymentLabel = method => paymentLabels[method] || method || '—';
 export const managerPages = new Set(['suppliers', 'purchases', 'expenses', 'summary', 'accounts', 'reports', 'returns', 'batches', 'audit', 'settings']);
 
 export function quantity(value, places = 3, allowZero = false, signed = false) {

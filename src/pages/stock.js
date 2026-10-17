@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 import { list, rpc } from '../lib/api.js';
 import { $, e, badge, timestamp, options, select, field, check, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
-import { quantity, canVoid, remainingReturns } from '../lib/domain.js';
+import { quantity, canVoid, remainingReturns, paymentLabel } from '../lib/domain.js';
 import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, payOptions, batchEditor, setupBatches, parseBatches } from './shared.js';
 
 export async function batches(ctx) {
@@ -129,7 +129,7 @@ export async function returns(ctx) {
       const header = headers.find(h => h.return_id === id);
       const lines = items.filter(i => i.return_id === id);
       const ids = new Set(lines.map(i => i.return_item_id));
-      dialog('Return audit', `<p><code>${e(id)}</code></p><p>${e(header.reason)}</p>${header.return_status === 'voided' ? note(`Voided: ${header.void_reason} · ${header.voided_by} · ${timestamp(header.voided_at, ctx.store.time_zone)}`) : ''}${table(['Product', 'Quantity', 'Refund', 'Disposition', 'Held', 'Batch ID'], lines.map(i => row([e(nameOf(products, i.product_id)), e(i.quantity), e(ctx.money(i.refund_amount)), e(i.disposition), e(i.quarantined_quantity), `<code>${e(i.batch_id || 'Unbatched original sale')}</code>`])))}<h3>Quarantine actions</h3>${table(['Action ID', 'Action', 'Quantity', 'Reason'], actions.filter(a => ids.has(a.return_item_id)).map(a => row([`<code>${e(a.action_id)}</code>`, e(a.action), e(a.quantity), e(a.reason)])))}${header.refunded_at ? note(`Refund recorded: ${header.refund_method} · ${header.refund_reference || 'Cash'} · ${timestamp(header.refunded_at, ctx.store.time_zone)}`) : ''}`);
+      dialog('Return audit', `<p><code>${e(id)}</code></p><p>${e(header.reason)}</p>${header.return_status === 'voided' ? note(`Voided: ${header.void_reason} · ${header.voided_by} · ${timestamp(header.voided_at, ctx.store.time_zone)}`) : ''}${table(['Product', 'Quantity', 'Refund', 'Disposition', 'Held', 'Batch ID'], lines.map(i => row([e(nameOf(products, i.product_id)), e(i.quantity), e(ctx.money(i.refund_amount)), e(i.disposition), e(i.quarantined_quantity), `<code>${e(i.batch_id || 'Unbatched original sale')}</code>`])))}<h3>Quarantine actions</h3>${table(['Action ID', 'Action', 'Quantity', 'Reason'], actions.filter(a => ids.has(a.return_item_id)).map(a => row([`<code>${e(a.action_id)}</code>`, e(a.action), e(a.quantity), e(a.reason)])))}${header.refunded_at ? note(`Refund recorded: ${paymentLabel(header.refund_method)} · ${header.refund_reference || 'Cash'} · ${timestamp(header.refunded_at, ctx.store.time_zone)}`) : ''}`);
     },
     process: id => {
       const held = items.filter(i => i.return_id === id && Number(i.quarantined_quantity) > 0);

@@ -100,6 +100,7 @@ test('sale payload uses server prices and retains its request UUID after uncerta
   await page.getByRole('link', { name: 'Sales', exact: true }).click();
   await page.getByRole('button', { name: 'Record sale', exact: true }).click();
   const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Payment method', { exact: true }).selectOption({ label: 'Mobile Money' });
   await dialog.getByLabel('Product', { exact: true }).selectOption(ids.product);
   await dialog.getByLabel('Quantity', { exact: true }).fill('1');
   await dialog.getByRole('button', { name: 'Record sale', exact: true }).click();
@@ -112,6 +113,7 @@ test('sale payload uses server prices and retains its request UUID after uncerta
   expect(submissions[0].body).toEqual(submissions[1].body);
   expect(Object.keys(submissions[0].body).sort()).toEqual(['p_items', 'p_payment_method', 'p_request_id']);
   expect(submissions[0].body.p_items).toEqual([{ product_id: ids.product, quantity: 1 }]);
+  expect(submissions[0].body.p_payment_method).toEqual('mobile_money');
   expect(state.errors).toEqual([]);
 });
 

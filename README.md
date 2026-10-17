@@ -69,6 +69,8 @@ If a system Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_P
 
 Read [frontend implementation notes](docs/frontend-implementation.md) for prerequisites, feature mapping, and known integration boundaries.
 
+Mobile Money is available in the payment selectors. Apply the [required SQL patch](database/patches/20261017_mobile_money.sql) to the hosted backend before using it; see [Mobile Money setup](docs/mobile-money.md).
+
 Frontend integration documentation:
 
 - [Backend handoff](docs/backend-integration.md): authentication, permissions, reads, writes, errors, and retries.
