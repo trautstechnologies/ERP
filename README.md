@@ -6,6 +6,8 @@ This repository now includes the TRAUTS browser frontend adapted from the suppli
 
 Requires Node.js 22.12+ (Node 24 recommended).
 
+Open a terminal in the extracted folder that contains `package.json`, `index.html`, and `src/` together. GitHub ZIPs add a wrapper folder; do not run npm from the parent directory or from `reference/original/`. If npm reports `ENOENT ... package.json`, use `find . -name package.json -not -path "*/node_modules/*"` in Git Bash to locate the project root. The frontend package is named `trauts-erp`.
+
 ```bash
 npm ci
 cp .env.example .env
@@ -19,6 +21,8 @@ npm run dev
 
 Use the address printed by Vite. Do not open `index.html` directly from the filesystem. Never enter a service-role key in frontend configuration. Environment variables are compiled into the browser bundle; configure them before building and rebuild after changing them.
 
+**VS Code Live Server is not the development server for this project.** It cannot resolve the source's npm imports or Vite environment variables. If the page remains on Loading, stop Live Server, open VS Code's terminal in the project folder, run the commands above, and use Vite's Local address (normally port 5173 rather than Live Server's port 5500). The updated entrypoint displays startup guidance for file opens, failed module imports, and stalled startup. Do not overwrite an existing `.env` when updating your checkout.
+
 ```bash
 npm run build
 npm run preview
@@ -30,6 +34,7 @@ Deploy the generated `dist/` directory to a static host over HTTPS. Routing uses
 
 ```text
 index.html                    Application entry
+src/bootstrap.js              Dependency-free startup/error guidance
 src/main.js                   Session gate, shell, role-aware hash routing
 src/lib/client.js             Supabase configuration
 src/lib/api.js                Queries, pagination, RPC and Edge Function calls

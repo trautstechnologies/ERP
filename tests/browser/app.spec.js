@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 
 const ids = {
   manager: '22222222-2222-4222-8222-222222222222', worker: '33333333-3333-4333-8333-333333333333',
@@ -219,4 +220,25 @@ test('tracked purchase form sends batch sums inside the atomic purchase RPC', as
   const call = state.calls.find(c => c.path.endsWith('/rpc/receive_purchase'));
   expect(call.body.p_items).toEqual([{ product_id: ids.product, quantity: 2, unit_cost: 10, batches: [{ batch_number: 'BATCH-001', quantity: 2, expires_on: '2099-01-01' }] }]);
   expect(state.errors).toEqual([]);
+});
+
+test('missing startup execution shows guidance after the loading timeout', async ({ page }) => {
+  await page.clock.install();
+  await page.route('**/src/bootstrap.js', route => route.fulfill({ status: 200, contentType: 'text/javascript', body: '// Startup did not run.' }));
+  await page.goto('/');
+  await page.clock.fastForward(21000);
+  await expect(page.getByRole('heading', { name: 'TRAUTS could not finish starting' })).toBeVisible();
+  await expect(page.locator('pre')).toContainText('npm run dev');
+  await expect(page.getByText('Loading TRAUTS…', { exact: true })).toHaveCount(0);
+});
+
+test('unbundled Live Server imports show a startup error instead of endless loading', async ({ page }) => {
+  await page.route('**/src/main.js', async route => route.fulfill({
+    status: 200,
+    contentType: 'text/javascript',
+    body: await readFile(new URL('../../src/main.js', import.meta.url), 'utf8'),
+  }));
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'TRAUTS could not load its application modules' })).toBeVisible();
+  await expect(page.getByText(/not VS Code Live Server/)).toBeVisible();
 });

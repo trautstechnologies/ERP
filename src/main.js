@@ -1,7 +1,7 @@
 import './styles/original/dashboard.css';
 import './styles/app.css';
 import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu, RefreshCw } from 'lucide';
-import { configured, supabase } from './lib/client.js';
+import { configured, configurationError, supabase } from './lib/client.js';
 import { list, unwrap } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
 import { managerPages } from './lib/domain.js';
@@ -124,9 +124,10 @@ async function render() {
 async function enter() { shell(); await render(); }
 
 if (!configured) {
-  app.innerHTML = '<main class="auth-container"><section class="auth-card"><div class="brand"><div class="brand-icon">T</div><h1>TRAUTS</h1><p>SHOP MANAGER</p></div><h2>Connect your store</h2><p>Copy <code>.env.example</code> to <code>.env</code>, enter your Supabase URL and public anon key, then restart the development server.</p><p>Never use a service-role key in this application.</p></section></main>';
+  app.innerHTML = `<main class="auth-container"><section class="auth-card"><div class="brand"><div class="brand-icon">T</div><h1>TRAUTS</h1><p>SHOP MANAGER</p></div><h2>Connect your store</h2>${configurationError ? `<p role="alert">${e(configurationError)}</p>` : ''}<p>Copy <code>.env.example</code> to <code>.env</code>, enter your Supabase URL and public anon key, then restart the development server.</p><p>Never use a service-role key in this application.</p></section></main>`;
 } else {
   const session = await supabase.auth.getSession();
+  if (session.error) throw session.error;
   sessionUser = session.data.session?.user.id;
   if (sessionUser) { try { await loadIdentity(); await enter(); } catch (error) { login(error.message); } }
   else login();

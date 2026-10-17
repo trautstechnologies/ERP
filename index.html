@@ -7,7 +7,31 @@
   <title>TRAUTS | Shop Manager</title>
 </head>
 <body>
-  <div id="app"><p role="status">Loading TRAUTS…</p></div>
-  <script type="module" src="/src/main.js"></script>
+  <div id="app"><p role="status" data-startup>Loading TRAUTS…</p></div>
+  <script>
+    // This plain script also runs when ES modules cannot load from file://.
+    window.trautsStartupHelp = function (title, message) {
+      const app = document.getElementById('app');
+      if (!app || !app.querySelector('[data-startup]')) return;
+      const card = document.createElement('main');
+      card.style.cssText = 'max-width:620px;margin:10vh auto;padding:28px;font:15px/1.7 Arial,sans-serif;color:#172c4c;background:#fff;border:1px solid #e2e8f0;border-radius:16px';
+      const heading = document.createElement('h1'); heading.textContent = title;
+      const paragraph = document.createElement('p'); paragraph.textContent = message;
+      const code = document.createElement('pre'); code.textContent = 'npm ci\ncp .env.example .env\n# Edit .env with your Supabase URL and public anon key\nnpm run dev';
+      code.style.cssText = 'background:#edf3fa;padding:16px;overflow:auto;font-size:13px';
+      const advice = document.createElement('p'); advice.textContent = 'Open the Local address printed by Vite. For hosting, run npm run build and upload the entire dist folder, including assets.';
+      card.append(heading, paragraph, code, advice);
+      document.body.style.background = '#edf3fa';
+      app.replaceChildren(card);
+    };
+    if (location.protocol === 'file:') {
+      window.trautsStartupHelp('Start TRAUTS with its development server', 'This project uses Vite and JavaScript modules. Double-clicking index.html cannot start it. Open a terminal in the extracted project folder and run:');
+    } else {
+      window.setTimeout(function () {
+        window.trautsStartupHelp('TRAUTS could not finish starting', 'The application scripts did not load or session startup is taking too long. Use the Vite server rather than Live Server, check the browser console and network connection, and verify your Supabase configuration.');
+      }, 20000);
+    }
+  </script>
+  <script type="module" src="/src/bootstrap.js"></script>
 </body>
 </html>
