@@ -1,0 +1,144 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #edf3fa;
+  color: #172c4c;
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.brand-icon {
+  background: #173f8a;
+  color: white;
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 auto 12px;
+}
+
+.brand h1 {
+  font-size: 26px;
+}
+
+.brand p {
+  color: #64748b;
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-top: 5px;
+}
+
+.tabs {
+  display: flex;
+  background: #edf3fa;
+  padding: 5px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.tabs button {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  background: transparent;
+  font-weight: bold;
+  color: #64748b;
+}
+
+.tabs button.active {
+  background: white;
+  color: #173f8a;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #173f8a;
+}
+
+.hidden {
+  display: none;
+}
+
+.primary-btn {
+  width: 100%;
+  background: #173f8a;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #102f69;
+}
+
+#message {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+.footer {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 25px;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px;
+  }
+}

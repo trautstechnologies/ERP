@@ -1,0 +1,220 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #f3f6fb;
+  color: #172c4c;
+}
+
+.setup-shell {
+  max-width: 740px;
+  margin: 40px auto;
+  padding: 0 18px;
+}
+
+.setup-brand {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.setup-logo {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #173f8a;
+  color: white;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.setup-brand h1 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.setup-brand p,
+.setup-heading p,
+.setup-step > p {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.setup-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+}
+
+.setup-heading h2 {
+  margin: 0;
+  font-size: 23px;
+}
+
+.setup-progress {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.setup-progress span {
+  height: 6px;
+  flex: 1;
+  background: #e2e8f0;
+  border-radius: 20px;
+}
+
+.setup-progress span.active {
+  background: #173f8a;
+}
+
+.setup-step h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.business-types {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.business-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.business-option input {
+  position: absolute;
+  opacity: 0;
+}
+
+.business-option span {
+  display: block;
+  padding: 18px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.business-option input:checked + span {
+  border: 2px solid #173f8a;
+  background: #eff6ff;
+  color: #173f8a;
+}
+
+.business-option input:focus-visible + span {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.setup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.setup-field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.setup-field input,
+.setup-field textarea {
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.setup-field input:focus,
+.setup-field textarea:focus {
+  outline: 2px solid #93c5fd;
+}
+
+.setup-field input:disabled {
+  background: #f1f5f9;
+}
+
+.feature-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.feature-list label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.feature-list input {
+  accent-color: #173f8a;
+}
+
+.setup-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.setup-buttons button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #173f8a;
+  color: white;
+  margin-left: auto;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+#setupMessage {
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 550px) {
+  .setup-shell {
+    margin: 20px auto;
+  }
+
+  .setup-card {
+    padding: 20px;
+  }
+
+  .business-types {
+    grid-template-columns: 1fr;
+  }
+}

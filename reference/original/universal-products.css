@@ -1,0 +1,161 @@
+/* TRAUTS UNIVERSAL PRODUCT FORM */
+
+.universal-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.universal-modal[hidden],
+#universalVariantFields[hidden],
+#universalStockGroup[hidden],
+#universalThresholdGroup[hidden],
+#universalExpiryGroup[hidden],
+#universalVariantsGroup[hidden] {
+  display: none !important;
+}
+
+.universal-modal-card {
+  width: min(760px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 26px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+}
+
+.universal-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.universal-modal-header h2 {
+  margin: 0 0 6px;
+  color: #172c4c;
+}
+
+.universal-modal-header p,
+.universal-help,
+#universalVariantFields p {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.universal-close {
+  border: none;
+  background: #f1f5f9;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.universal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.universal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.universal-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.universal-field input,
+.universal-field select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.universal-field input:focus,
+.universal-field select:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.universal-variants {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.universal-variants > label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#universalVariantFields {
+  margin-top: 14px;
+}
+
+.universal-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.universal-form-actions button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.universal-form-actions button:first-child {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.universal-form-actions button:last-child {
+  background: #173f8a;
+  color: #fff;
+}
+
+#universalProductMessage {
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .universal-modal {
+    padding: 10px;
+  }
+
+  .universal-modal-card {
+    padding: 18px;
+    max-height: 95vh;
+  }
+
+  .universal-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

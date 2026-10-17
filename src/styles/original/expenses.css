@@ -1,0 +1,215 @@
+/* ========================================
+   TRAUTS EXPENSES MANAGEMENT
+   ======================================== */
+
+.exp-header,
+.exp-toolbar,
+.exp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.exp-header {
+  margin-bottom: 22px;
+}
+
+.exp-header h2 {
+  margin: 0 0 6px;
+  color: #102747;
+}
+
+.exp-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.exp-primary,
+.exp-secondary,
+.exp-danger {
+  padding: 11px 16px;
+  border-radius: 9px;
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.exp-primary {
+  background: #173f8a;
+  color: #fff;
+}
+
+.exp-primary:hover {
+  background: #102f6a;
+}
+
+.exp-secondary {
+  background: #e8eef8;
+  color: #173f8a;
+}
+
+.exp-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.exp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.exp-stat,
+.exp-panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  padding: 20px;
+}
+
+.exp-stat p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.exp-stat h2 {
+  margin: 0;
+  color: #102747;
+  font-size: 25px;
+}
+
+.exp-panel {
+  margin-bottom: 20px;
+}
+
+.exp-panel h3 {
+  color: #102747;
+  margin: 0 0 18px;
+}
+
+.exp-form,
+.exp-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.exp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.exp-field label {
+  color: #334155;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.exp-field input,
+.exp-field select,
+.exp-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
+  font: inherit;
+}
+
+.exp-field input:focus,
+.exp-field select:focus,
+.exp-field textarea:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.exp-full {
+  grid-column: 1 / -1;
+}
+
+.exp-table-wrap {
+  overflow-x: auto;
+}
+
+.exp-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+}
+
+.exp-table th,
+.exp-table td {
+  padding: 13px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+.exp-table th {
+  color: #64748b;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.exp-table td {
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.exp-row-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.exp-row-actions button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.exp-message {
+  margin: 12px 0;
+  font-weight: 600;
+}
+
+.exp-muted {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.exp-empty {
+  text-align: center !important;
+  color: #64748b !important;
+  padding: 28px !important;
+}
+
+#expensesPage[hidden],
+#expFormPanel[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .exp-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .exp-stats,
+  .exp-form,
+  .exp-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .exp-full {
+    grid-column: auto;
+  }
+}

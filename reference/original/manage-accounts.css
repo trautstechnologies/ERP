@@ -1,0 +1,155 @@
+/* TRAUTS ACCOUNT MANAGEMENT */
+
+.accounts-header,
+.accounts-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.accounts-header {
+  margin-bottom: 24px;
+}
+
+.accounts-header h2 {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  margin: 0;
+}
+
+.accounts-header p {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.account-primary,
+.account-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 17px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+
+.account-primary {
+  background: #173f8a;
+  color: white;
+}
+
+.account-primary:hover {
+  background: #102f69;
+}
+
+.account-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.account-primary svg {
+  width: 17px;
+  height: 17px;
+}
+
+.account-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.accounts-toolbar {
+  margin-bottom: 18px;
+}
+
+.accounts-toolbar input,
+.staff-form input,
+.staff-form select {
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+  color: #172c4c;
+}
+
+.accounts-toolbar input {
+  width: 240px;
+  max-width: 100%;
+}
+
+.staff-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  max-width: 480px;
+}
+
+.staff-form label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.status-badge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.staff-action {
+  border: none;
+  background: transparent;
+  color: #173f8a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.staff-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#accountsMessage {
+  font-size: 13px;
+  color: #475569;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .account-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .accounts-toolbar input {
+    width: 100%;
+  }
+}

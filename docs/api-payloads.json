@@ -1,0 +1,138 @@
+{
+  "_instructions": "Examples only. Replace angle-bracket placeholders. Generate each p_request_id once per intended action and retain its original payload. RPC paths are POST /rest/v1/rpc/<name>; create-worker uses POST /functions/v1/create-worker. All require the authenticated user's bearer token and the public project apikey. See backend-integration.md for authorization and retries.",
+  "rpc": {
+    "record_sale": {
+      "p_request_id": "<sale-request-uuid>",
+      "p_payment_method": "cash",
+      "p_items": [{"product_id": "<product-uuid>", "quantity": 1}]
+    },
+    "receive_purchase": {
+      "p_request_id": "<purchase-request-uuid>",
+      "p_supplier_id": "<supplier-uuid>",
+      "p_items": [{"product_id": "<untracked-product-uuid>", "quantity": 5, "unit_cost": 10}]
+    },
+    "reverse_sale": {
+      "p_sale_id": "<sale-uuid>",
+      "p_reason": "Sale entered in error"
+    },
+    "reverse_purchase": {
+      "p_purchase_id": "<purchase-uuid>",
+      "p_reason": "Purchase entered in error"
+    },
+    "adjust_stock": {
+      "p_request_id": "<adjustment-request-uuid>",
+      "p_product_id": "<untracked-product-uuid>",
+      "p_quantity_change": -1,
+      "p_reason": "Damaged item removed after stock count"
+    },
+    "set_reorder_level": {
+      "p_product_id": "<product-uuid>",
+      "p_reorder_level": 2
+    },
+    "set_store_time_zone": {"p_time_zone": "Africa/Lusaka"},
+    "enable_batch_tracking": {
+      "p_product_id": "<empty-untracked-product-uuid>",
+      "p_requires_expiry": true
+    },
+    "migrate_existing_stock_to_batches": {
+      "p_request_id": "<migration-request-uuid>",
+      "p_product_id": "<positive-stock-untracked-product-uuid>",
+      "p_requires_expiry": true,
+      "p_batches": [
+        {"batch_number": "EXISTING-001", "quantity": 2, "expires_on": "<future-YYYY-MM-DD>", "status": "available"},
+        {"batch_number": "EXISTING-002", "quantity": 3, "expires_on": "<future-YYYY-MM-DD>", "status": "available"}
+      ],
+      "p_reason": "Allocate exactly five existing units into verified batches"
+    },
+    "adjust_batch_stock": {
+      "p_request_id": "<batch-adjustment-request-uuid>",
+      "p_batch_id": "<batch-uuid>",
+      "p_quantity_change": -1,
+      "p_reason": "Damaged batch unit removed after inspection"
+    },
+    "set_batch_status": {
+      "p_batch_id": "<batch-uuid>",
+      "p_status": "quarantined",
+      "p_reason": "Hold pending inspection"
+    },
+    "get_sale_batches": {"p_sale_id": "<sale-uuid>"},
+    "record_customer_return": {
+      "p_request_id": "<return-request-uuid>",
+      "p_sale_id": "<completed-sale-uuid>",
+      "p_items": [{"sales_item_id": "<original-sales-item-uuid>", "quantity": 1, "disposition": "quarantine"}],
+      "p_reason": "Customer return awaiting inspection"
+    },
+    "process_return_quarantine": {
+      "p_request_id": "<quarantine-action-request-uuid>",
+      "p_return_item_id": "<return-item-uuid>",
+      "p_action": "dispose",
+      "p_quantity": 1,
+      "p_reason": "Returned unit unsuitable for resale",
+      "p_inspected": false
+    },
+    "mark_return_refunded": {
+      "p_return_id": "<active-pending-return-uuid>",
+      "p_method": "card",
+      "p_reference": "<reference-from-refund-already-performed>"
+    },
+    "void_customer_return": {
+      "p_return_id": "<untouched-unrefunded-quarantine-return-uuid>",
+      "p_reason": "Erroneous entry; no goods actually received"
+    }
+  },
+  "rpc_variants": {
+    "receive_purchase_with_batches": {
+      "function": "receive_purchase",
+      "body": {
+        "p_request_id": "<purchase-request-uuid>",
+        "p_supplier_id": "<supplier-uuid>",
+        "p_items": [{
+          "product_id": "<tracked-product-uuid>",
+          "quantity": 5,
+          "unit_cost": 10,
+          "batches": [
+            {"batch_number": "RECEIPT-001", "quantity": 2, "expires_on": "<earlier-future-YYYY-MM-DD>"},
+            {"batch_number": "RECEIPT-002", "quantity": 3, "expires_on": "<later-future-YYYY-MM-DD>"}
+          ]
+        }]
+      }
+    },
+    "return_from_original_batch": {
+      "function": "record_customer_return",
+      "body": {
+        "p_request_id": "<return-request-uuid>",
+        "p_sale_id": "<completed-sale-uuid>",
+        "p_items": [{"sales_item_id": "<original-sales-item-uuid>", "batch_id": "<original-sold-batch-uuid>", "quantity": 1, "disposition": "quarantine"}],
+        "p_reason": "Return from original batch"
+      }
+    },
+    "ordinary_retail_inspected_restock": {
+      "function": "record_customer_return",
+      "body": {
+        "p_request_id": "<return-request-uuid>",
+        "p_sale_id": "<completed-sale-uuid>",
+        "p_items": [{"sales_item_id": "<original-unbatched-sales-item-uuid>", "quantity": 1, "disposition": "restock", "inspected": true}],
+        "p_reason": "Inspected ordinary retail return approved for resale"
+      }
+    },
+    "ordinary_retail_quarantine_release": {
+      "function": "process_return_quarantine",
+      "body": {
+        "p_request_id": "<release-action-request-uuid>",
+        "p_return_item_id": "<eligible-held-return-item-uuid>",
+        "p_action": "release",
+        "p_quantity": 1,
+        "p_reason": "Inspected and approved for resale",
+        "p_inspected": true
+      }
+    }
+  },
+  "edge": {
+    "create-worker": {
+      "email": "worker@example.com",
+      "password": "<unique-password-at-least-12-characters>",
+      "user_name": "Example Worker",
+      "phone": null
+    }
+  }
+}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Business Setup | TRAUTS</title>
+
+  <link rel="stylesheet" href="business-setup.css">
+
+  <script src="business-setup.js" defer></script>
+</head>
+<body>
+
+<main class="setup-shell">
+
+  <div class="setup-brand">
+    <div class="setup-logo">T</div>
+    <h1>TRAUTS</h1>
+    <p>Business Management Made Simple</p>
+  </div>
+
+  <section class="setup-card">
+
+    <div class="setup-heading">
+      <h2>Set Up Your Business</h2>
+      <p>Customize TRAUTS for the way you work.</p>
+    </div>
+
+    <div class="setup-progress">
+      <span class="active"></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <form id="businessSetupForm">
+
+      <!-- STEP 1 -->
+      <section class="setup-step" data-step="1">
+        <h3>What type of business do you run?</h3>
+        <p>Select a starting template.</p>
+
+        <div class="business-types">
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="general" checked>
+            <span>General Retail</span>
+          </label>
+
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="grocery">
+            <span>Grocery & Food</span>
+          </label>
+
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="fashion">
+            <span>Fashion & Clothing</span>
+          </label>
+
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="hardware">
+            <span>Hardware</span>
+          </label>
+
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="electronics">
+            <span>Electronics</span>
+          </label>
+
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="beauty">
+            <span>Beauty & Cosmetics</span>
+          </label>
+
+          <label class="business-option">
+            <input type="radio" name="businessType"
+                   value="services">
+            <span>Services</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="setup-step" data-step="2" hidden>
+        <h3>Business Information</h3>
+
+        <div class="setup-field">
+          <label for="businessName">Business Name *</label>
+          <input id="businessName" maxlength="100"
+                 placeholder="e.g. TRAUTS Fashion"
+                 required>
+        </div>
+
+        <div class="setup-field">
+          <label for="businessPhone">Phone Number</label>
+          <input id="businessPhone" type="tel"
+                 maxlength="30"
+                 placeholder="+260...">
+        </div>
+
+        <div class="setup-field">
+          <label for="businessAddress">Address</label>
+          <textarea id="businessAddress" rows="3"
+                    maxlength="250"></textarea>
+        </div>
+
+        <div class="setup-field">
+          <label>Currency</label>
+          <input value="ZMW — Zambian Kwacha"
+                 disabled>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="setup-step" data-step="3" hidden>
+        <h3>Choose Your Features</h3>
+        <p>You can change these later in Settings.</p>
+
+        <div class="feature-list">
+          <label>
+            <input type="checkbox" name="features"
+                   value="inventory" checked>
+            Inventory Management
+          </label>
+
+          <label>
+            <input type="checkbox" name="features"
+                   value="pos" checked>
+            Point of Sale
+          </label>
+
+          <label>
+            <input type="checkbox" name="features"
+                   value="reports" checked>
+            Reports & Analytics
+          </label>
+
+          <label>
+            <input type="checkbox" name="features"
+                   value="customers">
+            Customer Management
+          </label>
+
+          <label>
+            <input type="checkbox" name="features"
+                   value="suppliers">
+            Supplier Management
+          </label>
+        </div>
+      </section>
+
+      <p id="setupMessage" role="status"></p>
+
+      <div class="setup-buttons">
+        <button type="button" id="setupBack"
+                class="btn-secondary" hidden>
+          Back
+        </button>
+
+        <button type="button" id="setupNext"
+                class="btn-primary">
+          Continue
+        </button>
+
+        <button type="submit" id="setupFinish"
+                class="btn-primary" hidden>
+          Finish Setup
+        </button>
+      </div>
+
+    </form>
+  </section>
+</main>
+
+</body>
+</html>

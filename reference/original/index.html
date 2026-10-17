@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>TRAUTS Shop Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <main class="auth-container">
+    <div class="auth-card">
+
+      <div class="brand">
+        <div class="brand-icon">
+            <img src="img/trauts-logo.jpg" alt="" width="70px" height="70px">
+        </div>
+        <h1>TRAUTS</h1>
+        <p>SHOP MANAGER</p>
+      </div>
+
+      <div class="tabs">
+        <button id="loginTab"
+                class="active" type="button">
+          Login
+        </button>
+        <button id="signupTab" type="button">
+          Sign Up
+        </button>
+      </div>
+
+      <form id="authForm">
+
+        <div id="nameGroup" class="form-group hidden">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName"
+                 autocomplete="name"
+                 placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required
+                 autocomplete="email"
+                 placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password"
+                 required minlength="8"
+                 autocomplete="current-password"
+                 placeholder="Enter your password">
+        </div>
+
+        <div id="confirmGroup"
+             class="form-group hidden">
+          <label for="confirmPassword">
+            Confirm Password
+          </label>
+          <input type="password"
+                 id="confirmPassword"
+                 autocomplete="new-password"
+                 placeholder="Confirm your password">
+        </div>
+
+        <button type="submit" id="submitBtn"
+                class="primary-btn">
+          Login
+        </button>
+
+        <p id="message" role="status"></p>
+
+      </form>
+
+      <p class="footer">
+        © Powered by Trauts technologies
+      </p>
+    </div>
+  </main>
+
+</body>
+</html>

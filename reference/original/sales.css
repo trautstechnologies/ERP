@@ -1,0 +1,283 @@
+/* TRAUTS POINT OF SALE */
+
+.pos-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pos-heading h2 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.pos-heading p {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.pos-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.pos-layout .panel {
+  min-width: 0;
+}
+
+.pos-products input,
+.pos-checkout input,
+.pos-checkout select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #172c4c;
+  font: inherit;
+  font-size: 13px;
+}
+
+#posSearch {
+  margin: 18px 0;
+}
+
+.pos-product-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pos-product {
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.pos-product h4 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.pos-product p {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.pos-primary,
+.pos-secondary {
+  padding: 11px 15px;
+  border-radius: 8px;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pos-primary {
+  background: #173f8a;
+  color: #fff;
+}
+
+.pos-secondary {
+  background: #e2e8f0;
+  color: #173f8a;
+}
+
+.pos-primary:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.pos-product button {
+  margin-top: 10px;
+}
+
+.pos-cart-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pos-cart-row strong {
+  font-size: 13px;
+}
+
+.pos-cart-row small {
+  color: #64748b;
+}
+
+.pos-quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pos-quantity button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.pos-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.pos-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pos-totals label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pos-grand-total {
+  padding: 14px 0;
+  border-top: 1px solid #e2e8f0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#completeSaleBtn {
+  width: 100%;
+}
+
+#posMessage {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.pos-history-panel {
+  margin-top: 20px;
+}
+
+#salesPage[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 850px) {
+  .pos-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .pos-product-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ==========================================
+   TRAUTS LOW STOCK / RESTOCK ALERTS
+   ========================================== */
+
+.trauts-stock-alerts {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.trauts-stock-alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.trauts-stock-alert-header h3 {
+  margin: 0 0 6px;
+  color: #102747;
+}
+
+.trauts-stock-alert-header p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+#posAlertCount {
+  background: #e8eef8;
+  color: #173f8a;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.trauts-stock-alert-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 13px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.trauts-stock-alert-row:last-child {
+  border-bottom: none;
+}
+
+.trauts-stock-alert-row strong {
+  display: block;
+  color: #102747;
+  margin-bottom: 5px;
+}
+
+.trauts-stock-alert-row small {
+  display: block;
+  color: #64748b;
+}
+
+.trauts-stock-status {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.trauts-stock-status.low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.trauts-stock-status.out {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.trauts-stock-good {
+  color: #166534;
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .trauts-stock-alert-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
