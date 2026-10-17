@@ -5,6 +5,7 @@ import { configured, configurationError, supabase } from './lib/client.js';
 import { list, unwrap } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
 import { managerPages } from './lib/domain.js';
+import { branding, mountBranding } from './lib/branding.js';
 import { overview, products, inventory } from './pages/catalog.js';
 import { sales, purchases, suppliers, expenses, accounts } from './pages/operations.js';
 import { batches, returns, audit } from './pages/stock.js';
@@ -50,7 +51,8 @@ async function loadIdentity() {
 function login(message = '') {
   generation++;
   closeDialog(); shellUser = null; profile = store = organization = null;
-  app.innerHTML = `<main class="auth-container"><section class="auth-card"><div class="brand"><div class="brand-icon">T</div><h1>TRAUTS</h1><p>SHOP MANAGER</p></div><h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><p class="auth-help">Need an account or password assistance? Contact your manager. Worker accounts are created by a manager.</p><p class="footer">© Powered by Trauts technologies</p></section></main>`;
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><p class="auth-help">Need an account or password assistance? Contact your manager. Worker accounts are created by a manager.</p><p class="footer">© Powered by Trauts technologies</p></section></main>`;
+  mountBranding(app);
   $('#loginForm').onsubmit = async event => {
     event.preventDefault();
     const form = event.target;
@@ -68,7 +70,8 @@ function login(message = '') {
 function shell() {
   shellUser = `${profile.user_id}:${profile.role}:${profile.store_id}`;
   const allowed = Object.entries(routes).filter(([key]) => profile.role === 'manager' || !managerPages.has(key));
-  app.innerHTML = `<div class="layout"><aside class="sidebar" id="trautsSidebar"><div class="sidebar-brand"><div class="brand-logo brand-mark">T</div><div><h2>TRAUTS</h2><p>SHOP MANAGER</p></div></div><div class="menu-label">MAIN MENU</div><nav class="sidebar-nav">${allowed.map(([key, [name, icon]]) => `<a class="nav" href="#/${key}" data-route="${key}"><i data-lucide="${icon}"></i><span>${name}</span></a>`).join('')}</nav><div class="sidebar-footer"><div class="user-profile"><div class="user-avatar">${e(profile.user_name?.slice(0, 1) || 'U')}</div><div class="user-info"><strong>${e(profile.user_name)}</strong><small>${e(profile.role === 'manager' ? 'Shop Manager' : 'Shopkeeper')}</small></div></div><button id="logoutBtn" class="logout"><i data-lucide="log-out"></i>Logout</button></div></aside><main class="main"><button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="trautsSidebar" aria-expanded="false"><i data-lucide="menu"></i>Menu</button><header class="app-header"><div><p class="eyebrow">${e(organization?.organization_name || 'YOUR BUSINESS')}</p><h1 id="pageTitle">Dashboard</h1><p>${e(store.store_name)} · ${e(store.time_zone)} · ${e(profile.role === 'manager' ? 'Manager workspace' : 'Shopkeeper workspace')}</p></div><button id="refreshPage" class="secondary-btn"><i data-lucide="refresh-cw"></i>Refresh</button></header><p id="appMessage" hidden></p><section id="pageContent" aria-live="polite"></section><footer class="page-footer">TRAUTS Shop Manager · ${e(store.store_name)}</footer></main></div>`;
+  app.innerHTML = `<div class="layout"><aside class="sidebar" id="trautsSidebar">${branding(true)}<div class="menu-label">MAIN MENU</div><nav class="sidebar-nav">${allowed.map(([key, [name, icon]]) => `<a class="nav" href="#/${key}" data-route="${key}"><i data-lucide="${icon}"></i><span>${name}</span></a>`).join('')}</nav><div class="sidebar-footer"><div class="user-profile"><div class="user-avatar">${e(profile.user_name?.slice(0, 1) || 'U')}</div><div class="user-info"><strong>${e(profile.user_name)}</strong><small>${e(profile.role === 'manager' ? 'Shop Manager' : 'Shopkeeper')}</small></div></div><button id="logoutBtn" class="logout"><i data-lucide="log-out"></i>Logout</button></div></aside><main class="main"><button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="trautsSidebar" aria-expanded="false"><i data-lucide="menu"></i>Menu</button><header class="app-header"><div><p class="eyebrow">${e(organization?.organization_name || 'YOUR BUSINESS')}</p><h1 id="pageTitle">Dashboard</h1><p>${e(store.store_name)} · ${e(store.time_zone)} · ${e(profile.role === 'manager' ? 'Manager workspace' : 'Shopkeeper workspace')}</p></div><button id="refreshPage" class="secondary-btn"><i data-lucide="refresh-cw"></i>Refresh</button></header><p id="appMessage" hidden></p><section id="pageContent" aria-live="polite"></section><footer class="page-footer">TRAUTS Shop Manager · ${e(store.store_name)}</footer></main></div>`;
+  mountBranding(app);
   $('#logoutBtn').onclick = async () => {
     $('#logoutBtn').disabled = true;
     const result = await supabase.auth.signOut();
@@ -124,7 +127,8 @@ async function render() {
 async function enter() { shell(); await render(); }
 
 if (!configured) {
-  app.innerHTML = `<main class="auth-container"><section class="auth-card"><div class="brand"><div class="brand-icon">T</div><h1>TRAUTS</h1><p>SHOP MANAGER</p></div><h2>Connect your store</h2>${configurationError ? `<p role="alert">${e(configurationError)}</p>` : ''}<p>Copy <code>.env.example</code> to <code>.env</code>, enter your Supabase URL and public anon key, then restart the development server.</p><p>Never use a service-role key in this application.</p></section></main>`;
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Connect your store</h2>${configurationError ? `<p role="alert">${e(configurationError)}</p>` : ''}<p>Copy <code>.env.example</code> to <code>.env</code>, enter your Supabase URL and public anon key, then restart the development server.</p><p>Never use a service-role key in this application.</p></section></main>`;
+  mountBranding(app);
 } else {
   const session = await supabase.auth.getSession();
   if (session.error) throw session.error;

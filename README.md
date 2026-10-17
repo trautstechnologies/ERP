@@ -54,7 +54,7 @@ tests/                        Domain tests and mocked browser integration tests
 docs/                         Backend contracts and frontend implementation notes
 ```
 
-The uploaded JPEG was binary text inside a text file and cannot be faithfully reconstructed. A text TRAUTS mark preserves the brand position and colors; replace it with a clean image asset if available. The original files are retained as reference and are not loaded as executable demo scripts or copied to `dist`.
+The original uploaded JPEG was binary text inside a text file and could not be faithfully reconstructed. Login, setup and sidebar branding now share the image path `public/branding/trauts-logo.jpg`; upload the clean original JPG there to activate it everywhere. Until that file exists, the text TRAUTS mark remains visible. See [logo upload instructions](docs/branding.md). The original files are retained as reference and are not loaded as executable demo scripts or copied to `dist`.
 
 ## Verify the frontend
 
