@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  NPM_FLAGS = "--include=dev"
+
+# Hash-based routing needs no SPA catch-all redirect. Missing JavaScript
+# assets must remain 404 responses, rather than return index.html as JS.

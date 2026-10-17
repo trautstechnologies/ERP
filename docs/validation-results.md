@@ -8,6 +8,7 @@ Validated in the cloud workspace on 16 October 2026, with startup regression che
 | Vite production build | Passed |
 | Domain tests | 6 passed |
 | Mocked browser integration tests | 11 passed |
+| Built-production startup with external fonts blocked | 1 passed |
 | JavaScript syntax checks | Passed |
 | Documentation relative links and payload JSON | Passed |
 | Startup without Supabase configuration | Setup instructions rendered; no runtime errors |
@@ -18,6 +19,8 @@ Validated in the cloud workspace on 16 October 2026, with startup regression che
 Browser cases cover every manager route, worker route restrictions, stable sale request payloads after a failed response, active-only pending refunds, worker creation payload/response handling, original-sale-item return creation, mobile navigation, scoped product creation without direct inventory writes, and tracked purchase batch payloads.
 
 Additional startup cases verify that raw/unbundled source imports produce Vite guidance and that missing startup execution replaces the loading message after a timeout. Direct file-URL navigation is blocked by the workspace browser's administrator policy, so the file-protocol-specific hint was not verified by a file navigation here. Development uses the HTTP Vite server.
+
+Production regression: the earlier active CSS imported Google Fonts, and a blocked font request caused the production CSS preload to reject before login rendered. Removing the external import fixed the reproduced failure. `npm run test:production` builds with fake public project configuration, serves `dist`, blocks external font hosts, and verifies successful styled login startup. This checks the built files, not the user's live Netlify deployment.
 
 The mocked API does not substitute for a deployed backend. Run the hosted acceptance checklist after configuring the real project. Expense cancellation remains disabled pending signature verification; the text-corrupted source logo is represented by a brand text mark. No remote database, deployment, or Git remote was modified by this frontend task.
 

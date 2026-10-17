@@ -30,6 +30,8 @@ npm run preview
 
 Deploy the generated `dist/` directory to a static host over HTTPS. Routing uses URL hashes, so no server-side route rewrite is required. Old `dashboard.html`, `shopkeeper.html`, and `business-setup.html` bookmarks redirect to the shared app. Workers and managers use the same login and receive different navigation based on their verified profile. There is no public signup or browser business-creation workflow.
 
+For Netlify, see [Netlify deployment instructions](docs/netlify-deployment.md). `netlify.toml` sets the build command, `dist` publish directory, and Node version for Git-connected builds. Manual uploads must contain an already-built `dist` folder, not the source ZIP.
+
 ## Folder structure
 
 ```text
@@ -60,6 +62,7 @@ The uploaded JPEG was binary text inside a text file and cannot be faithfully re
 npm test
 npx playwright install chromium
 npm run test:browser
+npm run test:production
 ```
 
 If a system Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its full path rather than downloading another browser. Browser tests use a mock Supabase API and fake accounts, never real credentials or payments. Follow the hosted-project acceptance checklist before using live data.

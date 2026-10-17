@@ -17,9 +17,16 @@
       card.style.cssText = 'max-width:620px;margin:10vh auto;padding:28px;font:15px/1.7 Arial,sans-serif;color:#172c4c;background:#fff;border:1px solid #e2e8f0;border-radius:16px';
       const heading = document.createElement('h1'); heading.textContent = title;
       const paragraph = document.createElement('p'); paragraph.textContent = message;
-      const code = document.createElement('pre'); code.textContent = 'npm ci\ncp .env.example .env\n# Edit .env with your Supabase URL and public anon key\nnpm run dev';
+      const deployed = '%MODE%' === 'production' && location.protocol !== 'file:';
+      const code = document.createElement('pre');
+      code.textContent = deployed
+        ? 'Netlify build command: npm run build\nPublish directory: dist\nBase directory: repository root (leave empty)\nDeploy the latest Git commit after correcting settings.'
+        : 'npm ci\ncp .env.example .env\n# Edit .env with your Supabase URL and public anon key\nnpm run dev';
       code.style.cssText = 'background:#edf3fa;padding:16px;overflow:auto;font-size:13px';
-      const advice = document.createElement('p'); advice.textContent = 'Open the Local address printed by Vite. For hosting, run npm run build and upload the entire dist folder, including assets.';
+      const advice = document.createElement('p');
+      advice.textContent = deployed
+        ? 'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in the build environment, then redeploy. The browser console and Network tab can identify missing assets or startup errors.'
+        : 'Open the Local address printed by Vite. For hosting, run npm run build and upload the entire dist folder, including assets.';
       card.append(heading, paragraph, code, advice);
       document.body.style.background = '#edf3fa';
       app.replaceChildren(card);
