@@ -1,6 +1,6 @@
 # TRAUTS Shop Manager — User Guide
 
-For store managers and ordinary workers. Updated 17 October 2026.
+For store managers and ordinary workers. Updated 18 October 2026.
 
 This guide describes the current app. Your account determines which pages and buttons you can use. Some actions also depend on the features your administrator has enabled.
 
@@ -38,7 +38,7 @@ A manager's access is limited to their own store. Being in the same organization
 ### Moving around
 
 - Use the left menu to open a page. On a phone, select **Menu** first.
-- Select **Refresh** at the top to reload the latest saved information.
+- Select the current page again in the menu to reload its saved information. Successful changes update the page automatically.
 - Use a page's search box to find records. Clear the search to show the full list again.
 - On small screens, swipe wide tables sideways to see columns and action buttons on the right.
 - Read the success or error message after saving. A button becoming available again does not, by itself, prove that a record was saved.
@@ -58,14 +58,14 @@ The Dashboard gives a quick view of activity. A worker sees their own completed 
 - **Active products:** products currently available in the catalog.
 - **Low-stock products:** manager alert count based on stock that can actually be sold.
 - **Products available:** the worker's count of products with sellable stock.
-- A sales chart for the last seven days.
+- A sales chart for the last seven days. Dates use labels such as **12 Oct** and **Today**, based on your store timezone.
 - Restock alerts for managers, or available inventory for workers.
 - A short list of recent sales.
 
 ### Actions
 
-- Select **Record sale** to open the Sales page.
-- Select **Refresh** to reload the figures.
+- Select **Record sale** to go straight to the sale form in Sales.
+- Select **Dashboard** in the menu again to reload the figures.
 - Open **Sales** for the full sales history. Open **Inventory** or **Reports** for more stock detail.
 
 The dashboard lists are summaries, not the complete history. Gross sales are not profit and are not the same as money left after expenses or refunds.
@@ -141,7 +141,7 @@ If any item is invalid or has insufficient sellable stock, the sale is rejected 
 
 ### Find a sale and inspect details
 
-Use the search box to find a sale ID, payment method or status. Select **Details** to see the saved ID, status, total, quantities, original unit prices and line totals. For a tracked product, the details also show the original batches used.
+Use the search box to find products, staff names, payment methods or status. Select **Details** to see the status, total, quantities, original unit prices and line totals. Technical references are available under **Support references**. For a tracked product, the details also show the original batches used.
 
 ### Cancel an entire sale — managers
 
@@ -233,7 +233,7 @@ All batch quantities for one product must add up exactly to that product's recei
 
 ### View or cancel a purchase
 
-- Use search to find a supplier, purchase ID or status.
+- Use search to find a supplier, product or status.
 - Select **Details** to see received items, quantities, unit costs and totals.
 - For an incorrect eligible purchase, select **Cancel purchase**, enter a reason and **Save**.
 
@@ -344,7 +344,7 @@ Use search or the **Show** list:
 - **Voided entries:** erroneous returns that were voided, retained for audit.
 - **All audit history:** active and voided returns together.
 
-Select **Details** to inspect original sale references, products, quantities, refund amounts, holding balances, original batch IDs and quarantine actions. Voided details show who voided the entry, when, and why. A recorded refund shows its method, reference and time.
+Select **Details** to inspect original sale references, products, quantities, refund amounts, holding balances, original batch numbers and quarantine actions. Voided details show who voided the entry, when, and why. A recorded refund shows its method, reference and time.
 
 ### Record a customer return
 
@@ -455,7 +455,7 @@ Audit History is a read-only record of stock and related actions. It helps expla
 
 1. Choose a **Record type**.
 2. Use the search box to find a product, reason or full action/request ID.
-3. Review quantities, references, reasons and the person/time recorded in the available columns.
+3. Review product names, batch numbers, quantities, reasons and the person/time recorded. Select **Details** for more information; expand **Support references** only when you need technical references.
 
 | Record type | Use it to review |
 | --- | --- |
@@ -470,7 +470,7 @@ You cannot edit, delete or directly export audit rows from this page. Use the Re
 
 ## 15. Settings — managers
 
-Settings displays the organization, store, store type, timezone, currency setting and your account details. The long store/user IDs are reference numbers for support, not passwords.
+Settings displays the organization, store, store type, timezone, currency setting and your account details. Expand **Support references** to find the store and account reference numbers when support needs them.
 
 ### Set the store timezone
 
@@ -517,7 +517,7 @@ Other displayed details are not editable through this screen. Ask the administra
 | What you see | What to do |
 | --- | --- |
 | Invalid login or inactive account | Recheck the credentials; ask the manager/administrator to confirm the account and store status |
-| Insufficient stock | Refresh and check sellable stock, not just physical stock; check held or expired batches |
+| Insufficient stock | Reopen Inventory and check sellable stock, not just physical stock; check held or expired batches |
 | Quantity precision error | Use whole numbers for whole units, or the allowed decimal precision for the product |
 | Duplicate SKU or variant | Search first; use the existing record or a genuinely different unique SKU/variant |
 | Missing batch/expiry details | Choose the real batch and complete the required dates and quantities |
@@ -531,9 +531,9 @@ Other displayed details are not editable through this screen. Ask the administra
 ### A save times out or its result is unclear
 
 1. Do not repeatedly submit a fresh transaction.
-2. Copy the **Request ID** shown on the form before closing it, if present.
+2. Expand **Support references** on the form and copy the **Request ID** before closing it, if present.
 3. Check the relevant sales, purchases, return or audit history for that ID and compare the items/quantities.
-4. Refresh the affected data. Ask the manager/administrator to investigate if you cannot confirm the result.
+4. Select the affected page again in the menu. Ask the manager/administrator to investigate if you cannot confirm the result.
 5. Only start a new action once the outcome is understood.
 
 Some forms keep the original entries locked after an uncertain response to prevent a changed retry from becoming a different transaction. A duplicate or state error on retry does not automatically mean the original action failed. Worker creation also needs an account check before another attempt.

@@ -1,7 +1,7 @@
 import { list, insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
-import { $, e, badge, short, timestamp, options, select, field, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
+import { $, e, badge, timestamp, dateLabel, supportDetails, options, select, field, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
 import { price, paymentLabel } from '../lib/domain.js';
-import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, payOptions, lineEditor, setupLines, parseLines, detailLines } from './shared.js';
+import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, payOptions, lineEditor, setupLines, parseLines, detailLines, itemSummary } from './shared.js';
 
 async function transactionDetails(ctx, sale, products, isPurchase = false) {
   const idField = isPurchase ? 'purchase_id' : 'sale_id';
@@ -9,27 +9,29 @@ async function transactionDetails(ctx, sale, products, isPurchase = false) {
     scoped(ctx, isPurchase ? 'purchase_items' : 'sales_items', { filters: { [idField]: sale[idField] } }),
     isPurchase ? [] : rpc('get_sale_batches', { p_sale_id: sale.sale_id }),
   ]);
-  dialog(isPurchase ? 'Purchase details' : 'Sale details', `<p><code>${e(sale[idField])}</code></p><p>${badge(sale.status)} · ${e(ctx.money(sale.total_amount ?? sale.purchase_total_amount))}</p>${detailLines('Items', items, products, ctx, isPurchase ? 'unit_cost' : 'unit_price')}${allocations.length ? `<h3>Original sale batch allocation</h3>${table(['Product', 'Batch', 'Expiry', 'Quantity'], allocations.map(a => row([e(nameOf(products, a.product_id)), e(a.batch_number), e(a.expires_on || 'No expiry'), e(a.quantity)])))}` : ''}${note('For an uncertain request, compare the original request ID and item quantities with this record before creating another transaction.')}`);
+  dialog(isPurchase ? 'Purchase details' : 'Sale details', `<p>${e(timestamp(sale.purchase_date || sale.sale_date, ctx.store.time_zone))}</p><p>${badge(sale.status)} · ${e(ctx.money(sale.total_amount ?? sale.purchase_total_amount))}</p>${detailLines('Items', items, products, ctx, isPurchase ? 'unit_cost' : 'unit_price')}${allocations.length ? `<h3>Original sale batch allocation</h3>${table(['Product', 'Batch', 'Expiry', 'Quantity'], allocations.map(a => row([e(nameOf(products, a.product_id)), e(a.batch_number), e(a.expires_on ? dateLabel(a.expires_on) : 'No expiry'), e(a.quantity)])))}` : ''}${supportDetails({ [isPurchase ? 'Purchase reference' : 'Sale reference']: sale[idField] })}`);
 }
 
 export async function sales(ctx) {
-  const [data, products, units] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), list('selling_units')]);
-  const render = search => table(['Sale / request ID', 'Date', 'Payment', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).filter(s => matches({ ...s, payment_label: paymentLabel(s.payment_method) }, search)).map(s => row([
-    `<code>${e(s.sale_id)}</code>`, e(timestamp(s.sale_date, ctx.store.time_zone)), e(paymentLabel(s.payment_method)), badge(s.status), e(ctx.money(s.total_amount)), `<div class="actions">${button('Details', 'details', s.sale_id)}${ctx.manager && s.status === 'completed' ? button('Cancel sale', 'reverse', s.sale_id) : ''}</div>`,
+  const [data, products, units, saleItems, staff] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), list('selling_units'), scoped(ctx, 'sales_items'), ctx.manager ? scoped(ctx, 'profiles') : [ctx.profile]]);
+  const render = search => table(['Items sold', 'Recorded by', 'Date', 'Payment', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).filter(s => matches({ ...s, items: itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products), staff: nameOf(staff, s.user_id, 'user_id', 'user_name'), payment_label: paymentLabel(s.payment_method) }, search)).map(s => row([
+    e(itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products)), e(nameOf(staff, s.user_id, 'user_id', 'user_name')), e(timestamp(s.sale_date, ctx.store.time_zone)), e(paymentLabel(s.payment_method)), badge(s.status), e(ctx.money(s.total_amount)), `<div class="actions">${button('Details', 'details', s.sale_id)}${ctx.manager && s.status === 'completed' ? button('Cancel sale', 'reverse', s.sale_id) : ''}</div>`,
   ])));
   const root = ctx.mount(`${heading('Sales', ctx.manager ? 'Store sales, original item history and cancellations' : 'Record a sale and review your transactions', button('Record sale', 'add', '', false))}${panel('Sales history', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
-  searchable(root, render, { placeholder: 'Search sale UUID, payment or status…' });
+  searchable(root, render, { placeholder: 'Search products, staff, payment or status…' });
+  const openSale = () => {
+    const modal = actionForm('Record sale', select('Payment method', 'payment_method', payOptions()) + lineEditor(products, units), async (values, id) => {
+      await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products, units) });
+    }, ctx, { mutation: true, label: 'Record sale' });
+    setupLines(modal, products, units);
+  };
   bind(root, {
-    add: () => {
-      const modal = actionForm('Record sale', select('Payment method', 'payment_method', payOptions()) + lineEditor(products, units), async (values, id) => {
-        await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products, units) });
-      }, ctx, { mutation: true, label: 'Record sale' });
-      setupLines(modal, products, units);
-    },
+    add: openSale,
     details: id => transactionDetails(ctx, data.find(s => s.sale_id === id), products),
     reverse: id => actionForm('Cancel entire sale', note('This reverses the full sale and its original stock allocation. Active customer returns block cancellation. No money is transferred.') + reason(), values => rpc('reverse_sale', { p_sale_id: id, p_reason: values.reason }), ctx),
   });
+  if (ctx.intent === 'new-sale') openSale();
 }
 
 export async function suppliers(ctx) {
@@ -62,9 +64,9 @@ export async function suppliers(ctx) {
 }
 
 export async function purchases(ctx) {
-  const [data, suppliers, products, units] = await Promise.all([scoped(ctx, 'purchases'), scoped(ctx, 'suppliers'), scoped(ctx, 'products'), list('selling_units')]);
-  const render = search => table(['Purchase / request ID', 'Supplier', 'Date', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.purchase_date.localeCompare(a.purchase_date)).filter(p => matches({ ...p, supplier: nameOf(suppliers, p.supplier_id, 'supplier_id', 'supplier_name') }, search)).map(p => row([
-    `<code>${e(p.purchase_id)}</code>`, e(nameOf(suppliers, p.supplier_id, 'supplier_id', 'supplier_name')), e(timestamp(p.purchase_date, ctx.store.time_zone)), badge(p.status), e(ctx.money(p.purchase_total_amount)), `<div class="actions">${button('Details', 'details', p.purchase_id)}${p.status === 'received' ? button('Cancel purchase', 'reverse', p.purchase_id) : ''}</div>`,
+  const [data, suppliers, products, units, purchaseItems] = await Promise.all([scoped(ctx, 'purchases'), scoped(ctx, 'suppliers'), scoped(ctx, 'products'), list('selling_units'), scoped(ctx, 'purchase_items')]);
+  const render = search => table(['Items received', 'Supplier', 'Date', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.purchase_date.localeCompare(a.purchase_date)).filter(p => matches({ ...p, items: itemSummary(purchaseItems.filter(i => i.purchase_id === p.purchase_id), products), supplier: nameOf(suppliers, p.supplier_id, 'supplier_id', 'supplier_name') }, search)).map(p => row([
+    e(itemSummary(purchaseItems.filter(i => i.purchase_id === p.purchase_id), products)), e(nameOf(suppliers, p.supplier_id, 'supplier_id', 'supplier_name')), e(timestamp(p.purchase_date, ctx.store.time_zone)), badge(p.status), e(ctx.money(p.purchase_total_amount)), `<div class="actions">${button('Details', 'details', p.purchase_id)}${p.status === 'received' ? button('Cancel purchase', 'reverse', p.purchase_id) : ''}</div>`,
   ])));
   const root = ctx.mount(`${heading('Purchases', 'Receive supplier stock atomically, including batch allocations.', button('Receive purchase', 'add', '', false))}${panel('Purchase history', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
@@ -82,8 +84,8 @@ export async function purchases(ctx) {
 export async function expenses(ctx) {
   const data = await scoped(ctx, 'expenses');
   const enabled = import.meta.env.VITE_ENABLE_EXPENSE_CANCELLATION === 'true';
-  const render = search => table(['Expense ID', 'Date', 'Category', 'Description', 'Payment', 'Amount', 'Status', ...(enabled ? ['Actions'] : [])], data.filter(x => matches({ ...x, payment_label: paymentLabel(x.payment_method) }, search)).map(x => row([
-    `<code>${e(x.expense_id)}</code>`, e(timestamp(x.expense_date, ctx.store.time_zone)), e(x.category), e(x.description), e(paymentLabel(x.payment_method)), e(ctx.money(x.amount)), badge(x.status), ...(enabled ? [x.status === 'recorded' ? button('Cancel', 'cancel', x.expense_id) : '—'] : []),
+  const render = search => table(['Date', 'Category', 'Description', 'Payment', 'Amount', 'Status', ...(enabled ? ['Actions'] : [])], data.filter(x => matches({ ...x, payment_label: paymentLabel(x.payment_method) }, search)).map(x => row([
+    e(timestamp(x.expense_date, ctx.store.time_zone)), e(x.category), e(x.description), e(paymentLabel(x.payment_method)), e(ctx.money(x.amount)), badge(x.status), ...(enabled ? [x.status === 'recorded' ? button('Cancel', 'cancel', x.expense_id) : '—'] : []),
   ])));
   const root = ctx.mount(`${heading('Expenses', 'Record store expenses and preserve transaction history.', button('Record expense', 'add', '', false))}${!enabled ? note('Expense cancellation is unavailable until the deployed cancellation RPC signature has been verified. Recorded expenses cannot be deleted here.') : ''}${panel('Expenses', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
@@ -100,7 +102,7 @@ export async function expenses(ctx) {
 
 export async function accounts(ctx) {
   const data = await scoped(ctx, 'profiles');
-  const render = search => table(['Name', 'User ID', 'Phone', 'Role', 'Status', 'Actions'], data.filter(p => matches(p, search)).map(p => row([e(p.user_name), `<code>${e(p.user_id)}</code>`, e(p.phone || '—'), e(p.role === 'user' ? 'Worker' : 'Manager'), badge(p.status), p.role === 'user' ? button('Edit worker', 'edit', p.user_id) : 'Administrative account'])));
+  const render = search => table(['Name', 'Phone', 'Role', 'Status', 'Actions'], data.filter(p => matches(p, search)).map(p => row([e(p.user_name), e(p.phone || '—'), e(p.role === 'user' ? 'Worker' : 'Manager'), badge(p.status), p.role === 'user' ? button('Edit worker', 'edit', p.user_id) : 'Administrative account'])));
   const root = ctx.mount(`${heading('Manage accounts', 'Create workers in this store and manage their active status.', button('Create worker', 'add', '', false))}${note('Login emails are held by Supabase Auth, not the profiles table. This page never invents an email or allows store/role reassignment.')}${panel('Store team', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
   searchable(root, render);
@@ -115,7 +117,7 @@ export async function accounts(ctx) {
         if (submitted) throw new Error('This account creation was already submitted. Check the Auth account before opening a new request.');
         await ctx.guard(); submitted = true;
         const result = await createWorker({ email: values.email.trim(), password: values.password, user_name: values.user_name.trim(), phone: values.phone.trim() || null });
-        await ctx.refresh(); notify(`Worker created. UUID: ${result.user_id}. Immediate login is available.`);
+        await ctx.refresh(); notify(`${result.user_name || values.user_name} was created successfully. Immediate login is available.`);
       }, { submitLabel: 'Create worker' });
     },
   });

@@ -73,12 +73,14 @@ test('manager shell preserves navy/blue structure and loads every module without
   const backendState = await backend(page);
   await login(page);
   await expect(page.locator('.sidebar')).toHaveCSS('background-color', 'rgb(20, 45, 89)');
+  await expect(page.getByRole('button', { name: 'Refresh', exact: true })).toHaveCount(0);
   await page.screenshot({ path: test.info().outputPath('desktop-dashboard.png'), fullPage: true });
   for (const name of ['Products', 'Sales', 'Inventory', 'Suppliers', 'Purchases', 'Expenses', 'Operating Summary', 'Manage Accounts', 'Reports', 'Batches & Expiry', 'Returns & Refunds', 'Audit History', 'Settings']) {
     await page.getByRole('link', { name, exact: true }).click();
     await expect(page.locator('#pageTitle')).toHaveText(name);
     await expect(page.getByText('Unable to load this page')).toHaveCount(0);
     await expect(page.locator('.loading')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Refresh', exact: true })).toHaveCount(0);
   }
   expect(backendState.errors).toEqual([]);
 });
@@ -126,10 +128,10 @@ test('voided pending returns stay out of the active refund queue and require aud
   await login(page);
   await page.getByRole('link', { name: 'Returns & Refunds', exact: true }).click();
   await page.getByLabel('Show', { exact: true }).selectOption('pending');
-  await expect(page.locator('[data-table]')).toContainText('active-return');
-  await expect(page.locator('[data-table]')).not.toContainText('voided-return');
+  await expect(page.locator('[data-table]')).toContainText('Active return');
+  await expect(page.locator('[data-table]')).not.toContainText('Voided return');
   await page.getByLabel('Show', { exact: true }).selectOption('voided');
-  await expect(page.locator('[data-table]')).toContainText('voided-return');
+  await expect(page.locator('[data-table]')).toContainText('Voided return');
   await expect(page.getByRole('button', { name: 'Record refund' })).toHaveCount(0);
 });
 
@@ -235,7 +237,7 @@ test('missing startup execution shows guidance after the loading timeout', async
 });
 
 test('unbundled Live Server imports show a startup error instead of endless loading', async ({ page }) => {
-  await page.route('**/src/main.js', async route => route.fulfill({
+  await page.route(/\/src\/main\.js(?:\?.*)?$/, async route => route.fulfill({
     status: 200,
     contentType: 'text/javascript',
     body: await readFile(new URL('../../src/main.js', import.meta.url), 'utf8'),
@@ -243,4 +245,103 @@ test('unbundled Live Server imports show a startup error instead of endless load
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'TRAUTS could not load its application modules' })).toBeVisible();
   await expect(page.getByText(/not VS Code Live Server/)).toBeVisible();
+});
+
+for (const role of ['manager', 'worker']) {
+  test(`dashboard sale shortcut opens one form and consumes its intent for ${role}`, async ({ page }) => {
+    const state = await backend(page, { role });
+    await login(page, role);
+    await page.getByRole('link', { name: 'Record sale', exact: true }).click();
+    await expect(page.locator('#pageTitle')).toHaveText('Sales');
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog').getByLabel('Product', { exact: true })).toBeVisible();
+    await expect(page).toHaveURL(/#\/sales$/);
+    expect(state.calls.some(c => c.path.endsWith('/rpc/record_sale'))).toBe(false);
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click();
+    await page.getByRole('link', { name: 'Sales', exact: true }).click();
+    await expect(page.locator('.loading')).toHaveCount(0);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    expect(state.errors).toEqual([]);
+  });
+}
+
+test('dashboard chart dates use month names and the store business date', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-10-17T23:30:00Z') });
+  await backend(page);
+  await login(page);
+  const labels = await page.locator('.chart-column > span').allTextContents();
+  expect(labels).toEqual(['12 Oct', '13 Oct', '14 Oct', '15 Oct', '16 Oct', '17 Oct', 'Today']);
+  await expect(page.locator('.chart-column').last()).toHaveAttribute('title', /^Sunday, 18 October 2026:/);
+});
+
+test('transaction tables and selectors use product summaries while backend references remain correct', async ({ page }) => {
+  const state = await backend(page);
+  const supplier = '77777777-7777-4777-8777-777777777777';
+  const purchase = '88888888-8888-4888-8888-888888888888';
+  const expense = '99999999-9999-4999-8999-999999999999';
+  state.data.suppliers = [{ supplier_id: supplier, store_id: ids.store, supplier_name: 'Retail Supplier', active: true }];
+  state.data.purchases = [{ purchase_id: purchase, store_id: ids.store, supplier_id: supplier, purchase_date: '2026-10-16T09:00:00Z', status: 'received', purchase_total_amount: 20 }];
+  state.data.purchase_items = [{ purchase_item_id: 'purchase-line', store_id: ids.store, purchase_id: purchase, product_id: ids.product, quantity: 2, unit_cost: 10, line_total: 20 }];
+  state.data.expenses = [{ expense_id: expense, store_id: ids.store, expense_date: '2026-10-16T10:00:00Z', category: 'Transport', description: 'Supplier delivery', amount: 10, payment_method: 'cash', status: 'recorded' }];
+  await login(page);
+  for (const name of ['Sales', 'Purchases', 'Expenses', 'Manage Accounts']) {
+    await page.getByRole('link', { name, exact: true }).click();
+    await expect(page.locator('#pageTitle')).toHaveText(name);
+    await expect(page.locator('[data-table] table')).toBeVisible();
+    expect(await page.locator('table').innerText()).not.toMatch(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
+    expect(await page.locator('thead').innerText()).not.toMatch(/\bID\b|request/i);
+  }
+  await page.getByRole('link', { name: 'Sales', exact: true }).click();
+  await expect(page.locator('#pageTitle')).toHaveText('Sales');
+  await expect(page.locator('[data-table] tbody')).toContainText('Test Product × 3');
+  await expect(page.locator('tbody')).toContainText('Jane Manager');
+  await page.getByRole('button', { name: 'Details', exact: true }).click();
+  expect(await page.getByRole('dialog').innerText()).not.toContain(ids.sale);
+  await page.getByRole('dialog').getByText('Support references', { exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText(ids.sale);
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).first().click();
+  await page.getByRole('link', { name: 'Returns & Refunds', exact: true }).click();
+  await page.getByRole('button', { name: 'Record return', exact: true }).click();
+  const selector = page.getByRole('dialog').getByLabel('Original completed sale');
+  expect((await selector.locator('option').allTextContents()).join(' ')).not.toContain(ids.sale);
+  await expect(selector).toContainText('Test Product × 3');
+  await selector.selectOption(ids.sale);
+  await page.getByRole('dialog').getByLabel('Original sale item').selectOption(ids.item);
+  await page.getByRole('dialog').getByLabel('Return quantity').fill('1');
+  await page.getByRole('dialog').getByLabel('Reason', { exact: true }).fill('Item returned');
+  await page.getByRole('dialog').getByRole('button', { name: 'Record return', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  expect(state.calls.find(c => c.path.endsWith('/rpc/record_customer_return')).body.p_sale_id).toBe(ids.sale);
+});
+
+test('audit resolves staff and batches and low-stock reports omit IDs from display and CSV', async ({ page }) => {
+  const state = await backend(page);
+  const movement = '77777777-7777-4777-8777-777777777777';
+  const batch = '88888888-8888-4888-8888-888888888888';
+  state.data.stock_movements = [{ stock_movement_id: movement, store_id: ids.store, product_id: ids.product, created_by: ids.manager, created_at: '2026-10-16T09:00:00Z', movement_type: 'sale', quantity_change: -1, sales_item_id: ids.item }];
+  state.data.product_batches = [{ batch_id: batch, store_id: ids.store, product_id: ids.product, batch_number: 'BATCH-A', quantity: 4, status: 'available', expires_on: '2027-10-01' }];
+  state.data.stock_movement_batches = [{ allocation_id: 'allocation', store_id: ids.store, product_id: ids.product, stock_movement_id: movement, batch_id: batch, quantity_change: -1 }];
+  state.data.low_stock_report = [{ store_id: ids.store, product_id: ids.product, sku: 'TEST-001', product_name: 'Test Product', quantity: 1, reorder_level: 2, inventory_not_initialized: false }];
+  await login(page);
+  await page.getByRole('link', { name: 'Audit History', exact: true }).click();
+  await expect(page.getByLabel('Record type', { exact: true })).toBeVisible();
+  await expect(page.locator('tbody')).toContainText('Jane Manager');
+  await expect(page.locator('tbody')).toContainText('Test Product');
+  await page.getByLabel('Record type', { exact: true }).selectOption('Batch allocations');
+  await expect(page.locator('tbody')).toContainText('BATCH-A');
+  expect(await page.locator('table').innerText()).not.toContain(batch);
+  expect(await page.locator('thead').innerText()).not.toMatch(/_id|\bID\b/);
+  await page.getByRole('link', { name: 'Reports', exact: true }).click();
+  await page.getByLabel('Report', { exact: true }).selectOption('Low stock');
+  await page.getByRole('button', { name: 'Apply filters', exact: true }).click();
+  await expect(page.locator('[data-report]')).toContainText('Test Product');
+  expect(await page.locator('[data-report]').innerText()).not.toContain(ids.product);
+  const pending = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export CSV', exact: true }).click();
+  const download = await pending;
+  const content = await readFile(await download.path(), 'utf8');
+  expect(content).toContain('"Product"');
+  expect(content).not.toContain('product_id');
+  expect(content).not.toContain(ids.product);
+  expect(state.errors).toEqual([]);
 });

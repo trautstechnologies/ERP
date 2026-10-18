@@ -1,13 +1,13 @@
 # Frontend validation results
 
-Validated in the cloud workspace on 16 October 2026, with startup regression checks added on 17 October 2026, using Node 24, npm, and the installed Chromium.
+Validated in the cloud workspace on 16 October 2026, with startup regression checks added on 17 October 2026 and usability checks on 18 October 2026, using Node 24, npm, and the installed Chromium.
 
 | Check | Result |
 | --- | --- |
 | Frozen-lockfile install (`npm ci`, writable npm cache) | Passed |
 | Vite production build | Passed |
 | Domain tests | 6 passed |
-| Mocked browser integration tests | 11 passed |
+| Mocked browser integration tests | 16 passed |
 | Built-production startup with external fonts blocked | 1 passed |
 | JavaScript syntax checks | Passed |
 | Documentation relative links and payload JSON | Passed |
@@ -25,3 +25,5 @@ Production regression: the earlier active CSS imported Google Fonts, and a block
 The mocked API does not substitute for a deployed backend. Run the hosted acceptance checklist after configuring the real project. Expense cancellation remains disabled pending signature verification; the text-corrupted source logo is represented by a brand text mark. No remote database, deployment, or Git remote was modified by this frontend task.
 
 The browser download host returned a network denial; the already-installed Chromium was used successfully instead. Package installation uses `/tmp/erp-npm-cache` in this cloud environment because the default home cache is not writable. Standard local development may use npm's default cache.
+
+Usability checks on 18 October verify readable transaction and audit tables, hidden support references, product-based return selection with correct UUID payloads, readable report CSV exports, removal of Refresh controls, direct dashboard sale forms for both roles, and chart dates in the store timezone. Domain tests (6), browser tests (16), and built-production startup (1) passed. These checks use mocked APIs; live Supabase was not tested.

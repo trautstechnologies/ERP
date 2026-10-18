@@ -13,6 +13,17 @@ export function money(value, currency) {
 export function timestamp(value, zone) {
   return value ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: zone || 'Africa/Lusaka' }).format(new Date(value)) : '—';
 }
+export function dateLabel(value, style = 'medium') {
+  if (!value) return '—';
+  const date = new Date(`${String(value).slice(0, 10)}T12:00:00Z`);
+  if (!Number.isFinite(date.getTime())) return 'Date unavailable';
+  const options = style === 'short' ? { day: 'numeric', month: 'short' } : { dateStyle: style };
+  return new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'UTC' }).format(date);
+}
+export function supportDetails(references) {
+  const entries = Object.entries(references).filter(([, value]) => value);
+  return entries.length ? `<details class="support-details"><summary>Support references</summary><dl>${entries.map(([label, value]) => `<dt>${e(label)}</dt><dd><code>${e(value)}</code></dd>`).join('')}</dl></details>` : '';
+}
 export const options = (rows, value, label, selected = '', empty = 'Select…') =>
   `<option value="">${e(empty)}</option>` + rows.map(row => `<option value="${e(row[value])}" ${String(row[value]) === String(selected) ? 'selected' : ''}>${e(typeof label === 'function' ? label(row) : row[label])}</option>`).join('');
 
@@ -107,7 +118,7 @@ export function actionForm(title, content, submit, context, { mutation = false, 
     try { await context.refresh(); notify('Saved. Data refreshed.'); }
     catch { notify('Saved, but the page could not refresh. Refresh before starting another action.', true); }
   }, { submitLabel: label });
-  if (mutation) $('.dialog-body', node).insertAdjacentHTML('beforeend', `<p class="request-id">Request ID: <code>${e(id)}</code>. After a failed request, this form retains its original values. Review transaction history before starting a new request.</p>`);
+  if (mutation) $('.dialog-body', node).insertAdjacentHTML('beforeend', supportDetails({ 'Request ID': id }) + '<p class="request-id">If a save is uncertain, check the history before starting another request. Your original entries are retained for retry.</p>');
   return node;
 }
 

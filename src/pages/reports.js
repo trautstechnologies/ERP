@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { list, rpc } from '../lib/api.js';
-import { $, e, options, select, field, button, table, row, panel, stat, note, actionForm, exportCsv, notify } from '../lib/ui.js';
+import { $, e, options, select, field, button, table, row, panel, stat, note, actionForm, exportCsv, notify, dateLabel, supportDetails } from '../lib/ui.js';
 import { businessDate } from '../lib/domain.js';
 import { scoped, heading, bind } from './shared.js';
 
@@ -8,6 +8,14 @@ const reportTypes = {
   'Net sales': 'daily_net_sales_report', 'Gross sales': 'daily_sales_report',
   'Return entitlements': 'daily_return_report', 'Recorded refund payments': 'daily_refund_report',
   'Expenses': 'daily_expense_report', 'Low stock': 'low_stock_report',
+};
+const reportLabels = {
+  report_date: 'Date', sale_count: 'Sales', sales_total: 'Gross sales',
+  return_count: 'Returns', return_total: 'Return amount', refund_count: 'Refunds',
+  refund_total: 'Refund payments', expense_count: 'Expenses', expense_total: 'Expense amount',
+  category: 'Category', gross_sales: 'Gross sales', returns_total: 'Return amount', net_sales: 'Net sales',
+  product_name: 'Product', sku: 'SKU', quantity: 'Sellable stock', reorder_level: 'Reorder level',
+  inventory_not_initialized: 'Stock set up',
 };
 
 export async function reports(ctx) {
@@ -23,8 +31,12 @@ export async function reports(ctx) {
     if (request !== version || !root.isConnected) return;
     currentName = values.report;
     current = data.filter(r => !r.report_date || r.report_date >= values.start && r.report_date <= values.end);
-    const columns = [...new Set(current.flatMap(Object.keys))].filter(k => k !== 'store_id');
-    $('[data-report]', root).innerHTML = current.length ? table(columns.map(c => c.replaceAll('_', ' ')), current.map(r => row(columns.map(k => e(r[k]))))) : '<p class="empty">No report rows for this selection.</p>';
+    const columns = [...new Set(current.flatMap(Object.keys))].filter(k => !k.endsWith('_id') && k !== 'id');
+    const display = (record, key) => key === 'report_date' ? dateLabel(record[key])
+      : key === 'inventory_not_initialized' ? (record[key] ? 'No' : 'Yes')
+        : /(?:total|sales)$/.test(key) ? ctx.money(record[key]) : record[key];
+    $('[data-report]', root).innerHTML = current.length ? table(columns.map(c => reportLabels[c] || c.replaceAll('_', ' ')), current.map(r => row(columns.map(k => e(display(r, k)))))) : '<p class="empty">No report rows for this selection.</p>';
+    current = current.map(record => Object.fromEntries(columns.map(key => [reportLabels[key] || key.replaceAll('_', ' '), key === 'report_date' ? dateLabel(record[key]) : key === 'inventory_not_initialized' ? (record[key] ? 'No' : 'Yes') : record[key]])));
   };
   $('[data-filter-form]', root).onsubmit = async event => { event.preventDefault(); try { await load(); } catch (error) { notify(error.message, true); } };
   bind(root, { export: () => exportCsv(currentName.toLowerCase().replaceAll(' ', '-'), current) });
@@ -49,7 +61,7 @@ export async function summary(ctx) {
 }
 
 export async function settings(ctx) {
-  const root = ctx.mount(`${heading('Store settings', 'Your assigned business, store and operational timezone.', button('Set timezone', 'timezone', '', false))}<div class="grid-two">${panel('Business details', `<dl><dt>Organization</dt><dd>${e(ctx.organization?.organization_name || '—')}</dd><dt>Store</dt><dd>${e(ctx.store.store_name)}</dd><dt>Store ID</dt><dd><code>${e(ctx.store.store_id)}</code></dd><dt>Store type</dt><dd>${e(ctx.store.store_type_code)}</dd><dt>Timezone</dt><dd>${e(ctx.store.time_zone)}</dd><dt>Currency</dt><dd>${e(ctx.organization?.currency_code || 'Not configured — amounts are displayed without a currency symbol')}</dd></dl>`)}${panel('Account & administration', `<dl><dt>Name</dt><dd>${e(ctx.profile.user_name)}</dd><dt>Role</dt><dd>${e(ctx.profile.role)}</dd><dt>User ID</dt><dd><code>${e(ctx.profile.user_id)}</code></dd></dl>${note('Organizations, stores, manager accounts and store types are provisioned administratively. There is no client-side business signup or cross-store switch. Contact an administrator for those changes.')}`)}</div>`);
+  const root = ctx.mount(`${heading('Store settings', 'Your assigned business, store and operational timezone.', button('Set timezone', 'timezone', '', false))}<div class="grid-two">${panel('Business details', `<dl><dt>Organization</dt><dd>${e(ctx.organization?.organization_name || '—')}</dd><dt>Store</dt><dd>${e(ctx.store.store_name)}</dd><dt>Store type</dt><dd>${e(ctx.store.store_type_code.replaceAll('_', ' '))}</dd><dt>Timezone</dt><dd>${e(ctx.store.time_zone)}</dd><dt>Currency</dt><dd>${e(ctx.organization?.currency_code || 'Not configured — amounts are displayed without a currency symbol')}</dd></dl>${supportDetails({ 'Store reference': ctx.store.store_id })}`)}${panel('Account & administration', `<dl><dt>Name</dt><dd>${e(ctx.profile.user_name)}</dd><dt>Role</dt><dd>${e(ctx.profile.role)}</dd></dl>${supportDetails({ 'User reference': ctx.profile.user_id })}${note('Organizations, stores, manager accounts and store types are provisioned administratively. There is no client-side business signup or cross-store switch. Contact an administrator for those changes.')}`)}</div>`);
   if (!root) return;
   bind(root, { timezone: async () => {
     const zones = await list('store_time_zones', { order: 'time_zone' });

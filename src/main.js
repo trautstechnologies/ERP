@@ -1,6 +1,6 @@
 import './styles/original/dashboard.css';
 import './styles/app.css';
-import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu, RefreshCw } from 'lucide';
+import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu } from 'lucide';
 import { configured, configurationError, supabase } from './lib/client.js';
 import { list, unwrap } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
@@ -27,7 +27,7 @@ const routes = {
   audit: ['Audit History', 'history', audit],
   settings: ['Settings', 'settings', settings],
 };
-const icons = { LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu, RefreshCw };
+const icons = { LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu };
 
 let profile, store, organization, generation = 0, shellUser, sessionUser;
 let currentKey = 'dashboard';
@@ -70,7 +70,7 @@ function login(message = '') {
 function shell() {
   shellUser = `${profile.user_id}:${profile.role}:${profile.store_id}`;
   const allowed = Object.entries(routes).filter(([key]) => profile.role === 'manager' || !managerPages.has(key));
-  app.innerHTML = `<div class="layout"><aside class="sidebar" id="trautsSidebar">${branding(true)}<div class="menu-label">MAIN MENU</div><nav class="sidebar-nav">${allowed.map(([key, [name, icon]]) => `<a class="nav" href="#/${key}" data-route="${key}"><i data-lucide="${icon}"></i><span>${name}</span></a>`).join('')}</nav><div class="sidebar-footer"><div class="user-profile"><div class="user-avatar">${e(profile.user_name?.slice(0, 1) || 'U')}</div><div class="user-info"><strong>${e(profile.user_name)}</strong><small>${e(profile.role === 'manager' ? 'Shop Manager' : 'Shopkeeper')}</small></div></div><button id="logoutBtn" class="logout"><i data-lucide="log-out"></i>Logout</button></div></aside><main class="main"><button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="trautsSidebar" aria-expanded="false"><i data-lucide="menu"></i>Menu</button><header class="app-header"><div><p class="eyebrow">${e(organization?.organization_name || 'YOUR BUSINESS')}</p><h1 id="pageTitle">Dashboard</h1><p>${e(store.store_name)} · ${e(store.time_zone)} · ${e(profile.role === 'manager' ? 'Manager workspace' : 'Shopkeeper workspace')}</p></div><button id="refreshPage" class="secondary-btn"><i data-lucide="refresh-cw"></i>Refresh</button></header><p id="appMessage" hidden></p><section id="pageContent" aria-live="polite"></section><footer class="page-footer">TRAUTS Shop Manager · ${e(store.store_name)} · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></footer></main></div>`;
+  app.innerHTML = `<div class="layout"><aside class="sidebar" id="trautsSidebar">${branding(true)}<div class="menu-label">MAIN MENU</div><nav class="sidebar-nav">${allowed.map(([key, [name, icon]]) => `<a class="nav" href="#/${key}" data-route="${key}"><i data-lucide="${icon}"></i><span>${name}</span></a>`).join('')}</nav><div class="sidebar-footer"><div class="user-profile"><div class="user-avatar">${e(profile.user_name?.slice(0, 1) || 'U')}</div><div class="user-info"><strong>${e(profile.user_name)}</strong><small>${e(profile.role === 'manager' ? 'Shop Manager' : 'Shopkeeper')}</small></div></div><button id="logoutBtn" class="logout"><i data-lucide="log-out"></i>Logout</button></div></aside><main class="main"><button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="trautsSidebar" aria-expanded="false"><i data-lucide="menu"></i>Menu</button><header class="app-header"><div><p class="eyebrow">${e(organization?.organization_name || 'YOUR BUSINESS')}</p><h1 id="pageTitle">Dashboard</h1><p>${e(store.store_name)} · ${e(store.time_zone)} · ${e(profile.role === 'manager' ? 'Manager workspace' : 'Shopkeeper workspace')}</p></div></header><p id="appMessage" hidden></p><section id="pageContent" aria-live="polite"></section><footer class="page-footer">TRAUTS Shop Manager · ${e(store.store_name)} · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></footer></main></div>`;
   mountBranding(app);
   $('#logoutBtn').onclick = async () => {
     $('#logoutBtn').disabled = true;
@@ -82,7 +82,14 @@ function shell() {
     const open = $('#trautsSidebar').classList.toggle('mobile-open');
     $('#mobileMenuBtn').setAttribute('aria-expanded', String(open));
   };
-  $('#refreshPage').onclick = () => render();
+  document.querySelectorAll('[data-route]').forEach(link => {
+    link.addEventListener('click', event => {
+      if (link.hash === location.hash || (!location.hash && link.dataset.route === 'dashboard')) {
+        event.preventDefault();
+        render();
+      }
+    });
+  });
   iconRefresh();
 }
 
@@ -93,7 +100,9 @@ async function render() {
     await loadIdentity();
     if (token !== generation) return;
     if (shellUser !== `${profile.user_id}:${profile.role}:${profile.store_id}`) shell();
-    const requested = location.hash.replace(/^#\/?/, '') || 'dashboard';
+    const [path, query = ''] = location.hash.replace(/^#\/?/, '').split('?');
+    const requested = path || 'dashboard';
+    const intent = requested === 'sales' && new URLSearchParams(query).get('action') === 'new' ? 'new-sale' : null;
     currentKey = routes[requested] ? requested : 'dashboard';
     if (managerPages.has(currentKey) && profile.role !== 'manager') currentKey = 'dashboard';
     $('#pageTitle').textContent = routes[currentKey][0];
@@ -106,6 +115,7 @@ async function render() {
     const captured = { ...profile };
     const ctx = {
       profile: captured, store: { ...store }, organization,
+      intent,
       manager: profile.role === 'manager',
       money: value => new Intl.NumberFormat('en-ZM', organization?.currency_code ? { style: 'currency', currency: organization.currency_code } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0)),
       async guard() {
@@ -116,6 +126,9 @@ async function render() {
       mount(html) { if (token !== generation) return null; $('#pageContent').innerHTML = html; iconRefresh(); return $('#pageContent'); },
     };
     await routes[currentKey][2](ctx);
+    if (token === generation && intent && currentKey === 'sales') {
+      history.replaceState(null, '', '#/sales');
+    }
   } catch (error) {
     if (token !== generation) return;
     if (!profile || !shellUser) { login(error.message); return; }

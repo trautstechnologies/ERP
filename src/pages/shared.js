@@ -1,9 +1,16 @@
 import { list, rpc } from '../lib/api.js';
-import { $, e, options, select, field, button, notify, table, row } from '../lib/ui.js';
+import { $, e, options, select, field, button, notify, table, row, timestamp } from '../lib/ui.js';
 import { quantity, price, paymentMethods, paymentLabel } from '../lib/domain.js';
 
 export const scoped = (ctx, tableName, extra = {}) => list(tableName, { scope: ctx.profile.store_id, ...extra });
-export const nameOf = (rows, id, key = 'product_id', label = 'product_name') => rows.find(r => r[key] === id)?.[label] || id || '—';
+export const nameOf = (rows, id, key = 'product_id', label = 'product_name') => rows.find(r => r[key] === id)?.[label] || (id ? 'Name unavailable' : '—');
+export function itemSummary(items, products) {
+  return items.length ? items.map(item => `${nameOf(products, item.product_id)} × ${item.quantity}`).join(', ') : 'Items unavailable';
+}
+export function saleLabel(sale, items, products, ctx) {
+  if (!sale) return 'Sale unavailable';
+  return `${timestamp(sale.sale_date, ctx.store.time_zone)} · ${itemSummary(items.filter(i => i.sale_id === sale.sale_id), products)} · ${ctx.money(sale.total_amount)}`;
+}
 export const heading = (title, subtitle, actions = '') => `<div class="toolbar"><div><h2>${e(title)}</h2><p>${e(subtitle)}</p></div><div class="actions">${actions}</div></div>`;
 export const reason = () => field('Reason', 'reason', { maxLength: 1000 });
 export const payOptions = () => paymentMethods.map(v => `<option value="${v}">${e(paymentLabel(v))}</option>`).join('');
