@@ -35,3 +35,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .select-search-option:hover,.select-search-option.highlighted{background:#edf3fa;color:#173f8a;}
 .select-search-option[aria-selected="true"]{font-weight:600;}
 .select-search-empty{padding:10px;margin:0;color:#64748b;font-size:12px;}
+
+.auth-signup{width:100%;margin-top:12px;}
+#signupError{color:#b42336;font-size:13px;line-height:1.6;}
+
+.auth-signup[hidden]{display:none;}

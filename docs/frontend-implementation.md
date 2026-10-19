@@ -4,7 +4,7 @@
 
 The supplied `ERP.txt` concatenated 33 HTML/CSS/JS source files plus a text-corrupted JPEG. The originals are preserved under `reference/original/`. The working implementation is a modular Vite application; it keeps the navy sidebar (`#142d59`), blue primary actions (`#173f8a`), pale backgrounds, brand positioning, cards, forms and tables. It removes fake login, hardcoded staff, invented transactions, demo setup, and localStorage business ledgers. Supabase Auth session storage remains normal.
 
-The app uses a shared shell rather than separate copies of manager/shopkeeper pages. Workers have dashboard, products, sales and inventory; manager routes are guarded and hidden. Each navigation/mutation checks the current profile/store; database RLS and RPCs remain authoritative. Business/store creation and manager assignment are administrative operations, not a client signup wizard.
+The app uses a shared shell rather than separate copies of manager/shopkeeper pages. Workers have dashboard, products, sales and inventory; manager routes are guarded and hidden. Each navigation/mutation checks the current profile/store; database RLS and RPCs remain authoritative. Business owners can create their own new business/store/manager through Auth signup and an atomic database trigger; additional-store provisioning and reassignment remain administrative. See `owner-signup.md`.
 
 ## Feature map
 

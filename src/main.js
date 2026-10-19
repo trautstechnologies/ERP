@@ -2,7 +2,7 @@ import './styles/original/dashboard.css';
 import './styles/app.css';
 import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu } from 'lucide';
 import { configured, configurationError, supabase } from './lib/client.js';
-import { list, unwrap } from './lib/api.js';
+import { list, unwrap, signupOwner } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
 import { installSearchableSelects } from './lib/searchable-select.js';
 import { managerPages } from './lib/domain.js';
@@ -51,11 +51,18 @@ async function loadIdentity() {
   return data.user;
 }
 
-function login(message = '') {
+function login(message = '', { success = false, email = '' } = {}) {
   generation++;
   closeDialog(); shellUser = null; profile = store = organization = null;
-  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><p class="auth-help">Need an account or password assistance? Contact your manager. Worker accounts are created by a manager.</p><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username" value="${e(email)}"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><p class="auth-help">Need an account or password assistance? Contact your manager. Worker accounts are created by a manager.</p><button type="button" class="secondary-btn auth-signup" id="signupBtn" hidden>Create a business account</button><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
   mountBranding(app);
+  const signupButton = $('#signupBtn');
+  signupButton.onclick = ownerSignup;
+  // Do not offer account creation until its atomic database provisioning is deployed.
+  supabase.rpc('owner_signup_available').then(({ data, error }) => {
+    if (signupButton.isConnected && !error && data === true) signupButton.hidden = false;
+  }).catch(() => { /* Existing users can still sign in if availability cannot be checked. */ });
+  if (success) { $('#loginError').setAttribute('role', 'status'); $('#loginError').style.color = '#237a48'; }
   $('#loginForm').onsubmit = async event => {
     event.preventDefault();
     const form = event.target;
@@ -67,6 +74,50 @@ function login(message = '') {
       await loadIdentity(); form.reset(); await enter();
     } catch (error) { if ($('#loginError')) $('#loginError').textContent = error.message; }
     finally { submit.disabled = false; }
+  };
+}
+
+function ownerSignup() {
+  generation++;
+  closeDialog();
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Create your business</h2><p class="muted">Set up a new business and store. You will be its manager. Staff accounts are created by a manager after setup.</p><form id="signupForm"><label class="form-group">Your name<input name="user_name" required maxlength="150" autocomplete="name"></label><label class="form-group">Business name<input name="organization_name" required maxlength="150" autocomplete="organization"></label><label class="form-group">Store name<input name="store_name" required maxlength="150"></label><label class="form-group">Email address<input name="email" type="email" required autocomplete="email"></label><label class="form-group">Phone number (optional)<input name="phone" type="tel" maxlength="30" autocomplete="tel"></label><label class="form-group">Password<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label><p class="muted">Use at least 12 characters.</p><label class="form-group">Confirm password<input name="confirm_password" type="password" required autocomplete="new-password"></label><p id="signupError" role="alert"></p><button class="primary-btn" type="submit">Create business</button><button class="secondary-btn auth-signup" type="button" id="backToLogin">Back to login</button></form></section></main>`;
+  mountBranding(app);
+  $('#backToLogin').onclick = () => login();
+  $('#signupForm').onsubmit = async event => {
+    event.preventDefault();
+    const form = event.target;
+    const submit = $('button[type="submit"]', form);
+    if (submit.disabled) return;
+    const back = $('#backToLogin');
+    const errorBox = $('#signupError');
+    errorBox.textContent = '';
+    let uncertain = false, created = false;
+    try {
+      const values = Object.fromEntries(new FormData(form));
+      if (values.password !== values.confirm_password) throw new Error('Passwords do not match.');
+      for (const key of ['user_name', 'organization_name', 'store_name']) {
+        if (!values[key].trim()) throw new Error('Enter your name, business name and store name.');
+      }
+      submit.disabled = back.disabled = true;
+      const email = values.email.trim();
+      const result = await signupOwner({ email, password: values.password, user_name: values.user_name.trim(), organization_name: values.organization_name.trim(), store_name: values.store_name.trim(), phone: values.phone.trim() || null });
+      created = true;
+      form.reset();
+      if (result.confirmation_required) {
+        login('Check your email to confirm your account, then sign in. If you already have an account, sign in or contact your administrator.', { success: true, email });
+      } else {
+        history.replaceState(null, '', '#/dashboard');
+        await loadIdentity();
+        await enter();
+        notify('Your business is ready. Start by adding products and receiving stock.');
+      }
+    } catch (error) {
+      uncertain = created || Boolean(error.uncertain);
+      errorBox.textContent = error.message;
+      if (uncertain) {
+        form.querySelectorAll('input').forEach(input => { input.readOnly = true; });
+      }
+    } finally { submit.disabled = uncertain; back.disabled = false; }
   };
 }
 

@@ -7,7 +7,7 @@ const ids = {
   product: '44444444-4444-4444-8444-444444444444', sale: '55555555-5555-4555-8555-555555555555', item: '66666666-6666-4666-8666-666666666666',
 };
 
-async function backend(page, { role = 'manager', failSaleOnce = false } = {}) {
+async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true } = {}) {
   const calls = [], errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const userId = ids[role];
@@ -37,11 +37,17 @@ async function backend(page, { role = 'manager', failSaleOnce = false } = {}) {
     calls.push({ path: url.pathname, query: url.search, method: request.method(), body });
     const reply = (value, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(value) });
     if (url.pathname === '/auth/v1/token') return reply({ access_token: accessToken, refresh_token: 'test-refresh', token_type: 'bearer', expires_in: 3600, expires_at: now + 3600, user });
+    if (url.pathname === '/auth/v1/signup') {
+      if (signupMode === 'failure') return reply({ code: 'unexpected_failure', msg: 'Database error saving new user' }, 500);
+      if (signupMode === 'confirmation') return reply({ id: userId, email: body.email, identities: [{ id: userId }] });
+      return reply({ access_token: accessToken, refresh_token: 'test-refresh', token_type: 'bearer', expires_in: 3600, expires_at: now + 3600, user: { ...user, email: body.email } });
+    }
     if (url.pathname === '/auth/v1/user') return reply(user);
     if (url.pathname === '/auth/v1/logout') return reply({});
     if (url.pathname === '/functions/v1/create-worker') return reply({ user_id: ids.worker, user_name: body.user_name, role: 'user', confirmation_required: false }, 201);
     if (url.pathname.includes('/rpc/')) {
       const name = url.pathname.split('/').pop();
+      if (name === 'owner_signup_available') return reply(signupReady);
       if (name === 'get_sale_batches') return reply([]);
       if (name === 'record_sale') {
         if (failSaleOnce) { failSaleOnce = false; return reply({ code: 'XX000', message: 'Temporary database error; inspect sale history before retry.' }, 503); }
@@ -65,7 +71,7 @@ async function backend(page, { role = 'manager', failSaleOnce = false } = {}) {
     }
     const start = Number(url.searchParams.get('offset') || 0), limit = Number(url.searchParams.get('limit') || rows.length);
     rows = rows.slice(start, start + limit);
-    return reply(rows);
+    return reply(request.headers().accept?.includes('vnd.pgrst.object') ? rows[0] : rows);
   });
   return { calls, errors, data };
 }
@@ -587,4 +593,68 @@ test('blank SKUs are generated per product and clearing an existing SKU preserve
   await modal.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(modal).toHaveCount(0);
   expect(state.calls.find(c => c.path.endsWith('/products') && c.method === 'PATCH').body.sku).toBe('TEST-001');
+});
+
+async function fillBusinessSignup(page) {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create a business account', exact: true }).click();
+  await page.getByLabel('Your name', { exact: true }).fill('New Owner');
+  await page.getByLabel('Business name', { exact: true }).fill('New Retail Business');
+  await page.getByLabel('Store name', { exact: true }).fill('New Lusaka Store');
+  await page.getByLabel('Email address').fill('owner@example.com');
+  await page.getByLabel('Phone number (optional)').fill('0971234567');
+  await page.getByLabel('Password', { exact: true }).fill('Strong-test-password-123!');
+  await page.getByLabel('Confirm password', { exact: true }).fill('Strong-test-password-123!');
+}
+
+test('business signup uses Auth metadata and enters the manager workspace with a session', async ({ page }) => {
+  const state = await backend(page);
+  await fillBusinessSignup(page);
+  await page.getByRole('button', { name: 'Create business', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Manage Accounts', exact: true })).toBeVisible();
+  const signup = state.calls.find(c => c.path === '/auth/v1/signup');
+  expect(signup.body.data.erp_owner_signup).toEqual({ user_name: 'New Owner', organization_name: 'New Retail Business', store_name: 'New Lusaka Store', phone: '0971234567' });
+  expect(signup.body.data.erp_owner_signup).not.toHaveProperty('role');
+  expect(signup.body.data.erp_owner_signup).not.toHaveProperty('store_id');
+  expect(state.calls.filter(c => ['/rest/v1/profiles','/rest/v1/stores','/rest/v1/organizations'].includes(c.path) && c.method === 'POST')).toHaveLength(0);
+  expect(state.errors).toEqual([]);
+});
+
+test('business signup respects email confirmation and validates matching passwords', async ({ page }) => {
+  const state = await backend(page, { signupMode: 'confirmation' });
+  await fillBusinessSignup(page);
+  await page.getByLabel('Confirm password', { exact: true }).fill('Different-password-123!');
+  await page.getByRole('button', { name: 'Create business', exact: true }).click();
+  await expect(page.locator('#signupError')).toHaveText('Passwords do not match.');
+  expect(state.calls.filter(c => c.path === '/auth/v1/signup')).toHaveLength(0);
+  await page.getByLabel('Confirm password', { exact: true }).fill('Strong-test-password-123!');
+  await page.getByRole('button', { name: 'Create business', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  await expect(page.locator('#loginError')).toContainText('Check your email');
+  await expect(page.getByLabel('Email address')).toHaveValue('owner@example.com');
+  await expect(page.locator('.sidebar')).toHaveCount(0);
+});
+
+test('an uncertain signup does not silently retry and keeps login available', async ({ page }) => {
+  const state = await backend(page, { signupMode: 'failure' });
+  await fillBusinessSignup(page);
+  await page.getByRole('button', { name: 'Create business', exact: true }).click();
+  await expect(page.locator('#signupError')).toContainText('Database error saving new user');
+  await expect(page.getByRole('button', { name: 'Create business', exact: true })).toBeDisabled();
+  await page.getByRole('button', { name: 'Back to login', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  expect(state.calls.filter(c => c.path === '/auth/v1/signup')).toHaveLength(1);
+});
+
+
+test('signup remains unavailable before backend provisioning is enabled while login works', async ({ page }) => {
+  const state = await backend(page, { signupReady: false });
+  await login(page);
+  expect(state.calls.some(c => c.path.endsWith('/rpc/owner_signup_available'))).toBe(true);
+  expect(state.calls.filter(c => c.path === '/auth/v1/signup')).toHaveLength(0);
+  await page.getByRole('button', { name: 'Logout', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create a business account', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Login', exact: true })).toBeVisible();
 });

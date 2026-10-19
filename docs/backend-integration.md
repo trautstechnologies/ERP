@@ -65,7 +65,7 @@ Each profile has one store and one role: `user` or `manager`. Managers do not ga
 | Stock movement/batch allocation audit | No management audit access | Own-store read |
 | Operational reports | No manager report access | Own-store read |
 | Worker creation | Rejected | Create worker in own store only |
-| Manager creation/store reassignment | No frontend workflow | Administrative provisioning, not `create-worker` |
+| Additional managers/store reassignment | No frontend workflow | Administrative provisioning, not `create-worker`; new businesses use owner signup |
 
 An inactive profile may still have a valid Auth session. Protected data and RPCs must remain unavailable. A filtered read may return `[]`, and a prohibited filtered update may affect zero rows rather than raise an error. Check returned rows/counts; HTTP success alone does not prove a mutation occurred.
 
@@ -245,7 +245,7 @@ const { data, error } = await supabase.functions.invoke('create-worker', {
 if (error) throw error;
 ```
 
-The supplied source sends no email and does not alter existing unconfirmed accounts. Turn off Confirm email in the Auth Email provider if disabling verification for the overall sign-in flow. New workers can sign in immediately once the revised function is deployed and the provisioning trigger is installed. Frontend staff creation is manager-only; managers themselves are provisioned administratively.
+The supplied source sends no email and does not alter existing unconfirmed accounts. Turn off Confirm email in the Auth Email provider if disabling verification for the overall sign-in flow. New workers can sign in immediately once the revised function is deployed and the provisioning trigger is installed. Frontend staff creation is manager-only; new business owners can use the owner-signup flow; additional manager provisioning for an existing store remains administrative.
 
 The Edge success contract replaces the earlier `confirmation_email_sent` field and HTTP-200 assumption. Update scripts/UI accordingly. If an account-creation request times out, do not blindly create it again: this endpoint has no request-ID idempotency contract. Reconcile the account through an authorized administrative lookup; the profiles table does not provide an email lookup.
 
@@ -324,8 +324,10 @@ Filter daily reports with `.gte('report_date', startDate).lte('report_date', end
 5. Add manager catalog, purchases, adjustments, batching, returns/refunds/voids, and reports using the payload reference.
 6. Run [frontend-smoke-tests.md](frontend-smoke-tests.md) using dedicated test accounts/data.
 
-Before relying on features outside this contract, settle their requirements: password recovery/email delivery and redirect URLs, manager provisioning, confirmed expense-cancellation interface, refund-provider integration, and corrections after real restocking/disposal/refunds. Tax, discounts, multi-currency conversion, cross-store transfers, and pharmacy-specific regulatory workflows are not established by this handoff. Organizations and store types do not automatically implement those features.
+Before relying on features outside this contract, settle their requirements: password recovery/email delivery and redirect URLs, additional manager provisioning for existing stores, confirmed expense-cancellation interface, refund-provider integration, and corrections after real restocking/disposal/refunds. Tax, discounts, multi-currency conversion, cross-store transfers, and pharmacy-specific regulatory workflows are not established by this handoff. Organizations and store types do not automatically implement those features.
 
 When adding a Python backend later, preserve the same user/store authorization and transaction boundaries. Do not replace authenticated database calls with unrestricted service-role table writes.
 
 Supplier contacts use `public.supplier_phones(supplier_phone_id uuid, supplier_id uuid, phone text)`. Use `supplier_phone_id` for ordering and record identity; filter edits/deletions by both `supplier_phone_id` and `supplier_id`. There is no `id` or `store_id` column on this table. RLS must authorize contact access through the parent supplier. The supplier directory displays numbers and supports searching them; adding/editing/removing remains in the Phone numbers dialog.
+
+Owner signup uses Supabase Auth signUp and the additive owner provisioning trigger described in [owner-signup.md](owner-signup.md). The anonymous `owner_signup_available()` RPC reports whether the trigger is installed/enabled. Public owner metadata can name a new business and store but cannot choose existing tenant IDs or roles. Workers continue using the trusted create-worker endpoint.

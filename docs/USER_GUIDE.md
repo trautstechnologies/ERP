@@ -13,7 +13,19 @@ This guide describes the current app. Your account determines which pages and bu
 3. Select **Login**.
 4. Check the store name shown at the top of the screen before recording anything.
 
-There is no public signup form. A manager creates ordinary worker accounts. An administrator creates managers and assigns stores. In the updated account-creation process, new workers can sign in without confirming an email.
+Business owners can create a new business and store using **Create a business account** on the login page, when signup is enabled. A manager creates ordinary worker accounts through **Manage Accounts**; workers should not use business signup to join an existing store. New workers can sign in without confirming an email.
+
+### Create a business account
+
+1. Select **Create a business account** on the login page.
+2. Enter your name, business name, store name and email address. Phone number is optional.
+3. Choose a password of at least 12 characters and enter it again in **Confirm password**.
+4. Select **Create business** once and wait for the result.
+5. If email confirmation is enabled, check your inbox, confirm the email and sign in. Otherwise, your manager dashboard opens immediately.
+
+Your new store starts as general retail, with ZMW currency and Zambia's Africa/Lusaka timezone. Add products, receive stock and create worker accounts to get started. Signup creates a new business and store; it does not give access to another person's store. If the signup button is absent, ask the administrator to finish enabling signup. Use **Back to login** to return without creating an account.
+
+If signup reports an uncertain failure, try signing in or ask the administrator to check your account before submitting another signup.
 
 If your password does not work, contact your manager or administrator. You cannot reset another person's password or change their login email from the team page.
 
@@ -270,7 +282,7 @@ If creation fails or the connection drops, do not repeatedly create the same wor
 
 Set status to **Inactive** to remove access to protected store features. Set it back to **Active** to restore eligible access. An already-open login session does not override an inactive profile.
 
-Manager rows are administrative accounts and cannot be edited through this worker form. Contact the administrator for manager creation, store reassignment, email/password changes or account recovery. Staff and transaction history are not deleted here.
+Manager rows are administrative accounts and cannot be edited through this worker form. Use business signup for a new business; contact the administrator for additional managers in an existing store, store reassignment, email/password changes or account recovery. Staff and transaction history are not deleted here.
 
 ## 10. Batches & Expiry — managers
 

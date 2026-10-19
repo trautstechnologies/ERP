@@ -73,3 +73,25 @@ export async function createWorker(body) {
   if (!result.data?.user_id || result.data.confirmation_required !== false) throw new Error('Unexpected worker response. Confirm the no-email create-worker revision is deployed; do not create the account again.');
   return result.data;
 }
+
+
+export async function signupOwner({ email, password, user_name, organization_name, store_name, phone }) {
+  // Auth handles signup limits and email settings; the database creates the new store atomically.
+  const result = await supabase.auth.signUp({
+    email, password,
+    options: { emailRedirectTo: new URL(import.meta.env.BASE_URL, window.location.origin).href, data: { erp_owner_signup: { user_name, organization_name, store_name, phone } } },
+  });
+  if (result.error) throw Object.assign(new Error(result.error.message || 'Signup could not be completed.'), {
+    uncertain: !result.error.status || result.error.status >= 500,
+  });
+  if (!result.data?.user?.id) throw Object.assign(new Error('Check your email or try signing in before submitting another signup.'), { uncertain: true });
+  if (result.data.session) {
+    try {
+      const profile = await unwrap(await supabase.from('profiles').select('user_id,role,status,store_id').eq('user_id', result.data.user.id).single());
+      if (profile?.role !== 'manager' || profile.status !== 'active' || !profile.store_id) {
+        throw new Error('Your account needs store setup. Contact an administrator before signing up again.');
+      }
+    } catch (error) { throw Object.assign(error, { uncertain: true }); }
+  }
+  return { confirmation_required: !result.data.session };
+}

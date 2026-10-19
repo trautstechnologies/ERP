@@ -17,7 +17,7 @@ FROM pg_proc p
 JOIN pg_namespace n ON n.oid=p.pronamespace
 WHERE n.nspname='public'
   AND p.proname IN (
-    'record_sale','receive_purchase','reverse_sale','reverse_purchase',
+    'owner_signup_available','record_sale','receive_purchase','reverse_sale','reverse_purchase',
     'adjust_stock','set_reorder_level','set_store_time_zone',
     'enable_batch_tracking','migrate_existing_stock_to_batches',
     'adjust_batch_stock','set_batch_status','get_sale_batches',

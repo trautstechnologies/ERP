@@ -38,7 +38,7 @@ npm run build
 npm run preview
 ```
 
-Deploy the generated `dist/` directory to a static host over HTTPS. Routing uses URL hashes, so no server-side route rewrite is required. Old `dashboard.html`, `shopkeeper.html`, and `business-setup.html` bookmarks redirect to the shared app. Workers and managers use the same login and receive different navigation based on their verified profile. There is no public signup or browser business-creation workflow.
+Deploy the generated `dist/` directory to a static host over HTTPS. Routing uses URL hashes, so no server-side route rewrite is required. Old `dashboard.html`, `shopkeeper.html`, and `business-setup.html` bookmarks redirect to the shared app. Workers and managers use the same login and receive different navigation based on their verified profile. Business owners can create a new business and store from the login page after the [owner signup database patch](docs/owner-signup.md) is installed. Worker creation remains manager-only.
 
 For Netlify, see [Netlify deployment instructions](docs/netlify-deployment.md). `netlify.toml` sets the build command, `dist` publish directory, and Node version for Git-connected builds. Manual uploads must contain an already-built `dist` folder, not the source ZIP.
 
