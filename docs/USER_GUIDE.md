@@ -27,7 +27,18 @@ Your new store starts as general retail, with ZMW currency and Zambia's Africa/L
 
 If signup reports an uncertain failure, try signing in or ask the administrator to check your account before submitting another signup.
 
-If your password does not work, contact your manager or administrator. You cannot reset another person's password or change their login email from the team page.
+### Forgot your password?
+
+1. On the login page, select **Forgot password?**
+2. Enter your account email address and select **Send reset link**.
+3. Check your inbox and spam folder. The confirmation message is the same whether or not an account exists for that address.
+4. Open the newest reset email and follow its link. You should see **Choose a new password**.
+5. Enter a new password of at least 12 characters, enter it again, and select **Update password**.
+6. When the app returns to login, sign in with your new password.
+
+Use **Back to login** to leave the email-request form. Use **Cancel and return to login** to leave a valid reset form and close its reset session. If a link is invalid, expired or already consumed, request a new one. If you see a rate-limit message, wait before requesting another email.
+
+If the email does not arrive, contact the administrator to check email delivery. Password-reset email is still needed even when signup email confirmation is disabled. You cannot reset another person's password or change their login email from the team page.
 
 ### Your role
 

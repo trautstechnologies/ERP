@@ -7,7 +7,7 @@ const ids = {
   product: '44444444-4444-4444-8444-444444444444', sale: '55555555-5555-4555-8555-555555555555', item: '66666666-6666-4666-8666-666666666666',
 };
 
-async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true } = {}) {
+async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true, recoveryRequestStatus = 200, passwordUpdateStatus = 200 } = {}) {
   const calls = [], errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const userId = ids[role];
@@ -42,6 +42,9 @@ async function backend(page, { role = 'manager', failSaleOnce = false, signupMod
       if (signupMode === 'confirmation') return reply({ id: userId, email: body.email, identities: [{ id: userId }] });
       return reply({ access_token: accessToken, refresh_token: 'test-refresh', token_type: 'bearer', expires_in: 3600, expires_at: now + 3600, user: { ...user, email: body.email } });
     }
+    if (url.pathname === '/auth/v1/recover') return recoveryRequestStatus === 200
+      ? reply({}) : reply({ code: 'over_email_send_rate_limit', msg: 'Too many requests' }, recoveryRequestStatus);
+    if (url.pathname === '/auth/v1/user' && request.method() === 'PUT' && passwordUpdateStatus !== 200) return reply({ code: 'session_expired', msg: 'Reset session expired. Request a new reset link.' }, passwordUpdateStatus);
     if (url.pathname === '/auth/v1/user') return reply(user);
     if (url.pathname === '/auth/v1/logout') return reply({});
     if (url.pathname === '/functions/v1/create-worker') return reply({ user_id: ids.worker, user_name: body.user_name, role: 'user', confirmation_required: false }, 201);
@@ -73,7 +76,8 @@ async function backend(page, { role = 'manager', failSaleOnce = false, signupMod
     rows = rows.slice(start, start + limit);
     return reply(request.headers().accept?.includes('vnd.pgrst.object') ? rows[0] : rows);
   });
-  return { calls, errors, data };
+  const recoveryUrl = `/?auth=recovery#${new URLSearchParams({ access_token: accessToken, refresh_token: 'test-recovery-refresh', expires_in: '3600', token_type: 'bearer', type: 'recovery' })}`;
+  return { calls, errors, data, recoveryUrl };
 }
 
 async function login(page, role = 'manager') {
@@ -657,4 +661,103 @@ test('signup remains unavailable before backend provisioning is enabled while lo
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create a business account', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Login', exact: true })).toBeVisible();
+});
+
+test('forgot password requests an email with the app recovery redirect and generic confirmation', async ({ page }) => {
+  const state = await backend(page);
+  await page.goto('/');
+  await page.getByLabel('Email address').fill('worker@example.com');
+  await page.getByRole('button', { name: 'Forgot password?', exact: true }).click();
+  await expect(page.getByLabel('Email address')).toHaveValue('worker@example.com');
+  await page.getByRole('button', { name: 'Send reset link', exact: true }).click();
+  await expect(page.locator('#recoveryMessage')).toContainText('If an account exists');
+  const request = state.calls.find(c => c.path === '/auth/v1/recover');
+  expect(request.body.email).toBe('worker@example.com');
+  expect(new URLSearchParams(request.query).get('redirect_to')).toBe('http://127.0.0.1:5173/?auth=recovery');
+  await expect(page.getByRole('button', { name: 'Reset link requested', exact: true })).toBeDisabled();
+  await page.getByRole('button', { name: 'Back to login', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  expect(state.errors).toEqual([]);
+});
+
+for (const role of ['manager', 'worker']) {
+  test(`recovery links allow ${role} to update a password before entering the dashboard`, async ({ page }) => {
+    const state = await backend(page, { role });
+    await page.goto(state.recoveryUrl);
+    await expect(page.getByRole('heading', { name: 'Choose a new password' })).toBeVisible();
+    await expect(page.locator('.sidebar')).toHaveCount(0);
+    expect(state.calls.filter(c => c.path === '/rest/v1/profiles')).toHaveLength(0);
+    await page.getByLabel('New password', { exact: true }).fill('Changed-test-password-123!');
+    await page.getByLabel('Confirm new password', { exact: true }).fill('Different-test-password-123!');
+    await page.getByRole('button', { name: 'Update password', exact: true }).click();
+    await expect(page.locator('#recoveryMessage')).toHaveText('Passwords do not match.');
+    expect(state.calls.filter(c => c.method === 'PUT')).toHaveLength(0);
+    await page.getByLabel('Confirm new password', { exact: true }).fill('Changed-test-password-123!');
+    await page.getByRole('button', { name: 'Update password', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+    await expect(page.locator('#loginError')).toContainText('Your password was updated.');
+    expect(state.calls.find(c => c.method === 'PUT' && c.path === '/auth/v1/user').body).toMatchObject({ password: 'Changed-test-password-123!' });
+    expect(state.calls.some(c => c.path === '/auth/v1/logout')).toBe(true);
+    expect(page.url()).not.toContain('auth=recovery');
+    expect(page.url()).not.toContain('access_token');
+    expect(state.errors).toEqual([]);
+  });
+}
+
+test('expired recovery links request a fresh link and remove URL credentials', async ({ page }) => {
+  const state = await backend(page);
+  await page.goto('/?auth=recovery#error=access_denied&error_code=otp_expired&error_description=Expired');
+  await expect(page.getByRole('heading', { name: 'Forgot password?' })).toBeVisible();
+  await expect(page.locator('#recoveryMessage')).toContainText('invalid or has expired');
+  await expect(page.locator('#passwordResetForm')).toHaveCount(0);
+  expect(page.url()).not.toContain('error=');
+  expect(state.calls.filter(c => c.method === 'PUT')).toHaveLength(0);
+});
+
+test('a recovery URL marker alone cannot reuse a normal saved login as a recovery link', async ({ page }) => {
+  const state = await backend(page);
+  await login(page);
+  await page.goto('/?auth=recovery');
+  await expect(page.getByRole('heading', { name: 'Forgot password?' })).toBeVisible();
+  await expect(page.locator('#passwordResetForm')).toHaveCount(0);
+  await expect(page.locator('.sidebar')).toHaveCount(0);
+  expect(state.calls.filter(c => c.method === 'PUT')).toHaveLength(0);
+});
+
+test('reset email rate limits are shown and failed password updates never claim success', async ({ page }) => {
+  const state = await backend(page, { recoveryRequestStatus: 429, passwordUpdateStatus: 401 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Forgot password?', exact: true }).click();
+  await page.getByLabel('Email address').fill('manager@example.com');
+  await page.getByRole('button', { name: 'Send reset link', exact: true }).click();
+  await expect(page.locator('#recoveryMessage')).toContainText('Too many requests');
+  await page.goto(state.recoveryUrl);
+  await page.getByLabel('New password', { exact: true }).fill('Changed-test-password-123!');
+  await page.getByLabel('Confirm new password', { exact: true }).fill('Changed-test-password-123!');
+  await page.getByRole('button', { name: 'Update password', exact: true }).click();
+  await expect(page.locator('#recoveryMessage')).toContainText('Reset session expired');
+  await expect(page.locator('#passwordResetForm')).toBeVisible();
+  expect(state.calls.filter(c => c.path === '/auth/v1/logout')).toHaveLength(0);
+});
+
+test('recovery cancel closes the recovery session and returns to login', async ({ page }) => {
+  const state = await backend(page);
+  await page.goto(state.recoveryUrl);
+  await page.getByRole('button', { name: 'Cancel and return to login', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  expect(state.calls.filter(c => c.method === 'PUT')).toHaveLength(0);
+  expect(state.calls.some(c => c.path === '/auth/v1/logout')).toBe(true);
+  expect(page.url()).not.toContain('auth=recovery');
+});
+
+test('a changed recovery account cannot update another user password', async ({ page }) => {
+  const state = await backend(page);
+  await page.goto(state.recoveryUrl);
+  await expect(page.getByRole('heading', { name: 'Choose a new password' })).toBeVisible();
+  await page.route('https://test-project.supabase.co/auth/v1/user', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: ids.worker, email: 'worker@example.com', aud: 'authenticated', role: 'authenticated' }) }));
+  await page.getByLabel('New password', { exact: true }).fill('Changed-test-password-123!');
+  await page.getByLabel('Confirm new password', { exact: true }).fill('Changed-test-password-123!');
+  await page.getByRole('button', { name: 'Update password', exact: true }).click();
+  await expect(page.locator('#recoveryMessage')).toContainText('expired or changed');
+  expect(state.calls.filter(c => c.method === 'PUT')).toHaveLength(0);
 });

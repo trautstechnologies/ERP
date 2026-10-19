@@ -40,3 +40,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 #signupError{color:#b42336;font-size:13px;line-height:1.6;}
 
 .auth-signup[hidden]{display:none;}
+
+.auth-link{border:0;background:none;color:#173f8a;text-decoration:underline;cursor:pointer;padding:8px 0;font-size:13px;}
+#recoveryMessage{color:#b42336;font-size:13px;line-height:1.6;}
+#recoveryMessage.auth-success{color:#237a48;}

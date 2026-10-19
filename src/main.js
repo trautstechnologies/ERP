@@ -1,10 +1,11 @@
 import './styles/original/dashboard.css';
 import './styles/app.css';
 import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu } from 'lucide';
-import { configured, configurationError, supabase } from './lib/client.js';
+import { configured, configurationError, supabase, recoveryContext } from './lib/client.js';
 import { list, unwrap, signupOwner } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
 import { installSearchableSelects } from './lib/searchable-select.js';
+import { forgotPassword, resetPassword, clearRecoveryUrl } from './lib/password-recovery.js';
 import { managerPages } from './lib/domain.js';
 import { branding, mountBranding } from './lib/branding.js';
 import { overview, products, inventory } from './pages/catalog.js';
@@ -34,6 +35,7 @@ const icons = { LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardL
 
 let profile, store, organization, generation = 0, shellUser, sessionUser;
 let currentKey = 'dashboard';
+let recoveryActive = false;
 const app = $('#app');
 
 function iconRefresh() { createIcons({ icons }); }
@@ -54,8 +56,13 @@ async function loadIdentity() {
 function login(message = '', { success = false, email = '' } = {}) {
   generation++;
   closeDialog(); shellUser = null; profile = store = organization = null;
-  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username" value="${e(email)}"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><p class="auth-help">Need an account or password assistance? Contact your manager. Worker accounts are created by a manager.</p><button type="button" class="secondary-btn auth-signup" id="signupBtn" hidden>Create a business account</button><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username" value="${e(email)}"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><button type="button" class="auth-link" id="forgotPasswordBtn">Forgot password?</button><p class="auth-help">Need an account? Contact your manager. Worker accounts are created by a manager.</p><button type="button" class="secondary-btn auth-signup" id="signupBtn" hidden>Create a business account</button><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
   mountBranding(app);
+  $('#forgotPasswordBtn').onclick = () => {
+    const email = $('#loginForm [name="email"]').value;
+    generation++;
+    forgotPassword({ email, onBack: () => login() });
+  };
   const signupButton = $('#signupBtn');
   signupButton.onclick = ownerSignup;
   // Do not offer account creation until its atomic database provisioning is deployed.
@@ -148,6 +155,7 @@ function shell() {
 }
 
 async function render() {
+  if (recoveryActive) return;
   const token = ++generation;
   closeDialog();
   try {
@@ -199,25 +207,61 @@ async function render() {
   }
 }
 
-async function enter() { shell(); await render(); }
+async function enter() { if (recoveryActive) return; shell(); await render(); }
+
+function finishRecovery() {
+  recoveryActive = false;
+  recoveryContext.requested = recoveryContext.fromLink = false;
+  recoveryContext.userId = null;
+  clearRecoveryUrl();
+}
+
+function beginRecovery(userId) {
+  if (recoveryActive && $('#passwordResetForm')) return;
+  recoveryActive = true;
+  generation++;
+  shellUser = null; profile = store = organization = null;
+  resetPassword({ userId,
+    onComplete: message => { finishRecovery(); login(message, { success: true }); },
+    onCancel: () => { finishRecovery(); login(); },
+  });
+}
 
 if (!configured) {
   app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Connect your store</h2>${configurationError ? `<p role="alert">${e(configurationError)}</p>` : ''}<p>Copy <code>.env.example</code> to <code>.env</code>, enter your Supabase URL and public anon key, then restart the development server.</p><p>Never use a service-role key in this application.</p></section></main>`;
   mountBranding(app);
 } else {
-  const session = await supabase.auth.getSession();
-  if (session.error) throw session.error;
-  sessionUser = session.data.session?.user.id;
-  if (sessionUser) { try { await loadIdentity(); await enter(); } catch (error) { login(error.message); } }
-  else login();
+  // Listen before awaiting startup: recovery events must take precedence over dashboard entry.
   supabase.auth.onAuthStateChange((event, nextSession) => {
     const nextUser = nextSession?.user.id;
-    if (event === 'SIGNED_OUT') { sessionUser = null; login(); }
+    if (event === 'PASSWORD_RECOVERY' && nextUser) {
+      sessionUser = nextUser;
+      recoveryActive = true;
+      setTimeout(() => beginRecovery(nextUser), 0);
+    } else if (event === 'SIGNED_OUT') {
+      sessionUser = null;
+      if (!recoveryActive) login();
+    } else if (recoveryActive || recoveryContext.requested) {
+      if (nextUser) sessionUser = nextUser;
     // Never await Supabase calls inside this callback (Auth holds an internal lock).
-    else if (event === 'SIGNED_IN' && nextUser && sessionUser && nextUser !== sessionUser) {
+    } else if (event === 'SIGNED_IN' && nextUser && sessionUser && nextUser !== sessionUser) {
       sessionUser = nextUser;
       setTimeout(() => render(), 0);
     } else if (nextUser) sessionUser = nextUser;
   });
+  const initialized = await supabase.auth.initialize();
+  const session = await supabase.auth.getSession();
+  if (session.error && !recoveryContext.requested) throw session.error;
+  sessionUser = session.data.session?.user.id;
+  if (recoveryContext.requested || recoveryContext.userId) {
+    if (!initialized.error && sessionUser && (recoveryContext.fromLink || recoveryContext.userId === sessionUser)) {
+      beginRecovery(sessionUser);
+    } else {
+      finishRecovery();
+      forgotPassword({ message: 'This reset link is invalid or has expired. Request a new link below.', onBack: () => login() });
+    }
+  } else if (sessionUser) {
+    try { await loadIdentity(); await enter(); } catch (error) { login(error.message); }
+  } else login();
   window.addEventListener('hashchange', () => { if (shellUser) render(); });
 }

@@ -9,7 +9,7 @@
 5. Trigger a new deployment after changing variables. They are compiled into the browser files; changing runtime settings without rebuilding cannot update them.
 6. Inspect the build log: Vite must complete and produce `dist/index.html` and `dist/assets/`. Deploy the new commit, rather than retrying an old commit that predates `netlify.toml`.
 
-Configure Supabase Auth Site URL to the final HTTPS frontend address. Allowlist any redirect URLs needed by future recovery flows. This does not fix missing frontend JavaScript assets; verify the build first.
+Configure Supabase Auth Site URL to the final HTTPS frontend address. Allowlist the deployed app root and its `?auth=recovery` URL for password recovery; see [password-recovery.md](password-recovery.md). This does not fix missing frontend JavaScript assets; verify the build first.
 
 ## Manual drag-and-drop deployment
 

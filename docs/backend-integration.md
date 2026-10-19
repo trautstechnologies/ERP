@@ -169,7 +169,7 @@ Every function below uses `POST /rest/v1/rpc/<name>`, JSON with the exact parame
 | `mark_return_refunded` | `p_return_id`, `p_method`, `p_reference` (default null) | Return UUID | Manager |
 | `void_customer_return` | `p_return_id`, `p_reason` | Return UUID | Manager |
 
-Expense cancellation exists in the previously developed workflow, but its definition is absent from the workspace sources. Inspect the deployed catalog for `cancel_expense` before implementing its client. Staff editing beyond the table grants above and password reset/admin account recovery also need their deployed implementation confirmed.
+Expense cancellation exists in the previously developed workflow, but its definition is absent from the workspace sources. Inspect the deployed catalog for `cancel_expense` before implementing its client. Staff editing beyond the table grants above and administrator-led account recovery need their deployed implementation confirmed. Self-service password recovery uses the standard Auth endpoints described in password-recovery.md.
 
 ### Sales, purchases, and quantities
 
@@ -324,10 +324,12 @@ Filter daily reports with `.gte('report_date', startDate).lte('report_date', end
 5. Add manager catalog, purchases, adjustments, batching, returns/refunds/voids, and reports using the payload reference.
 6. Run [frontend-smoke-tests.md](frontend-smoke-tests.md) using dedicated test accounts/data.
 
-Before relying on features outside this contract, settle their requirements: password recovery/email delivery and redirect URLs, additional manager provisioning for existing stores, confirmed expense-cancellation interface, refund-provider integration, and corrections after real restocking/disposal/refunds. Tax, discounts, multi-currency conversion, cross-store transfers, and pharmacy-specific regulatory workflows are not established by this handoff. Organizations and store types do not automatically implement those features.
+Before relying on features outside this contract, settle their requirements: hosted email delivery and recovery redirect configuration, additional manager provisioning for existing stores, confirmed expense-cancellation interface, refund-provider integration, and corrections after real restocking/disposal/refunds. Tax, discounts, multi-currency conversion, cross-store transfers, and pharmacy-specific regulatory workflows are not established by this handoff. Organizations and store types do not automatically implement those features.
 
 When adding a Python backend later, preserve the same user/store authorization and transaction boundaries. Do not replace authenticated database calls with unrestricted service-role table writes.
 
 Supplier contacts use `public.supplier_phones(supplier_phone_id uuid, supplier_id uuid, phone text)`. Use `supplier_phone_id` for ordering and record identity; filter edits/deletions by both `supplier_phone_id` and `supplier_id`. There is no `id` or `store_id` column on this table. RLS must authorize contact access through the parent supplier. The supplier directory displays numbers and supports searching them; adding/editing/removing remains in the Phone numbers dialog.
 
 Owner signup uses Supabase Auth signUp and the additive owner provisioning trigger described in [owner-signup.md](owner-signup.md). The anonymous `owner_signup_available()` RPC reports whether the trigger is installed/enabled. Public owner metadata can name a new business and store but cannot choose existing tenant IDs or roles. Workers continue using the trusted create-worker endpoint.
+
+Self-service password recovery: `resetPasswordForEmail` calls `POST /auth/v1/recover` with email and the deployed `?auth=recovery` redirect. A verified recovery session can update its own password through `PUT /auth/v1/user` via `updateUser({password})`. Profile/store/role records are not modified. See [password-recovery.md](password-recovery.md) for redirect and email setup and acceptance checks.

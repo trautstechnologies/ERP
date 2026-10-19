@@ -65,3 +65,5 @@ The output can be statically hosted from `dist/`. HTTPS and trusted deployment a
 Since 19 October 2026, all quantity forms accept whole numbers only. New products use `each`; existing units and attributes are preserved when editing. Apply [the whole-quantity database patch](../database/patches/20261019_whole_quantities.sql) as described in [the transition notes](simple-products.md).
 
 All dropdowns use the shared searchable-select enhancement. Native select controls remain the source of truth for required validation, FormData, selected values and existing change handlers. Menus support label filtering, keyboard selection/cancellation, dynamic form rows, mobile positioning and empty results. Search text has no form name and is never included in backend payloads.
+
+Password recovery is implemented in `src/lib/password-recovery.js`. The client captures recovery intent and observes Auth recovery events before initialization completes. The main startup path prioritizes recovery over store-profile loading. See `password-recovery.md` for the verified-link checks, current-account guard and deployment requirements.
