@@ -85,7 +85,7 @@ Use Products to look up names, SKUs, categories, units, prices, sellable quantit
 ### Add a product — managers
 
 1. Select **Add product**.
-2. Enter the **Product name** and a unique **SKU** for this store.
+2. Enter the **Product name**. **SKU** is optional: enter your own unique product code, or leave it blank and the app generates one.
 3. Add a category if useful, such as Groceries or Clothing.
 4. Enter the **Selling price** and **Buying price** for one item or pack.
 5. Choose a supplier if applicable.
@@ -97,7 +97,7 @@ Stock is counted in whole items. For different sizes, colours or packs, create s
 
 ### Edit or change availability — managers
 
-- Select **Edit** to change the allowed product details, prices or supplier, then **Save**.
+- Select **Edit** to change the allowed product details, prices or supplier, then **Save**. Clearing the SKU field keeps the existing code.
 - Select **Deactivate** and confirm with **Save** to stop offering a product for new sales.
 - Select **Activate** and **Save** to make an eligible inactive product active again.
 
@@ -475,7 +475,7 @@ Other displayed details are not editable through this screen. Ask the administra
 
 1. Add the supplier and contact numbers.
 2. Give different sizes or packs separate, clear product names.
-3. Add each product with the correct SKU, prices and selling unit.
+3. Add each product with its prices. Enter a SKU if you use your own product codes, or leave it blank.
 4. Enable batch/expiry tracking before receiving stock if required; migrate existing stock instead if it is already present.
 5. Receive supplier purchases and their batch details.
 6. Set useful reorder levels and check sellable quantities.

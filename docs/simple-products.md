@@ -13,3 +13,5 @@ The patch applies whole-number constraints to numeric quantity and reorder-level
 If any existing record is fractional or nonfinite, the entire patch rolls back and identifies its table/column. Do not round or delete accounting/audit records to make it pass. Reconcile a migration plan for those records before switching the live store. Keep the old frontend until that is resolved; old fractional sales may require fractional returns or reversals. Existing variant uniqueness constraints remain relevant to administratively created grouped products.
 
 Re-running the patch is supported. A lock timeout also rolls back the transaction; retry at a quieter time. No hosted database was changed by committing this file.
+
+SKU entry is optional. New products with a blank SKU receive an `AUTO-` code derived from their full stable product UUID. Retrying the same creation uses the same code. Clearing SKU during an edit preserves the existing code; explicitly entered codes are trimmed and still subject to the database unique constraint. The database continues receiving a nonempty SKU, so no schema change is needed.

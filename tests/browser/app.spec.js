@@ -562,3 +562,29 @@ test('blank supplier phone entries do not create contact records', async ({ page
   await expect(modal.locator('.form-error')).toHaveText('Enter a phone number.');
   expect(state.calls.filter(c => c.path.endsWith('/supplier_phones') && c.method === 'POST')).toHaveLength(0);
 });
+
+test('blank SKUs are generated per product and clearing an existing SKU preserves it', async ({ page }) => {
+  const state = await backend(page);
+  await login(page);
+  await page.getByRole('link', { name: 'Products', exact: true }).click();
+  for (const name of ['First automatic product', 'Second automatic product']) {
+    await page.getByRole('button', { name: 'Add product', exact: true }).click();
+    const modal = page.getByRole('dialog');
+    await expect(modal.getByLabel('SKU', { exact: true })).not.toHaveAttribute('required');
+    await modal.getByLabel('Product name', { exact: true }).fill(name);
+    await modal.getByLabel('SKU', { exact: true }).fill('   ');
+    await modal.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(modal).toHaveCount(0);
+  }
+  const created = state.calls.filter(c => c.path.endsWith('/products') && c.method === 'POST');
+  expect(created).toHaveLength(2);
+  for (const call of created) expect(call.body.sku).toBe(`AUTO-${call.body.product_id.replaceAll('-', '').toUpperCase()}`);
+  expect(created[0].body.sku).not.toBe(created[1].body.sku);
+  const existing = page.locator('tbody tr').filter({ hasText: 'Test Product' });
+  await existing.getByRole('button', { name: 'Edit', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('SKU', { exact: true }).fill('');
+  await modal.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  expect(state.calls.find(c => c.path.endsWith('/products') && c.method === 'PATCH').body.sku).toBe('TEST-001');
+});
