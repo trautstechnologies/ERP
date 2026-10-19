@@ -63,3 +63,5 @@ Run `npm test`, `npm run build`, and the mocked browser integration tests. The m
 The output can be statically hosted from `dist/`. HTTPS and trusted deployment access remain the host's responsibility. If deploying under a URL subdirectory, configure Vite's `base` for that path before building. Do not deploy the original reference directory as an alternative app.
 
 Since 19 October 2026, all quantity forms accept whole numbers only. New products use `each`; existing units and attributes are preserved when editing. Apply [the whole-quantity database patch](../database/patches/20261019_whole_quantities.sql) as described in [the transition notes](simple-products.md).
+
+All dropdowns use the shared searchable-select enhancement. Native select controls remain the source of truth for required validation, FormData, selected values and existing change handlers. Menus support label filtering, keyboard selection/cancellation, dynamic form rows, mobile positioning and empty results. Search text has no form name and is never included in backend payloads.

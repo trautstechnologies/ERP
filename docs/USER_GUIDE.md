@@ -45,6 +45,8 @@ A manager's access is limited to their own store. Being in the same organization
 - Select **Cancel**, **Close**, or the **×** in a form to leave it before saving. That does not undo something already saved.
 - Select **Logout** when finished, especially on a shared device. You may need to scroll down inside the menu to reach it.
 
+Dropdown menus are searchable: open a menu, type part of a name in **Type to search…**, then select a matching option. Clear the search to see all options. Searching alone does not change your selection. On a keyboard, use the arrow keys and Enter to select; Escape closes the menu.
+
 Refreshing, navigating away, or closing a form can lose unsaved entries. Avoid doing this while a save is in progress.
 
 ## 2. Dashboard

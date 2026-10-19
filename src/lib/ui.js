@@ -30,7 +30,11 @@ export const options = (rows, value, label, selected = '', empty = 'Select…') 
 export function field(label, name, { value = '', type = 'text', required = true, min, step, maxLength, extra = '' } = {}) {
   return `<label class="form-group">${e(label)}<input name="${e(name)}" type="${e(type)}" value="${e(value)}" ${required ? 'required' : ''} ${min !== undefined ? `min="${e(min)}"` : ''} ${step ? `step="${e(step)}"` : ''} ${maxLength ? `maxlength="${maxLength}"` : ''} ${extra}></label>`;
 }
-export const select = (label, name, html, required = true) => `<label class="form-group">${e(label)}<select name="${e(name)}" aria-label="${e(label)}" ${required ? 'required' : ''}>${html}</select></label>`;
+let selectCounter = 0;
+export function select(label, name, html, required = true) {
+  const id = `select-${++selectCounter}`;
+  return `<div class="form-group"><label for="${id}">${e(label)}</label><div class="select-search"><select id="${id}" data-searchable name="${e(name)}" aria-label="${e(label)}" ${required ? 'required' : ''}>${html}</select></div></div>`;
+}
 export const check = (label, name, checked = false) => `<label class="check"><input type="checkbox" name="${e(name)}" ${checked ? 'checked' : ''}>${e(label)}</label>`;
 export const button = (label, action, id = '', secondary = true) => `<button type="button" class="${secondary ? 'secondary-btn' : 'primary-btn'}" data-action="${e(action)}" data-id="${e(id)}">${e(label)}</button>`;
 export const table = (headers, rows) => `<div class="table-wrap"><table><thead><tr>${headers.map(h => `<th>${e(h)}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.join('') : `<tr><td colspan="${headers.length}" class="empty">No records to display.</td></tr>`}</tbody></table></div>`;

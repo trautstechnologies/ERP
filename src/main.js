@@ -4,12 +4,15 @@ import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, Clip
 import { configured, configurationError, supabase } from './lib/client.js';
 import { list, unwrap } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
+import { installSearchableSelects } from './lib/searchable-select.js';
 import { managerPages } from './lib/domain.js';
 import { branding, mountBranding } from './lib/branding.js';
 import { overview, products, inventory } from './pages/catalog.js';
 import { sales, purchases, suppliers, expenses, accounts } from './pages/operations.js';
 import { batches, returns, audit } from './pages/stock.js';
 import { reports, summary, settings } from './pages/reports.js';
+
+installSearchableSelects();
 
 const routes = {
   dashboard: ['Dashboard', 'layout-dashboard', overview],

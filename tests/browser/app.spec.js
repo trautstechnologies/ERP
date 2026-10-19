@@ -389,3 +389,68 @@ test('quarantine processing submits whole quantities with the original return it
   expect(state.calls.find(c => c.path.endsWith('/rpc/process_return_quarantine')).body).toMatchObject({ p_return_item_id: 'held-item', p_quantity: 1, p_action: 'dispose' });
   expect(state.errors).toEqual([]);
 });
+
+test('searchable dropdowns filter labels and submit selected product and payment values', async ({ page }) => {
+  const state = await backend(page);
+  await login(page);
+  await page.getByRole('link', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Product', { exact: true }).click();
+  const search = modal.getByRole('combobox', { name: 'Search Product options', exact: true });
+  await search.fill('unmatched');
+  await expect(modal.getByRole('status')).toHaveText('No matching options');
+  await search.press('Enter');
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+  await search.fill('tEsT pRoD');
+  await modal.getByRole('listbox', { name: 'Product options', exact: true }).getByRole('option', { name: 'Test Product · each', exact: true }).click();
+  await expect(modal.getByLabel('Product', { exact: true })).toHaveValue(ids.product);
+  await modal.getByLabel('Payment method', { exact: true }).click();
+  const paymentSearch = modal.getByRole('combobox', { name: 'Search Payment method options', exact: true });
+  await paymentSearch.fill('mobile');
+  await paymentSearch.press('Enter');
+  await expect(modal.getByLabel('Payment method', { exact: true })).toHaveValue('mobile_money');
+  await expect(modal).toBeVisible();
+  await modal.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  expect(state.calls.find(c => c.path.endsWith('/rpc/record_sale')).body).toMatchObject({ p_payment_method: 'mobile_money', p_items: [{ product_id: ids.product, quantity: 1 }] });
+});
+
+test('searchable dropdown keyboard cancel preserves selection and supports dynamic rows', async ({ page }) => {
+  await backend(page);
+  await login(page);
+  await page.getByRole('link', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  const payment = modal.getByLabel('Payment method', { exact: true });
+  await payment.focus();
+  await payment.press('ArrowDown');
+  const search = modal.getByRole('combobox', { name: 'Search Payment method options', exact: true });
+  await search.fill('bank');
+  await search.press('Escape');
+  await expect(modal).toBeVisible();
+  await expect(payment).toHaveValue('cash');
+  await expect(payment).toBeFocused();
+  await modal.getByRole('button', { name: 'Add item', exact: true }).click();
+  await modal.getByLabel('Product', { exact: true }).nth(1).click();
+  const productSearch = modal.getByRole('combobox', { name: 'Search Product options', exact: true });
+  await productSearch.fill('test');
+  await productSearch.press('ArrowDown');
+  await productSearch.press('Enter');
+  await expect(modal.getByLabel('Product', { exact: true }).nth(1)).toHaveValue(ids.product);
+});
+
+test('searchable page filters work on mobile without overflowing the viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await backend(page);
+  await login(page);
+  await page.getByRole('button', { name: 'Menu', exact: true }).click();
+  await page.getByRole('link', { name: 'Returns & Refunds', exact: true }).click();
+  await page.getByLabel('Show', { exact: true }).click();
+  await page.getByRole('combobox', { name: 'Search Show options', exact: true }).fill('voided');
+  const popup = page.locator('.select-search-popup');
+  const bounds = await popup.boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(390);
+  await page.getByRole('listbox', { name: 'Show options', exact: true }).getByRole('option', { name: 'Voided entries', exact: true }).click();
+  await expect(page.getByLabel('Show', { exact: true })).toHaveValue('voided');
+  await expect(popup).toHaveCount(0);
+});
