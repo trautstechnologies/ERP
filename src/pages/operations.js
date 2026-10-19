@@ -1,4 +1,4 @@
-import { insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
+import { list, insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
 import { $, e, badge, timestamp, dateLabel, supportDetails, options, select, field, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
 import { price, paymentLabel } from '../lib/domain.js';
 import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, payOptions, lineEditor, setupLines, parseLines, detailLines, itemSummary } from './shared.js';

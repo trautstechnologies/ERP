@@ -454,3 +454,28 @@ test('searchable page filters work on mobile without overflowing the viewport', 
   await expect(page.getByLabel('Show', { exact: true })).toHaveValue('voided');
   await expect(popup).toHaveCount(0);
 });
+
+test('purchase details after visiting Sales use only the current page handlers', async ({ page }) => {
+  const state = await backend(page);
+  const purchase = '88888888-8888-4888-8888-888888888888';
+  state.data.purchases = [{ purchase_id: purchase, store_id: ids.store, purchase_date: '2026-10-16T09:00:00Z', status: 'received', purchase_total_amount: 20 }];
+  state.data.purchase_items = [{ purchase_item_id: 'purchase-line', store_id: ids.store, purchase_id: purchase, product_id: ids.product, quantity: 2, unit_cost: 10, line_total: 20 }];
+  await login(page);
+  for (let visit = 0; visit < 2; visit++) {
+    await page.getByRole('link', { name: 'Sales', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Sales', exact: true }).last()).toBeVisible();
+    await page.getByRole('link', { name: 'Purchases', exact: true }).click();
+    await expect(page.locator('[data-table]')).toContainText('Test Product × 2');
+    await page.getByRole('button', { name: 'Details', exact: true }).click();
+    await expect(page.getByRole('dialog')).toContainText('Purchase details');
+    await expect(page.getByRole('dialog')).toContainText('Test Product');
+    await expect(page.locator('#appMessage')).toBeHidden();
+    await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).first().click();
+    await page.getByRole('button', { name: 'Receive purchase', exact: true }).click();
+    await expect(page.getByRole('dialog')).toContainText('Receive purchase');
+    await expect(page.getByRole('dialog')).not.toContainText('Payment method');
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click();
+  }
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/get_sale_batches'))).toHaveLength(0);
+  expect(state.errors).toEqual([]);
+});

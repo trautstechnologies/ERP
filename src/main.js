@@ -126,7 +126,15 @@ async function render() {
         if (profile.user_id !== captured.user_id || profile.store_id !== captured.store_id || profile.role !== captured.role) throw new Error('Your account assignment changed. Reload before continuing.');
       },
       refresh: () => render(),
-      mount(html) { if (token !== generation) return null; $('#pageContent').innerHTML = html; iconRefresh(); return $('#pageContent'); },
+      mount(html) {
+        if (token !== generation) return null;
+        // Give each page its own event root; old delegated handlers leave with it.
+        const root = document.createElement('div');
+        root.innerHTML = html;
+        $('#pageContent').replaceChildren(root);
+        iconRefresh();
+        return root;
+      },
     };
     await routes[currentKey][2](ctx);
     if (token === generation && intent && currentKey === 'sales') {
