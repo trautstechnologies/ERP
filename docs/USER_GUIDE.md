@@ -175,7 +175,7 @@ For a tracked product, use **Manage batches** to open Batches & Expiry and adjus
 
 ## 6. Suppliers — managers
 
-Use Suppliers to maintain supplier details and contact numbers. Search to find an existing supplier before adding another.
+Use Suppliers to maintain supplier details and contact numbers. The **Phone numbers** column shows all saved numbers, or **Not added** if none are saved. Search by supplier details or phone number before adding another supplier.
 
 ### Add or edit a supplier
 
@@ -190,7 +190,7 @@ Use Suppliers to maintain supplier details and contact numbers. Search to find a
 3. To change a number, select **Edit number**, enter the corrected number and **Save**.
 4. To remove a number, select **Remove number** and confirm with **Remove number**.
 
-Removing a contact number does not remove the supplier or their purchase history.
+You can save more than one number per supplier. Numbers keep their leading zero or international prefix, such as 0971234567 or +260 97 123 4567. After saving a number, the supplier table updates automatically. Removing a contact number does not remove the supplier or their purchase history.
 
 ### Activate or deactivate
 

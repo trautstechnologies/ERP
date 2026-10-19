@@ -35,8 +35,14 @@ export async function sales(ctx) {
 }
 
 export async function suppliers(ctx) {
-  const data = await scoped(ctx, 'suppliers');
-  const render = search => table(['Supplier', 'Email', 'Address', 'Status', 'Actions'], data.filter(s => matches(s, search)).map(s => row([e(s.supplier_name), e(s.email || '—'), e(s.address || '—'), badge(s.active ? 'active' : 'inactive'), `<div class="actions">${button('Edit', 'edit', s.supplier_id)}${button('Phone numbers', 'phones', s.supplier_id)}${button(s.active ? 'Deactivate' : 'Activate', 'toggle', s.supplier_id)}</div>`])));
+  const [data, allPhones] = await Promise.all([scoped(ctx, 'suppliers'), list('supplier_phones')]);
+  const phonesFor = id => allPhones.filter(phone => phone.supplier_id === id);
+  const phoneValue = value => {
+    const phone = value.trim();
+    if (!phone) throw new Error('Enter a phone number.');
+    return phone;
+  };
+  const render = search => table(['Supplier', 'Phone numbers', 'Email', 'Address', 'Status', 'Actions'], data.filter(s => matches({ ...s, phones: phonesFor(s.supplier_id).map(p => p.phone).join(' ') }, search)).map(s => row([e(s.supplier_name), phonesFor(s.supplier_id).map(p => e(p.phone)).join('<br>') || 'Not added', e(s.email || '—'), e(s.address || '—'), badge(s.active ? 'active' : 'inactive'), `<div class="actions">${button('Edit', 'edit', s.supplier_id)}${button('Phone numbers', 'phones', s.supplier_id)}${button(s.active ? 'Deactivate' : 'Activate', 'toggle', s.supplier_id)}</div>`])));
   const root = ctx.mount(`${heading('Suppliers', 'Supplier details and contact numbers', button('Add supplier', 'add', '', false))}${panel('Suppliers', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
   searchable(root, render);
@@ -51,11 +57,11 @@ export async function suppliers(ctx) {
     add: () => edit(), edit,
     toggle: id => { const supplier = data.find(s => s.supplier_id === id); actionForm('Update supplier status', note(supplier.supplier_name), () => patch('suppliers', 'supplier_id', id, { active: !supplier.active }, ctx.profile.store_id), ctx); },
     phones: async id => {
-      // The supplier FK enforces scope; supplier_phones has no store_id column.
+      // RLS authorizes contacts through the parent supplier; there is no store_id column.
       const phones = await list('supplier_phones', { filters: { supplier_id: id } });
-      const modal = actionForm('Supplier phone numbers', table(['Phone', 'Actions'], phones.map(p => row([e(p.phone), `<div class="actions">${button('Edit number', 'edit-phone', p.id)}${button('Remove number', 'remove-phone', p.id)}</div>`]))) + field('Add phone number', 'phone', { maxLength: 30 }), (values, requestId) => insert('supplier_phones', { id: requestId, supplier_id: id, phone: values.phone.trim() }), ctx, { mutation: true, label: 'Add number' });
+      const modal = actionForm('Supplier phone numbers', table(['Phone', 'Actions'], phones.map(p => row([e(p.phone), `<div class="actions">${button('Edit number', 'edit-phone', p.supplier_phone_id)}${button('Remove number', 'remove-phone', p.supplier_phone_id)}</div>`]))) + field('Add phone number', 'phone', { type: 'tel', maxLength: 30 }), (values, requestId) => insert('supplier_phones', { supplier_phone_id: requestId, supplier_id: id, phone: phoneValue(values.phone) }), ctx, { mutation: true, label: 'Add number' });
       bind(modal, {
-        'edit-phone': phoneId => actionForm('Edit supplier phone', field('Phone', 'phone', { value: phones.find(p => p.id === phoneId).phone, maxLength: 30 }), values => updateSupplierPhone(phoneId, id, values.phone.trim()), ctx),
+        'edit-phone': phoneId => actionForm('Edit supplier phone', field('Phone', 'phone', { value: phones.find(p => p.supplier_phone_id === phoneId).phone, type: 'tel', maxLength: 30 }), values => updateSupplierPhone(phoneId, id, phoneValue(values.phone)), ctx),
         'remove-phone': phoneId => actionForm('Remove supplier contact number', note('This removes a contact number only. Supplier and transaction audit history are retained.'), () => deleteSupplierPhone(phoneId, id), ctx, { label: 'Remove number' }),
       });
       return modal;

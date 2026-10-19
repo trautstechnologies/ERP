@@ -2,7 +2,7 @@ import { supabase } from './client.js';
 
 const identities = {
   profiles: 'user_id', stores: 'store_id', organizations: 'organization_id', products: 'product_id',
-  suppliers: 'supplier_id', supplier_phones: 'id', product_groups: 'product_group_id', selling_units: 'unit_code',
+  suppliers: 'supplier_id', supplier_phones: 'supplier_phone_id', product_groups: 'product_group_id', selling_units: 'unit_code',
   sales: 'sale_id', sales_items: 'sales_item_id', purchases: 'purchase_id', purchase_items: 'purchase_item_id',
   expenses: 'expense_id', store_inventory: 'product_id', product_batches: 'batch_id',
   stock_movements: 'stock_movement_id', stock_movement_batches: 'allocation_id', batch_status_events: 'event_id',
@@ -52,11 +52,11 @@ export async function patch(table, idField, id, body, storeId) {
 }
 
 export async function updateSupplierPhone(id, supplierId, phone) {
-  return unwrap(await supabase.from('supplier_phones').update({ phone }).eq('id', id).eq('supplier_id', supplierId).select().single());
+  return unwrap(await supabase.from('supplier_phones').update({ phone }).eq('supplier_phone_id', id).eq('supplier_id', supplierId).select().single());
 }
 
 export async function deleteSupplierPhone(id, supplierId) {
-  return unwrap(await supabase.from('supplier_phones').delete().eq('id', id).eq('supplier_id', supplierId).select().single());
+  return unwrap(await supabase.from('supplier_phones').delete().eq('supplier_phone_id', id).eq('supplier_id', supplierId).select().single());
 }
 
 export async function rpc(name, body) {

@@ -34,7 +34,7 @@ Products are inventory items in the current schema. The original demo's services
 2. Apply the previously developed fractional, organization/type/variant, batching, existing-stock migration, customer returns and return-void migrations. These SQL sources are not copied into a guessed migration history here.
 3. Deploy the updated no-email `create-worker` function provided in the conversation. Its success contract is HTTP 201, `confirmation_required:false`, worker UUID and role `user`. Keep the atomic Auth profile-provisioning trigger. Older email-delivery responses produce a deliberate client error rather than another account creation.
 4. Supply active profiles/stores and real selling-unit rows. Zambia store timezone is `Africa/Lusaka`. An inactive Auth account/profile/store cannot enter the app merely because it has a persisted session.
-5. Verify `supplier_phones` has `id,supplier_id,phone` and the grants described by the backend handoff. This naming comes from the session schema, not the original ERD. Adjust `src/pages/operations.js` and the API identity map if the actual deployed schema differs.
+5. The confirmed `supplier_phones` columns are `supplier_phone_id` (uuid primary key), `supplier_id` (uuid) and `phone` (text). Contact reads/writes use RLS through the parent supplier; edits/removals filter by both contact key and supplier key.
 6. Expense cancellation stays disabled by default. Only set `VITE_ENABLE_EXPENSE_CANCELLATION=true` after verifying `cancel_expense(p_expense_id uuid,p_reason text)`. Its complete deployed definition was not supplied. Disabled cancellation is visibly explained in the UI.
 7. No administrator/service key belongs in `.env`. Normal clients can never call private staging/core functions directly.
 

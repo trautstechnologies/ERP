@@ -34,7 +34,7 @@ async function backend(page, { role = 'manager', failSaleOnce = false } = {}) {
   await page.route('https://test-project.supabase.co/**', async route => {
     const request = route.request(), url = new URL(request.url());
     const body = request.postData() ? JSON.parse(request.postData()) : null;
-    calls.push({ path: url.pathname, method: request.method(), body });
+    calls.push({ path: url.pathname, query: url.search, method: request.method(), body });
     const reply = (value, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(value) });
     if (url.pathname === '/auth/v1/token') return reply({ access_token: accessToken, refresh_token: 'test-refresh', token_type: 'bearer', expires_in: 3600, expires_at: now + 3600, user });
     if (url.pathname === '/auth/v1/user') return reply(user);
@@ -51,9 +51,18 @@ async function backend(page, { role = 'manager', failSaleOnce = false } = {}) {
     }
     const resource = url.pathname.split('/').pop();
     if (!(resource in data)) return reply({ message: `Unknown test resource: ${resource}` }, 404);
+    if (resource === 'supplier_phones' && (url.searchParams.get('order')?.includes('id.') && !url.searchParams.get('order')?.includes('supplier_phone_id.') || url.searchParams.has('id') || body && Object.hasOwn(body, 'id'))) return reply({ code: '42703', message: 'column supplier_phones.id does not exist' }, 400);
     if (request.method() === 'POST') { data[resource].push(body); return reply(request.headers().accept?.includes('vnd.pgrst.object') ? body : [body], 201); }
     let rows = [...data[resource]];
     for (const [key, value] of url.searchParams) if (value.startsWith('eq.')) rows = rows.filter(r => String(r[key]) === value.slice(3));
+    if (resource === 'supplier_phones' && request.method() === 'PATCH') {
+      rows.forEach(r => Object.assign(r, body));
+      return reply(rows[0]);
+    }
+    if (resource === 'supplier_phones' && request.method() === 'DELETE') {
+      data[resource] = data[resource].filter(r => !rows.includes(r));
+      return reply(rows[0]);
+    }
     const start = Number(url.searchParams.get('offset') || 0), limit = Number(url.searchParams.get('limit') || rows.length);
     rows = rows.slice(start, start + limit);
     return reply(rows);
@@ -478,4 +487,78 @@ test('purchase details after visiting Sales use only the current page handlers',
   }
   expect(state.calls.filter(c => c.path.endsWith('/rpc/get_sale_batches'))).toHaveLength(0);
   expect(state.errors).toEqual([]);
+});
+
+test('supplier contacts use the confirmed key for listing, adding, editing and removing', async ({ page }) => {
+  const state = await backend(page);
+  const supplier = '77777777-7777-4777-8777-777777777777';
+  const otherSupplier = '88888888-8888-4888-8888-888888888888';
+  const phoneId = '99999999-9999-4999-8999-999999999999';
+  state.data.suppliers = [
+    { supplier_id: supplier, store_id: ids.store, supplier_name: 'Retail Supplier', active: true },
+    { supplier_id: otherSupplier, store_id: ids.store, supplier_name: 'Other Supplier', active: true },
+  ];
+  state.data.supplier_phones = [
+    { supplier_phone_id: phoneId, supplier_id: supplier, phone: '0971234567' },
+    { supplier_phone_id: 'other-phone', supplier_id: otherSupplier, phone: '+260 96 555 5555' },
+  ];
+  await login(page);
+  await page.getByRole('link', { name: 'Suppliers', exact: true }).click();
+  const supplierRow = () => page.locator('tbody tr').filter({ hasText: 'Retail Supplier' });
+  await expect(supplierRow()).toContainText('0971234567');
+  await expect(supplierRow()).not.toContainText('+260 96 555 5555');
+  await page.getByRole('searchbox', { name: 'Search records' }).fill('0971234567');
+  await expect(page.locator('tbody')).not.toContainText('Other Supplier');
+  await supplierRow().getByRole('button', { name: 'Phone numbers', exact: true }).click();
+  let modal = page.getByRole('dialog');
+  await expect(modal).toContainText('0971234567');
+  await expect(modal).not.toContainText('+260 96 555 5555');
+  await modal.getByLabel('Add phone number').fill(' +260 97 111 2222 ');
+  await modal.getByRole('button', { name: 'Add number', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  await expect(supplierRow()).toContainText('+260 97 111 2222');
+  const added = state.calls.find(c => c.path.endsWith('/supplier_phones') && c.method === 'POST').body;
+  expect(added).toMatchObject({ supplier_id: supplier, phone: '+260 97 111 2222' });
+  expect(added.supplier_phone_id).toMatch(/^[a-f0-9-]{36}$/);
+  expect(added).not.toHaveProperty('id');
+
+  await supplierRow().getByRole('button', { name: 'Phone numbers', exact: true }).click();
+  await page.getByRole('dialog').getByRole('row').filter({ hasText: '0971234567' }).getByRole('button', { name: 'Edit number', exact: true }).click();
+  modal = page.getByRole('dialog');
+  await modal.getByLabel('Phone', { exact: true }).fill('0961234567');
+  await modal.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  await expect(supplierRow()).toContainText('0961234567');
+  await expect(supplierRow()).not.toContainText('0971234567');
+  const updated = state.calls.find(c => c.path.endsWith('/supplier_phones') && c.method === 'PATCH');
+  const query = new URLSearchParams(updated.query);
+  expect(query.get('supplier_phone_id')).toBe(`eq.${phoneId}`);
+  expect(query.get('supplier_id')).toBe(`eq.${supplier}`);
+
+  await supplierRow().getByRole('button', { name: 'Phone numbers', exact: true }).click();
+  await page.getByRole('dialog').getByRole('row').filter({ hasText: '0961234567' }).getByRole('button', { name: 'Remove number', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Remove number', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(supplierRow()).not.toContainText('0961234567');
+  await expect(supplierRow()).toContainText('+260 97 111 2222');
+  expect(state.data.supplier_phones.find(p => p.supplier_id === otherSupplier).phone).toBe('+260 96 555 5555');
+  const deleted = new URLSearchParams(state.calls.find(c => c.method === 'DELETE').query);
+  expect(deleted.get('supplier_phone_id')).toBe(`eq.${phoneId}`);
+  expect(deleted.get('supplier_id')).toBe(`eq.${supplier}`);
+  await expect(page.locator('#appMessage')).not.toHaveClass(/error/);
+  expect(state.errors).toEqual([]);
+});
+
+test('blank supplier phone entries do not create contact records', async ({ page }) => {
+  const state = await backend(page);
+  state.data.suppliers = [{ supplier_id: 'supplier', store_id: ids.store, supplier_name: 'New Supplier', active: true }];
+  await login(page);
+  await page.getByRole('link', { name: 'Suppliers', exact: true }).click();
+  await expect(page.locator('[data-table] tbody')).toContainText('Not added');
+  await page.getByRole('button', { name: 'Phone numbers', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Add phone number').fill('   ');
+  await modal.getByRole('button', { name: 'Add number', exact: true }).click();
+  await expect(modal.locator('.form-error')).toHaveText('Enter a phone number.');
+  expect(state.calls.filter(c => c.path.endsWith('/supplier_phones') && c.method === 'POST')).toHaveLength(0);
 });
