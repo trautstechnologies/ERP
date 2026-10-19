@@ -5,13 +5,13 @@ export const paymentLabels = { cash: 'Cash', card: 'Card', bank_transfer: 'Bank 
 export const paymentLabel = method => paymentLabels[method] || method || '—';
 export const managerPages = new Set(['suppliers', 'purchases', 'expenses', 'summary', 'accounts', 'reports', 'returns', 'batches', 'audit', 'settings']);
 
-export function quantity(value, places = 3, allowZero = false, signed = false) {
+export function quantity(value, { allowZero = false, signed = false } = {}) {
   let number;
   try { number = new Decimal(value); } catch { throw new Error('Enter a valid quantity.'); }
-  if (!number.isFinite() || (signed ? number.isZero() : allowZero ? number.lt(0) : number.lte(0)) || number.decimalPlaces() > places) {
-    throw new Error(`Enter ${signed ? 'a non-zero' : allowZero ? 'a non-negative' : 'a positive'} quantity with at most ${places} decimal places.`);
+  if (!number.isFinite() || (signed ? number.isZero() : allowZero ? number.lt(0) : number.lte(0)) || !number.isInteger()) {
+    throw new Error(`Enter ${signed ? 'a non-zero' : allowZero ? 'a non-negative' : 'a positive'} whole-number quantity.`);
   }
-  if (number.abs().mul(new Decimal(10).pow(places)).gt(Number.MAX_SAFE_INTEGER)) throw new Error('Quantity exceeds the precision supported by this browser form.');
+  if (number.abs().gt(Number.MAX_SAFE_INTEGER)) throw new Error('Quantity exceeds the precision supported by this browser form.');
   return number.toNumber();
 }
 

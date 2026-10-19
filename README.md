@@ -52,7 +52,7 @@ src/lib/client.js             Supabase configuration
 src/lib/api.js                Queries, pagination, RPC and Edge Function calls
 src/lib/domain.js             Quantity/decimal/date/return rules
 src/lib/ui.js                 Safe rendering, dialogs, CSV and request identity
-src/pages/catalog.js          Dashboard, products/variants, inventory
+src/pages/catalog.js          Dashboard, products, inventory
 src/pages/operations.js       Sales, suppliers, purchases, expenses, workers
 src/pages/stock.js            Batches, existing-stock migration, returns, audit
 src/pages/reports.js          Reports, operating summary, store settings
@@ -89,3 +89,7 @@ Frontend integration documentation:
 - [Deployed contract inspection](docs/verify-backend-contract.sql): read-only SQL to inspect the actual project's functions, columns, policies, and grants.
 
 The handoff describes the implementation developed in this session. This checkout does not contain the project's complete migration history or deployed Edge Function source. Reconcile the documentation with the linked Supabase project before treating it as a versioned API release.
+
+## Simple product entry
+
+Products use whole-item quantities and have no variant/group setup in the UI. Prices still allow cents. Before using the updated frontend for live writes, apply the database step in [Simple products and whole quantities](docs/simple-products.md). The patch stops without changes if historical fractional records need reconciliation.

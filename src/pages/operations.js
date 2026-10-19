@@ -1,4 +1,4 @@
-import { list, insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
+import { insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
 import { $, e, badge, timestamp, dateLabel, supportDetails, options, select, field, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
 import { price, paymentLabel } from '../lib/domain.js';
 import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, payOptions, lineEditor, setupLines, parseLines, detailLines, itemSummary } from './shared.js';
@@ -13,7 +13,7 @@ async function transactionDetails(ctx, sale, products, isPurchase = false) {
 }
 
 export async function sales(ctx) {
-  const [data, products, units, saleItems, staff] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), list('selling_units'), scoped(ctx, 'sales_items'), ctx.manager ? scoped(ctx, 'profiles') : [ctx.profile]]);
+  const [data, products, saleItems, staff] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), scoped(ctx, 'sales_items'), ctx.manager ? scoped(ctx, 'profiles') : [ctx.profile]]);
   const render = search => table(['Items sold', 'Recorded by', 'Date', 'Payment', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).filter(s => matches({ ...s, items: itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products), staff: nameOf(staff, s.user_id, 'user_id', 'user_name'), payment_label: paymentLabel(s.payment_method) }, search)).map(s => row([
     e(itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products)), e(nameOf(staff, s.user_id, 'user_id', 'user_name')), e(timestamp(s.sale_date, ctx.store.time_zone)), e(paymentLabel(s.payment_method)), badge(s.status), e(ctx.money(s.total_amount)), `<div class="actions">${button('Details', 'details', s.sale_id)}${ctx.manager && s.status === 'completed' ? button('Cancel sale', 'reverse', s.sale_id) : ''}</div>`,
   ])));
@@ -21,10 +21,10 @@ export async function sales(ctx) {
   if (!root) return;
   searchable(root, render, { placeholder: 'Search products, staff, payment or status…' });
   const openSale = () => {
-    const modal = actionForm('Record sale', select('Payment method', 'payment_method', payOptions()) + lineEditor(products, units), async (values, id) => {
-      await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products, units) });
+    const modal = actionForm('Record sale', select('Payment method', 'payment_method', payOptions()) + lineEditor(products), async (values, id) => {
+      await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products) });
     }, ctx, { mutation: true, label: 'Record sale' });
-    setupLines(modal, products, units);
+    setupLines(modal, products);
   };
   bind(root, {
     add: openSale,
@@ -64,7 +64,7 @@ export async function suppliers(ctx) {
 }
 
 export async function purchases(ctx) {
-  const [data, suppliers, products, units, purchaseItems] = await Promise.all([scoped(ctx, 'purchases'), scoped(ctx, 'suppliers'), scoped(ctx, 'products'), list('selling_units'), scoped(ctx, 'purchase_items')]);
+  const [data, suppliers, products, purchaseItems] = await Promise.all([scoped(ctx, 'purchases'), scoped(ctx, 'suppliers'), scoped(ctx, 'products'), scoped(ctx, 'purchase_items')]);
   const render = search => table(['Items received', 'Supplier', 'Date', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.purchase_date.localeCompare(a.purchase_date)).filter(p => matches({ ...p, items: itemSummary(purchaseItems.filter(i => i.purchase_id === p.purchase_id), products), supplier: nameOf(suppliers, p.supplier_id, 'supplier_id', 'supplier_name') }, search)).map(p => row([
     e(itemSummary(purchaseItems.filter(i => i.purchase_id === p.purchase_id), products)), e(nameOf(suppliers, p.supplier_id, 'supplier_id', 'supplier_name')), e(timestamp(p.purchase_date, ctx.store.time_zone)), badge(p.status), e(ctx.money(p.purchase_total_amount)), `<div class="actions">${button('Details', 'details', p.purchase_id)}${p.status === 'received' ? button('Cancel purchase', 'reverse', p.purchase_id) : ''}</div>`,
   ])));
@@ -73,8 +73,8 @@ export async function purchases(ctx) {
   searchable(root, render);
   bind(root, {
     add: () => {
-      const modal = actionForm('Receive purchase', select('Supplier', 'supplier_id', options(suppliers.filter(s => s.active), 'supplier_id', 'supplier_name')) + lineEditor(products, units, { purchase: true }), (values, id) => rpc('receive_purchase', { p_request_id: id, p_supplier_id: values.supplier_id, p_items: parseLines(values, products, units, true) }), ctx, { mutation: true, label: 'Receive stock' });
-      setupLines(modal, products, units, { purchase: true });
+      const modal = actionForm('Receive purchase', select('Supplier', 'supplier_id', options(suppliers.filter(s => s.active), 'supplier_id', 'supplier_name')) + lineEditor(products, { purchase: true }), (values, id) => rpc('receive_purchase', { p_request_id: id, p_supplier_id: values.supplier_id, p_items: parseLines(values, products, true) }), ctx, { mutation: true, label: 'Receive stock' });
+      setupLines(modal, products, { purchase: true });
     },
     details: id => transactionDetails(ctx, data.find(p => p.purchase_id === id), products, true),
     reverse: id => actionForm('Cancel entire purchase', note('The received quantities will be removed. The backend rejects this if the required stock is no longer available.') + reason(), values => rpc('reverse_purchase', { p_purchase_id: id, p_reason: values.reason }), ctx),

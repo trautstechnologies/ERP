@@ -43,29 +43,28 @@ export function detailLines(title, lines, products, ctx, costField) {
   ])))}`;
 }
 
-export function lineEditor(products, units, { purchase = false } = {}) {
+export function lineEditor(products, { purchase = false } = {}) {
   return `<div data-lines></div>${button('Add item', 'add-line')}<p class="muted">${purchase ? 'For tracked products, allocate the received quantity to batches.' : 'Prices and final totals are calculated by the server.'}</p>`;
 }
 
-export function setupLines(dialog, products, units, { purchase = false } = {}) {
+export function setupLines(dialog, products, { purchase = false } = {}) {
   let next = 0;
   const add = () => {
     const index = next++;
     const node = document.createElement('div'); node.className = 'line-editor'; node.dataset.line = index;
-    node.innerHTML = `<div class="form-grid">${select('Product', `line_${index}_product`, options(products.filter(p => p.active), 'product_id', p => `${p.product_name} · ${p.selling_unit_code}`))}${field('Quantity', `line_${index}_quantity`, { type: 'number', min: '0.001', step: '0.001', value: 1 })}${purchase ? field('Unit cost', `line_${index}_cost`, { type: 'number', min: 0, step: '0.01', value: 0 }) : '<p class="muted" data-price></p>'}</div><div data-batches hidden></div>${button('Remove item', 'remove-line')}`;
+    node.innerHTML = `<div class="form-grid">${select('Product', `line_${index}_product`, options(products.filter(p => p.active), 'product_id', p => `${p.product_name} · ${p.selling_unit_code}`))}${field('Quantity', `line_${index}_quantity`, { type: 'number', min: '1', step: '1', value: 1 })}${purchase ? field('Unit cost', `line_${index}_cost`, { type: 'number', min: 0, step: '0.01', value: 0 }) : '<p class="muted" data-price></p>'}</div><div data-batches hidden></div>${button('Remove item', 'remove-line')}`;
     $('[data-lines]', dialog).append(node);
     $('select', node).onchange = () => {
       const product = products.find(p => p.product_id === $('select', node).value);
-      const places = units.find(u => u.unit_code === product?.selling_unit_code)?.decimal_places ?? 0;
       const qty = $(`[name="line_${index}_quantity"]`, node);
-      qty.step = places ? `0.${'0'.repeat(places - 1)}1` : '1'; qty.min = qty.step;
+      qty.step = '1'; qty.min = '1';
       if (!purchase) $('[data-price]', node).textContent = product ? `Unit price: ${product.selling_price} · ${product.selling_unit_code}` : '';
       if (purchase) {
         $(`[name="line_${index}_cost"]`, node).value = product?.buying_price ?? 0;
         const batchArea = $('[data-batches]', node);
         batchArea.hidden = !product?.batch_tracking;
         batchArea.innerHTML = product?.batch_tracking ? batchEditor(`line_${index}_batch`) : '';
-        if (product?.batch_tracking) setupBatches(batchArea, `line_${index}_batch`, { requiredExpiry: product.requires_expiry, places });
+        if (product?.batch_tracking) setupBatches(batchArea, `line_${index}_batch`, { requiredExpiry: product.requires_expiry });
       }
     };
   };
@@ -77,7 +76,7 @@ export function setupLines(dialog, products, units, { purchase = false } = {}) {
   add();
 }
 
-export function parseLines(values, products, units, purchase = false) {
+export function parseLines(values, products, purchase = false) {
   const keys = Object.keys(values).filter(k => /^line_\d+_product$/.test(k));
   if (!keys.length) throw new Error('Add at least one item.');
   const seen = new Set();
@@ -87,11 +86,10 @@ export function parseLines(values, products, units, purchase = false) {
     if (!product) throw new Error('Select a product for every item.');
     if (seen.has(product.product_id)) throw new Error('Use one line per product; combine duplicate quantities.');
     seen.add(product.product_id);
-    const places = units.find(u => u.unit_code === product.selling_unit_code)?.decimal_places ?? 0;
-    const item = { product_id: product.product_id, quantity: quantity(values[`${prefix}_quantity`], places) };
+    const item = { product_id: product.product_id, quantity: quantity(values[`${prefix}_quantity`]) };
     if (purchase) {
       item.unit_cost = price(values[`${prefix}_cost`]);
-      if (product.batch_tracking) item.batches = parseBatches(values, `${prefix}_batch`, places, product.requires_expiry);
+      if (product.batch_tracking) item.batches = parseBatches(values, `${prefix}_batch`, product.requires_expiry);
     }
     return item;
   });
@@ -101,12 +99,12 @@ export function batchEditor(prefix = 'batch') {
   return `<div data-batch-list="${e(prefix)}"></div><button type="button" class="secondary-btn" data-add-batch="${e(prefix)}">Add batch</button>`;
 }
 
-export function setupBatches(root, prefix = 'batch', { requiredExpiry = false, places = 3, status = false } = {}) {
+export function setupBatches(root, prefix = 'batch', { requiredExpiry = false, status = false } = {}) {
   let next = 0;
   const add = () => {
     const index = next++;
     const node = document.createElement('div'); node.className = 'line-editor';
-    node.innerHTML = `<div class="form-grid">${field('Batch number', `${prefix}_${index}_number`, { maxLength: 100 })}${field('Batch quantity', `${prefix}_${index}_quantity`, { type: 'number', min: places ? '0.001' : '1', step: places ? '0.001' : '1' })}${field('Expiry date', `${prefix}_${index}_expiry`, { type: 'date', required: requiredExpiry })}${status ? select('Initial status', `${prefix}_${index}_status`, '<option value="available">Available</option><option value="quarantined">Quarantined</option><option value="recalled">Recalled</option>') : ''}</div><button type="button" class="secondary-btn" data-remove-batch>Remove batch</button>`;
+    node.innerHTML = `<div class="form-grid">${field('Batch number', `${prefix}_${index}_number`, { maxLength: 100 })}${field('Batch quantity', `${prefix}_${index}_quantity`, { type: 'number', min: '1', step: '1' })}${field('Expiry date', `${prefix}_${index}_expiry`, { type: 'date', required: requiredExpiry })}${status ? select('Initial status', `${prefix}_${index}_status`, '<option value="available">Available</option><option value="quarantined">Quarantined</option><option value="recalled">Recalled</option>') : ''}</div><button type="button" class="secondary-btn" data-remove-batch>Remove batch</button>`;
     $(`[data-batch-list="${prefix}"]`, root).append(node);
     $('[data-remove-batch]', node).onclick = () => node.remove();
   };
@@ -114,7 +112,7 @@ export function setupBatches(root, prefix = 'batch', { requiredExpiry = false, p
   add();
 }
 
-export function parseBatches(values, prefix, places = 3, requiredExpiry = false, includeStatus = false) {
+export function parseBatches(values, prefix, requiredExpiry = false, includeStatus = false) {
   const keys = Object.keys(values).filter(k => new RegExp(`^${prefix}_\\d+_number$`).test(k));
   if (!keys.length) throw new Error('Add at least one batch.');
   return keys.map(key => {
@@ -123,7 +121,7 @@ export function parseBatches(values, prefix, places = 3, requiredExpiry = false,
     if (!batch_number) throw new Error('Every batch needs a number.');
     const expires_on = values[`${base}_expiry`] || null;
     if (requiredExpiry && !expires_on) throw new Error('Every batch needs an expiry date.');
-    return { batch_number, quantity: quantity(values[`${base}_quantity`], places), expires_on, ...(includeStatus ? { status: values[`${base}_status`] } : {}) };
+    return { batch_number, quantity: quantity(values[`${base}_quantity`]), expires_on, ...(includeStatus ? { status: values[`${base}_status`] } : {}) };
   });
 }
 

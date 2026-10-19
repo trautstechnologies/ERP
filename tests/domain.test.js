@@ -2,15 +2,15 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { quantity, price, lineTotal, remainingReturns, canVoid, businessDate, csv } from '../src/lib/domain.js';
 
-test('unit precision, signs, zero and nonfinite quantities follow the API contract', () => {
-  assert.equal(quantity('0.125', 3), 0.125);
-  assert.equal(quantity('2', 0), 2);
-  assert.equal(quantity('0', 0, true), 0);
-  assert.equal(quantity('-1', 0, false, true), -1);
-  for (const v of ['0', '-1', 'NaN', 'Infinity', '0.0001', 'bad']) assert.throws(() => quantity(v, 3));
-  assert.throws(() => quantity('0.5', 0));
-  assert.throws(() => quantity('0', 3, false, true));
-  assert.throws(() => quantity('999999999999999.999', 3));
+test('whole quantities reject fractions while allowing zero reorder levels and signed adjustments', () => {
+  assert.throws(() => quantity('0.125'));
+  assert.equal(quantity('2'), 2);
+  assert.equal(quantity('0', { allowZero: true }), 0);
+  assert.equal(quantity('-1', { signed: true }), -1);
+  for (const v of ['0', '-1', 'NaN', 'Infinity', '0.0001', 'bad']) assert.throws(() => quantity(v));
+  assert.throws(() => quantity('0.5'));
+  assert.throws(() => quantity('0', { signed: true }));
+  assert.throws(() => quantity('9007199254740992'));
 });
 
 test('money previews use decimal, line-level rounding', () => {

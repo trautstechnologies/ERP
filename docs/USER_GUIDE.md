@@ -1,6 +1,6 @@
 # TRAUTS Shop Manager — User Guide
 
-For store managers and ordinary workers. Updated 18 October 2026.
+For store managers and ordinary workers. Updated 19 October 2026.
 
 This guide describes the current app. Your account determines which pages and buttons you can use. Some actions also depend on the features your administrator has enabled.
 
@@ -85,32 +85,17 @@ Use Products to look up names, SKUs, categories, units, prices, sellable quantit
 1. Select **Add product**.
 2. Enter the **Product name** and a unique **SKU** for this store.
 3. Add a category if useful, such as Groceries or Clothing.
-4. Choose the **Selling unit**, such as each, kg, bottle or pack.
-5. Enter the **Selling price** and **Buying price** for one selling unit.
-6. Choose a supplier if applicable.
-7. Choose a product group and attributes only if this is a variant.
-8. Select **Save** and check the success message.
+4. Enter the **Selling price** and **Buying price** for one item or pack.
+5. Choose a supplier if applicable.
+6. Select **Save** and check the success message.
 
 Adding a product does not add stock. Receive stock through Purchases, or use an authorized stock adjustment for an appropriate opening balance/correction.
 
-Choose the selling unit carefully: it cannot be changed in the product edit form. The app does not automatically turn a pack into tablets, or kilograms into grams. Quantities and prices must use the selected selling unit.
-
-### Product groups and variants — managers
-
-A group joins related products. For example, the group School Shirt could contain separate Small/White and Medium/Blue products. Each variant has its own SKU, price and stock.
-
-1. Select **Add product group**.
-2. Enter a **Group name** and optional description; select **Save**.
-3. Open **Add product** or **Edit** for a variant and choose that group.
-4. Select **Add attribute** for details such as Size = Medium or Color = Blue.
-5. Use **Remove attribute** to remove an unwanted attribute before saving.
-6. Save the product.
-
-Attributes require a product group. Do not create two products with the same combination of attributes in the same group. This page adds groups; it does not provide a separate group rename/delete screen.
+Stock is counted in whole items. For different sizes, colours or packs, create separate products with clear names, such as Cola 500 ml and Cola 2 L. There is no group or attribute setup. New products use the internal selling unit **each**. A pack sold as one product counts as one item; the app does not automatically split packs into individual pieces. Existing product units and historical information are retained.
 
 ### Edit or change availability — managers
 
-- Select **Edit** to change the allowed product details, prices, supplier, group or attributes, then **Save**.
+- Select **Edit** to change the allowed product details, prices or supplier, then **Save**.
 - Select **Deactivate** and confirm with **Save** to stop offering a product for new sales.
 - Select **Activate** and **Save** to make an eligible inactive product active again.
 
@@ -135,7 +120,7 @@ The app uses the current selling prices automatically. You cannot type a differe
 
 Selecting a payment method records how payment was made. It does not charge a card, collect Mobile Money or transfer money. There is no cash-tender/change calculation in this form.
 
-For **each** and similar whole units, enter whole quantities such as 1 or 3. Decimal units such as kg can allow up to three decimal places, for example 0.250 kg. The app rejects quantities that do not match the unit's precision.
+Enter whole quantities such as 1, 2 or 3. Fractional quantities such as 0.5 are not accepted. Prices and payment amounts still allow cents.
 
 If any item is invalid or has insufficient sellable stock, the sale is rejected as a whole. Another user may sell the last unit while your form is open; refresh availability if the app reports insufficient stock.
 
@@ -359,7 +344,7 @@ Select **Details** to inspect original sale references, products, quantities, re
 
 The app limits returns to the quantity originally sold, less previous active returns. For batched sales it also checks the quantity from the selected original batch. It uses the original sale prices, even if today's catalog price is different.
 
-Small decimal returns can have rounded amounts of zero. Across a full return, the app preserves the original rounded sale total. A zero-amount return is marked **not_required** for refund payment and does not need a payment record.
+A return of a zero-priced item can have a refund amount of zero. Across a full return, the app preserves the original sale total. A zero-amount return is marked **not_required** for refund payment and does not need a payment record.
 
 ### Choose the disposition
 
@@ -487,7 +472,7 @@ Other displayed details are not editable through this screen. Ask the administra
 ### A manager setting up products and stock
 
 1. Add the supplier and contact numbers.
-2. Create product groups if variants are needed.
+2. Give different sizes or packs separate, clear product names.
 3. Add each product with the correct SKU, prices and selling unit.
 4. Enable batch/expiry tracking before receiving stock if required; migrate existing stock instead if it is already present.
 5. Receive supplier purchases and their batch details.
@@ -518,8 +503,8 @@ Other displayed details are not editable through this screen. Ask the administra
 | --- | --- |
 | Invalid login or inactive account | Recheck the credentials; ask the manager/administrator to confirm the account and store status |
 | Insufficient stock | Reopen Inventory and check sellable stock, not just physical stock; check held or expired batches |
-| Quantity precision error | Use whole numbers for whole units, or the allowed decimal precision for the product |
-| Duplicate SKU or variant | Search first; use the existing record or a genuinely different unique SKU/variant |
+| Quantity precision error | Use whole numbers such as 1, 2 or 3 |
+| Duplicate SKU | Search first; use the existing record or a different unique SKU |
 | Missing batch/expiry details | Choose the real batch and complete the required dates and quantities |
 | Return exceeds sold quantity | Check the original sale and previous active returns; do not choose a different sale just to bypass the limit |
 | Non-cash refund requires a reference | Enter the reference for the actual refund already performed |

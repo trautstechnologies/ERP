@@ -189,6 +189,8 @@ test('product creation uses scoped catalog fields without directly inserting inv
   await page.getByRole('link', { name: 'Products', exact: true }).click();
   await page.getByRole('button', { name: 'Add product', exact: true }).click();
   const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Variant attributes', { exact: true })).toHaveCount(0);
+  await expect(dialog.getByLabel('Selling unit', { exact: true })).toHaveCount(0);
   await dialog.getByLabel('Product name', { exact: true }).fill('New Product');
   await dialog.getByLabel('SKU', { exact: true }).fill('NEW-001');
   await dialog.getByLabel('Selling price').fill('25');
@@ -199,7 +201,8 @@ test('product creation uses scoped catalog fields without directly inserting inv
   expect(call.body.store_id).toEqual(ids.store);
   expect(call.body.created_by).toEqual(ids.manager);
   expect(call.body.selling_unit_code).toEqual('each');
-  expect(call.body.variant_attributes).toEqual({});
+  expect(call.body).not.toHaveProperty('variant_attributes');
+  expect(call.body).not.toHaveProperty('product_group_id');
   expect(call.body).not.toHaveProperty('quantity');
   expect(state.calls.some(c => c.path.endsWith('/store_inventory') && c.method !== 'GET')).toBe(false);
 });
@@ -343,5 +346,46 @@ test('audit resolves staff and batches and low-stock reports omit IDs from displ
   expect(content).toContain('"Product"');
   expect(content).not.toContain('product_id');
   expect(content).not.toContain(ids.product);
+  expect(state.errors).toEqual([]);
+});
+
+
+test('legacy fractional units cannot bypass whole-number sale validation', async ({ page }) => {
+  const state = await backend(page);
+  state.data.products[0].selling_unit_code = 'kg';
+  state.data.selling_units.push({ unit_code: 'kg', display_name: 'Kilogram', decimal_places: 3 });
+  await login(page);
+  await page.getByRole('link', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Product', { exact: true }).selectOption(ids.product);
+  const qty = modal.getByLabel('Quantity', { exact: true });
+  await expect(qty).toHaveAttribute('step', '1');
+  await qty.evaluate(node => { node.step = 'any'; node.min = '0'; });
+  await qty.fill('0.5');
+  await modal.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(modal.locator('.form-error')).toContainText('whole-number');
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+  await qty.fill('2');
+  await modal.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  expect(state.calls.find(c => c.path.endsWith('/rpc/record_sale')).body.p_items[0].quantity).toBe(2);
+});
+
+
+test('quarantine processing submits whole quantities with the original return item', async ({ page }) => {
+  const state = await backend(page);
+  state.data.customer_returns = [{ return_id: 'held-return', store_id: ids.store, sale_id: ids.sale, created_at: '2026-10-16T10:00:00Z', return_status: 'active', refund_status: 'pending', refund_total: 20, reason: 'Held return' }];
+  state.data.customer_return_items = [{ return_item_id: 'held-item', return_id: 'held-return', store_id: ids.store, product_id: ids.product, quantity: 1, quarantined_quantity: 1, disposition: 'quarantine' }];
+  await login(page);
+  await page.getByRole('link', { name: 'Returns & Refunds', exact: true }).click();
+  await page.getByRole('button', { name: 'Process holding', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Held return item').selectOption('held-item');
+  await expect(modal.getByLabel('Quantity', { exact: true })).toHaveAttribute('step', '1');
+  await modal.getByLabel('Quantity', { exact: true }).fill('1');
+  await modal.getByLabel('Reason', { exact: true }).fill('Damaged item disposed');
+  await modal.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  expect(state.calls.find(c => c.path.endsWith('/rpc/process_return_quarantine')).body).toMatchObject({ p_return_item_id: 'held-item', p_quantity: 1, p_action: 'dispose' });
   expect(state.errors).toEqual([]);
 });
