@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Shopkeeper | TRAUTS</title>
+
+  <link rel="stylesheet" href="../user.css/dashboard.css">
+  <link rel="stylesheet" href="../user.css/sales.css">
+  <link rel="stylesheet" href="../user.css/shopkeeper.css">
+
+  <script
+          src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"
+          defer></script>
+
+  <script src="../script.js/shopkeeper.js" defer></script>
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <i data-lucide="store"></i>
+      <div>
+        <h2>TRAUTS</h2>
+        <p>SHOPKEEPER PORTAL</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav active" data-page="Dashboard">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="nav" data-page="New Sale">
+        <i data-lucide="shopping-cart"></i>
+        <span>New Sale</span>
+      </button>
+
+      <button class="nav" data-page="Products">
+        <i data-lucide="package"></i>
+        <span>Products</span>
+      </button>
+
+      <button class="nav" data-page="Stock Lookup">
+        <i data-lucide="boxes"></i>
+        <span>Stock Lookup</span>
+      </button>
+
+      <button class="nav" data-page="My Sales">
+        <i data-lucide="receipt"></i>
+        <span>My Sales</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <i data-lucide="user-round"></i>
+        <div class="user-info">
+          <strong>Shopkeeper</strong>
+          <small>Staff Account</small>
+        </div>
+      </div>
+
+      <button class="logout" id="logoutBtn">
+        <i data-lucide="log-out"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header>
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p>Welcome to your workspace</p>
+      </div>
+      <div class="avatar">SK</div>
+    </header>
+
+    <section id="shopDashboard">
+      <div class="shopkeeper-stats">
+        <article class="stat">
+          <p>My Sales Today</p>
+          <h2 id="mySalesToday">K 0.00</h2>
+        </article>
+
+        <article class="stat">
+          <p>My Transactions Today</p>
+          <h2 id="myTransactionsToday">0</h2>
+        </article>
+      </div>
+
+      <section class="panel shopkeeper-panel">
+        <h3>Quick Actions</h3>
+        <div class="shopkeeper-actions">
+          <button class="shop-action"
+                  data-go="New Sale">
+            <i data-lucide="shopping-cart"></i>
+            New Sale
+          </button>
+
+          <button class="shop-action secondary"
+                  data-go="Stock Lookup">
+            <i data-lucide="package-search"></i>
+            Stock Lookup
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <section id="shopProducts" hidden>
+      <section class="panel">
+        <h3>Product Lookup</h3>
+        <input id="shopProductSearch"
+               class="shop-search"
+               placeholder="Search products or SKU...">
+        <div id="shopProductList"
+             class="shop-product-grid"></div>
+      </section>
+    </section>
+
+    <section id="shopInventory" hidden>
+      <section class="panel">
+        <h3>Stock Lookup</h3>
+        <p class="shop-hint">
+          View stock availability without editing quantities.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Available</th>
+              <th>Status</th>
+            </tr>
+            </thead>
+            <tbody id="shopStockTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="shopSales" hidden>
+      <div class="pos-heading">
+        <div>
+          <h2>New Sale</h2>
+          <p>Process customer purchases</p>
+        </div>
+        <button id="shopNewSaleBtn"
+                class="pos-secondary">Clear Cart</button>
+      </div>
+
+      <div class="pos-layout">
+        <section class="panel pos-products">
+          <h3>Select Products</h3>
+          <input id="shopPosSearch" type="search"
+                 placeholder="Search products...">
+          <div id="shopPosProducts"
+               class="pos-product-list"></div>
+        </section>
+
+        <section class="panel pos-checkout">
+          <h3>Current Sale</h3>
+          <div id="shopCart"></div>
+
+          <div class="pos-totals">
+            <div>
+              <span>Subtotal</span>
+              <strong id="shopSubtotal">K 0.00</strong>
+            </div>
+
+            <label for="shopDiscount">Discount (K)</label>
+            <input id="shopDiscount" type="number"
+                   min="0" step="0.01" value="0">
+
+            <div class="pos-grand-total">
+              <span>Total</span>
+              <strong id="shopTotal">K 0.00</strong>
+            </div>
+
+            <label for="shopPayment">Payment Method</label>
+            <select id="shopPayment">
+              <option value="cash">Cash</option>
+              <option value="mobile_money">Mobile Money</option>
+              <option value="card">Card</option>
+            </select>
+
+            <label for="shopReceived">
+              Amount Received (K)
+            </label>
+            <input id="shopReceived" type="number"
+                   min="0" step="0.01" value="0">
+
+            <div>
+              <span>Change</span>
+              <strong id="shopChange">K 0.00</strong>
+            </div>
+          </div>
+
+          <button id="shopCheckoutBtn"
+                  class="pos-primary">
+            Complete Sale
+          </button>
+          <p id="shopPosMessage" role="status"></p>
+        </section>
+      </div>
+    </section>
+
+    <section id="shopHistory" hidden>
+      <section class="panel">
+        <h3>My Sales</h3>
+        <p class="shop-hint">
+          Transactions attributed to the current demo staff ID.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>Receipt</th>
+              <th>Date</th>
+              <th>Items</th>
+              <th>Total</th>
+            </tr>
+            </thead>
+            <tbody id="shopSalesTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

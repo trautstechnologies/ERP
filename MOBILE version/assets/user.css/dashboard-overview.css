@@ -1,0 +1,632 @@
+/* TRAUTS Dashboard Overview — mobile-friendly interface
+   Load AFTER dashboard.css and dashboard-mobile.css.
+   Uses the TRAUTS existing light/navy company palette; no global styles changed.
+*/
+
+#trautsLiveDashboard {
+  --tld-background: #fff;
+  --tld-surface: #fff;
+  --tld-subtle: #f5f7fb;
+  --tld-border: #dfe6ef;
+  --tld-text: #17283e;
+  --tld-muted: #617188;
+  --tld-accent: #508fda;
+  --tld-warning: #b45309;
+  --tld-danger: #b91c1c;
+  color: var(--tld-text);
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 0 22px;
+  box-sizing: border-box;
+}
+
+#trautsLiveDashboard *,
+#trautsLiveDashboard *::before,
+#trautsLiveDashboard *::after { box-sizing: border-box; }
+
+#trautsLiveDashboard .tld-heading {
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+#trautsLiveDashboard .tld-heading h2 {
+  margin: 0 0 4px;
+  color: var(--tld-text);
+  font-size: clamp(1.05rem, 4.4vw, 1.4rem);
+  line-height: 1.25;
+}
+#trautsLiveDashboard #tldDateLabel {
+  font-size: .84rem;
+  margin: 0;
+  color: var(--tld-muted);
+}
+#trautsLiveDashboard .tld-refresh {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--tld-border);
+  border-radius: 12px;
+  background: var(--tld-surface);
+  color: var(--tld-text);
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+#trautsLiveDashboard .tld-refresh:focus-visible,
+#trautsLiveDashboard .tld-range-btn:focus-visible {
+  outline: 2px solid var(--tld-accent);
+  outline-offset: 3px;
+}
+
+/* Summary cards */
+#trautsLiveDashboard .tld-cards {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+#trautsLiveDashboard .tld-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 134px;
+  padding: 18px;
+  border: 1px solid var(--tld-border) !important;
+  border-radius: 17px;
+  background: var(--tld-surface) !important;
+  color: var(--tld-text) !important;
+  box-shadow: 0 5px 20px rgba(12, 28, 49, 0.045);
+}
+#trautsLiveDashboard .tld-card > span {
+  color: var(--tld-muted) !important;
+  font-size: .83rem;
+  line-height: 1.35;
+}
+#trautsLiveDashboard .tld-card strong {
+  display: block;
+  color: var(--tld-text);
+  font-size: clamp(1.1rem, 2.1vw, 1.55rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+#trautsLiveDashboard .tld-card small {
+}
+
+/* ==========================================
+   TRAUTS MOBILE DASHBOARD REFINEMENTS
+   Company colours remain unchanged
+   ========================================== */
+
+@media (max-width: 767px) {
+
+  /* SIX CARDS: TWO COLUMNS, THREE ROWS */
+
+  #trautsLiveDashboard .tld-cards {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 22px;
+  }
+
+  #trautsLiveDashboard .tld-card {
+    min-width: 0;
+    min-height: 145px;
+    padding: 15px 12px !important;
+    border-radius: 16px;
+    gap: 9px;
+  }
+
+  #trautsLiveDashboard .tld-card > span {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  #trautsLiveDashboard .tld-card strong {
+    font-size: clamp(16px, 4.3vw, 21px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  #trautsLiveDashboard .tld-card small {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  /* LARGER SALES PERFORMANCE PANEL */
+
+  #trautsLiveDashboard .tld-chart-panel {
+    width: 100%;
+    min-height: 335px;
+    padding: 20px 16px !important;
+    border-radius: 18px;
+    margin-bottom: 22px;
+  }
+
+  #trautsLiveDashboard .tld-chart-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  #trautsLiveDashboard .tld-chart-heading h3 {
+    font-size: 18px;
+  }
+
+  #trautsLiveDashboard .tld-chart-ranges {
+    width: 100%;
+    display: flex;
+  }
+
+  #trautsLiveDashboard .tld-range-btn {
+    flex: 1;
+    min-height: 42px;
+  }
+
+  #trautsLiveDashboard .tld-chart-summary {
+    margin-top: 20px;
+    margin-bottom: 14px;
+  }
+
+  /* Allow the graph itself extra drawing space.
+     Users can swipe horizontally on small phones. */
+
+  #trautsLiveDashboard .tld-chart-container {
+    width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #trautsLiveDashboard #tldRevenueChart {
+    display: block;
+    width: 100%;
+    min-width: 520px;
+    max-width: none;
+    height: auto;
+  }
+
+  /* STACK RESTOCK AND RECENT SALES PANELS */
+
+  #trautsLiveDashboard .tld-columns {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 15px;
+  }
+
+  #trautsLiveDashboard .tld-columns .tld-panel {
+    padding: 16px !important;
+    border-radius: 18px;
+  }
+
+  /* CONVERT TABLE ROWS INTO MOBILE CARDS */
+
+  #trautsLiveDashboard .tld-table-wrap {
+    overflow: visible !important;
+  }
+
+  #trautsLiveDashboard .tld-table {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+    border: none;
+  }
+
+  #trautsLiveDashboard .tld-table thead {
+    display: none !important;
+  }
+
+  #trautsLiveDashboard .tld-table tbody {
+    display: grid;
+    gap: 10px;
+  }
+
+  #trautsLiveDashboard .tld-table tbody tr {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--tld-border);
+    border-radius: 14px;
+    background: var(--tld-subtle) !important;
+  }
+
+  #trautsLiveDashboard .tld-table tbody td {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  /* RESTOCK ALERT CARDS */
+
+  #tldRestockTable tr td:first-child {
+    grid-column: 1 / -1;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  #tldRestockTable tr td:nth-child(2)::before {
+    content: "Available";
+  }
+
+  #tldRestockTable tr td:nth-child(3)::before {
+    content: "Threshold";
+  }
+
+  #tldRestockTable tr td:nth-child(2)::before,
+  #tldRestockTable tr td:nth-child(3)::before {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--tld-muted);
+    margin-bottom: 5px;
+  }
+
+  #tldRestockTable tr td:nth-child(4) {
+    grid-column: 1 / -1;
+    align-items: flex-start;
+  }
+
+  /* RECENT SALES CARDS */
+
+  #tldRecentSales tr td:first-child {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #tldRecentSales tr td:nth-child(2)::before {
+    content: "Date";
+  }
+
+  #tldRecentSales tr td:nth-child(3)::before {
+    content: "Amount";
+  }
+
+  #tldRecentSales tr td:nth-child(2)::before,
+  #tldRecentSales tr td:nth-child(3)::before {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--tld-muted);
+    margin-bottom: 5px;
+  }
+
+  #tldRecentSales tr td:nth-child(3) {
+    font-weight: 700;
+  }
+
+  /* EMPTY STATES */
+
+  #trautsLiveDashboard
+  .tld-table tbody td[colspan] {
+    grid-column: 1 / -1;
+    font-weight: 400;
+  }
+
+  /* MOBILE MONTHLY SUMMARY */
+
+  #trautsLiveDashboard .tld-monthly {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #trautsLiveDashboard .tld-monthly > div {
+    min-width: 0;
+    padding: 13px;
+    border-radius: 13px;
+  }
+
+  #trautsLiveDashboard .tld-monthly strong {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* THEME BUTTON: KEEP IT INTERACTIVE */
+
+#trautsThemeToggle,
+.login-theme-toggle {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ==========================================
+   TRAUTS DARK MODE CONSISTENCY FIX
+   Dashboard + business module tables
+   ========================================== */
+
+/* Keep existing TRAUTS brand colours */
+
+html.trauts-dark #trautsLiveDashboard {
+  --tld-background: #0b1524;
+  --tld-surface: #17283e;
+  --tld-subtle: #20324a;
+  --tld-border: #364a63;
+  --tld-text: #e8eff9;
+  --tld-muted: #b6c7dc;
+
+  color: var(--tld-text) !important;
+}
+
+/* ==========================================
+   DASHBOARD HEADING AND DESCRIPTION
+   ========================================== */
+
+html.trauts-dark .trauts-page-header,
+html.trauts-dark #trautsOverviewHeading,
+html.trauts-dark .trauts-section-heading,
+html.trauts-dark #trautsLiveDashboard .tld-heading {
+  color: #e8eff9 !important;
+}
+
+html.trauts-dark #trautsPageTitle,
+html.trauts-dark #trautsLiveDashboard
+.tld-heading h2 {
+  color: #e8eff9 !important;
+}
+
+/* Date and description under overview */
+
+html.trauts-dark #trautsLiveDashboard
+#tldDateLabel,
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-heading p,
+html.trauts-dark #trautsLiveDashboard
+.tld-panel-heading span,
+html.trauts-dark #trautsLiveDashboard
+.tld-notice,
+html.trauts-dark #trautsLiveDashboard
+.tld-footnote {
+  color: #b6c7dc !important;
+}
+
+/* ==========================================
+   ALL DASHBOARD OVERVIEW PANELS
+   ========================================== */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-card,
+html.trauts-dark #trautsLiveDashboard
+.tld-panel,
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-panel {
+  background: #17283e !important;
+  color: #e8eff9 !important;
+  border-color: #364a63 !important;
+}
+
+/* Summary card headings and amounts */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-card strong,
+html.trauts-dark #trautsLiveDashboard
+.tld-panel h3,
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-summary strong {
+  color: #e8eff9 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-card > span,
+html.trauts-dark #trautsLiveDashboard
+.tld-card small {
+  color: #b6c7dc !important;
+}
+
+/* ==========================================
+   SALES PERFORMANCE GRAPH
+   ========================================== */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-container {
+  background: transparent !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-summary,
+html.trauts-dark #trautsLiveDashboard
+#tldChartTotal {
+  color: #e8eff9 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+#tldChartPeriod,
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-empty {
+  color: #b6c7dc !important;
+}
+
+/* Seven-day / thirty-day controls */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-ranges {
+  background: #20324a !important;
+  border-color: #364a63 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-range-btn {
+  color: #b6c7dc !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-range-btn[aria-pressed="true"] {
+  background: #315376 !important;
+  color: #ffffff !important;
+}
+
+/* Graph axes and lines */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-grid {
+  stroke: #364a63 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-chart-axis {
+  fill: #b6c7dc !important;
+}
+
+/* ==========================================
+   RESTOCK ALERTS AND RECENT SALES
+   ========================================== */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-table-wrap {
+  background: transparent !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-table {
+  background: transparent !important;
+  color: #e8eff9 !important;
+}
+
+/* Individual mobile cards */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-table tbody tr {
+  background: #20324a !important;
+  border-color: #364a63 !important;
+}
+
+/* Remove white cell backgrounds */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-table tbody td {
+  background: transparent !important;
+  color: #e8eff9 !important;
+  border-color: #364a63 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-table thead th {
+  background: #20324a !important;
+  color: #e8eff9 !important;
+}
+
+/* Secondary labels */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-table td small {
+  color: #b6c7dc !important;
+}
+
+/* ==========================================
+   THIS MONTH AT A GLANCE
+   ========================================== */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-monthly > div {
+  background: #20324a !important;
+  border: 1px solid #364a63 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-monthly span {
+  color: #b6c7dc !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-monthly strong {
+  color: #e8eff9 !important;
+}
+
+/* ==========================================
+   OTHER MENU PAGE TABLES
+   Products, Sales, Inventory, etc.
+   ========================================== */
+
+/* Table containers */
+
+html.trauts-dark .main .table-wrap {
+  background: #17283e !important;
+  border-color: #364a63 !important;
+}
+
+/* Table itself */
+
+html.trauts-dark .main .table-wrap table {
+  background: #17283e !important;
+  color: #e8eff9 !important;
+}
+
+/* Table headings */
+
+html.trauts-dark .main .table-wrap
+table thead,
+html.trauts-dark .main .table-wrap
+table th {
+  background: #20324a !important;
+  color: #e8eff9 !important;
+  border-color: #364a63 !important;
+}
+
+/* Table rows */
+
+html.trauts-dark .main .table-wrap
+table tbody tr {
+  background: #17283e !important;
+}
+
+/* Alternate row colour */
+
+html.trauts-dark .main .table-wrap
+table tbody tr:nth-child(even) {
+  background: #20324a !important;
+}
+
+/* Cells inherit row background */
+
+html.trauts-dark .main .table-wrap
+table tbody td {
+  background: transparent !important;
+  color: #e8eff9 !important;
+  border-color: #364a63 !important;
+}
+
+/* Keep selected and disabled controls readable */
+
+html.trauts-dark .main select,
+html.trauts-dark .main textarea,
+html.trauts-dark .main input:not(
+  [type="checkbox"]
+):not([type="radio"]) {
+  background: #0d1c2e !important;
+  color: #f0f5fc !important;
+  border-color: #52647b !important;
+}
+
+/* ==========================================
+   PRESERVE NEGATIVE VALUES AND ALERTS
+   ========================================== */
+
+html.trauts-dark #trautsLiveDashboard
+.tld-negative {
+  color: #fca5a5 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-status.out {
+  color: #fca5a5 !important;
+}
+
+html.trauts-dark #trautsLiveDashboard
+.tld-status.low {
+  color: #fbbf24 !important;
+}

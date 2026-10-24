@@ -1,0 +1,1238 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172c4c;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  background: #142d59;
+  color: white;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  margin: 0;
+}
+
+.sidebar p {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #a9b9d3;
+}
+
+nav {
+  margin-top: 30px;
+}
+
+.nav, .logout {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 6px;
+  text-align: left;
+  background: transparent;
+  color: #cbd5e1;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.nav:hover, .nav.active {
+  background: #2855a0;
+  color: white;
+}
+
+.logout {
+  margin-top: auto;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 30px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p, .stat p, .panel p {
+  color: #64748b;
+}
+
+.avatar {
+  background: #173f8a;
+  color: white;
+  padding: 14px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.stat, .panel {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.stat h2 {
+  font-size: 27px;
+  margin: 12px 0;
+}
+
+.stat small {
+  color: #64748b;
+}
+
+.panel {
+  margin-top: 22px;
+}
+
+.chart {
+  height: 190px;
+  display: flex;
+  align-items: end;
+  justify-content: space-around;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.bar-group {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: 10px;
+}
+
+.bar {
+  width: 75%;
+  max-width: 65px;
+  background: #4479d1;
+  border-radius: 5px 5px 0 0;
+}
+
+.bar-group span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+th {
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    margin-top: 15px;
+  }
+
+  .nav {
+    white-space: nowrap;
+    width: auto;
+  }
+
+  .main {
+    padding: 16px;
+  }
+
+  .stats {
+    gap: 10px;
+  }
+
+  .stat {
+    padding: 15px;
+  }
+}
+
+
+/* ===================================
+   TRAUTS DASHBOARD TYPOGRAPHY
+   =================================== */
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar branding */
+.sidebar h2 {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+.sidebar p {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+/* Navigation */
+.nav,
+.logout {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.nav.active {
+  font-weight: 600;
+}
+
+/* Dashboard page title */
+header h1 {
+  font-size: 27px;
+  font-weight: 750;
+  letter-spacing: -1px;
+  line-height: 1.3;
+}
+
+/* Welcome text */
+header p {
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+/* Statistic labels */
+.stat p {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Statistic values */
+.stat h2 {
+  font-size: 29px;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Small descriptions */
+.stat small {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* Panel titles */
+.panel h3 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #172c4c;
+}
+
+/* Panel descriptions */
+.panel p {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Tables */
+table {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+th {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+td {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Chart labels */
+.bar-group span {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Mobile typography */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 23px;
+  }
+
+  .stat h2 {
+    font-size: 23px;
+  }
+
+  .panel h3 {
+    font-size: 15px;
+  }
+}
+
+
+/* ===================================
+   TRAUTS MODERN SIDEBAR
+   =================================== */
+
+.sidebar {
+  width: 245px;
+  min-height: 100vh;
+  background: #142d59;
+  color: white;
+  padding: 24px 14px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* Brand */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 24px;
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  background: #2855a0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo svg {
+  width: 23px;
+  height: 23px;
+}
+
+.sidebar-brand h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+}
+
+.sidebar-brand p {
+  margin: 3px 0 0;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #a9b9d3;
+}
+
+/* Menu */
+.menu-label {
+  padding: 12px 14px;
+  color: #93a8ca;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 12px 14px;
+  margin: 0;
+  background: transparent;
+  color: #cbd5e1;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.nav:hover {
+  background: #234579;
+  color: white;
+}
+
+.nav.active {
+  background: #2855a0;
+  color: white;
+  font-weight: 600;
+}
+
+/* Footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 30px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 10px;
+  border-top: 1px solid #345077;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #2855a0;
+  display: grid;
+  place-items: center;
+}
+
+.user-avatar svg {
+  width: 19px;
+  height: 19px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-info strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-info small {
+  font-size: 11px;
+  color: #a9b9d3;
+}
+
+.logout {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 13px 14px;
+  color: #fca5a5;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 9px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.logout svg {
+  width: 18px;
+  height: 18px;
+}
+
+.logout:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Tablet and mobile */
+@media (max-width: 600px) {
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .sidebar-brand {
+    padding-bottom: 10px;
+  }
+
+  .menu-label {
+    display: none;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-top: 10px;
+  }
+
+  .sidebar-nav .nav {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .sidebar-footer {
+    margin-top: 8px;
+    padding-top: 0;
+  }
+
+  .user-profile {
+    display: none;
+  }
+
+  .logout {
+    width: auto;
+  }
+}
+
+
+/* =====================================
+   TRAUTS SALES CHART
+   ===================================== */
+
+.sales-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 16px;
+  height: 300px;
+  padding: 36px 12px 30px;
+  margin-top: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chart-column {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  min-width: 0;
+}
+
+.chart-bar {
+  width: min(100%, 60px);
+  background: linear-gradient(
+    180deg,
+    #4b83e5 0%,
+    #173f8a 100%
+  );
+  border-radius: 7px 7px 0 0;
+  min-height: 4px;
+  transition: height 0.4s ease;
+}
+
+.chart-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.chart-label {
+  position: absolute;
+  bottom: -25px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .sales-chart {
+    gap: 6px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .chart-value {
+    font-size: 9px;
+  }
+}
+
+
+[hidden] {
+  display: none !important;
+}
+
+
+/* ==========================================
+   TRAUTS LIVE DASHBOARD OVERVIEW
+   ========================================== */
+
+.trauts-live-dashboard {
+  width: 100%;
+  margin-bottom: 28px;
+  color: #102747;
+}
+
+.tld-heading,
+.tld-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tld-heading {
+  margin-bottom: 20px;
+}
+
+.tld-heading h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.tld-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.tld-refresh {
+  background: #173f8a;
+  color: white;
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tld-refresh:hover {
+  background: #102f6a;
+}
+
+.tld-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tld-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tld-card > span,
+.tld-monthly span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.tld-card > strong {
+  font-size: 26px;
+  color: #102747;
+  overflow-wrap: anywhere;
+}
+
+.tld-card > small {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.tld-card-featured {
+  border-color: #93b2e8;
+}
+
+.tld-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.tld-panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  padding: 20px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.tld-panel h3 {
+  margin: 0 0 16px;
+  font-size: 17px;
+  color: #102747;
+}
+
+.tld-panel-heading h3 {
+  margin: 0;
+}
+
+.tld-panel-heading {
+  margin-bottom: 16px;
+}
+
+.tld-panel-heading span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.tld-table-wrap {
+  overflow-x: auto;
+}
+
+.tld-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 400px;
+}
+
+.tld-table th,
+.tld-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+}
+
+.tld-table th {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.tld-table td strong,
+.tld-table td small {
+  display: block;
+}
+
+.tld-table td small {
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.tld-status {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tld-status.low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.tld-status.out {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.tld-monthly {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tld-monthly > div {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.tld-monthly strong {
+  font-size: 19px;
+  overflow-wrap: anywhere;
+}
+
+.tld-negative {
+  color: #b91c1c !important;
+}
+
+.tld-notice {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 9px;
+  color: #9a3412;
+  padding: 12px 15px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.tld-notice[hidden] {
+  display: none !important;
+}
+
+.tld-footnote {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+  .tld-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tld-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .tld-monthly {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .tld-cards,
+  .tld-monthly {
+    grid-template-columns: 1fr;
+  }
+
+  .tld-heading {
+    align-items: flex-start;
+  }
+
+  .tld-card > strong {
+    font-size: 23px;
+  }
+}
+
+/* ==========================================
+   TRAUTS RESPONSIVE FRONTEND
+   ========================================== */
+
+/* Keep the mobile menu hidden on desktop */
+
+.mobile-menu-btn {
+  display: none;
+}
+
+.mobile-sidebar-backdrop[hidden] {
+  display: none !important;
+}
+
+/* Flexible dashboard containers */
+
+.main {
+  min-width: 0;
+}
+
+.main > section {
+  min-width: 0;
+}
+
+.stats,
+.product-stats,
+.inventory-stats,
+.reports-stats,
+.account-stats {
+  min-width: 0;
+}
+
+.stat,
+.panel {
+  min-width: 0;
+}
+
+/* Prevent wide tables from breaking layout */
+
+.table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Forms should fit their containers */
+
+.main input,
+.main select,
+.main textarea {
+  max-width: 100%;
+}
+
+.main button {
+  font-family: inherit;
+}
+
+/* ==========================================
+   TABLET AND MOBILE
+   ========================================== */
+
+@media (max-width: 900px) {
+
+  .layout {
+    display: block;
+    min-height: 100vh;
+  }
+
+  /* Slide-out sidebar */
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: min(290px, 85vw);
+    height: 100dvh;
+    min-height: 0;
+
+    z-index: 1001;
+
+    padding: 20px 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+
+    box-shadow: 12px 0 35px
+      rgba(15, 23, 42, 0.12);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Override old horizontal mobile nav */
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+
+    overflow: visible;
+    gap: 5px;
+
+    margin-top: 8px;
+    padding-bottom: 0;
+  }
+
+  .sidebar-nav .nav {
+    width: 100%;
+    flex: none;
+
+    white-space: normal;
+    justify-content: flex-start;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 24px;
+  }
+
+  .user-profile {
+    display: flex;
+  }
+
+  .logout {
+    width: 100%;
+  }
+
+  /* Dark backdrop */
+
+  .mobile-sidebar-backdrop:not([hidden]) {
+    position: fixed;
+    inset: 0;
+
+    display: block;
+
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 1000;
+  }
+
+  body.trauts-menu-open {
+    overflow: hidden;
+  }
+
+  /* Mobile menu trigger */
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    margin-bottom: 20px;
+    padding: 11px 15px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+
+    background: white;
+    color: #173f8a;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+  }
+
+  .mobile-menu-btn svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .main {
+    width: 100%;
+    padding: 22px;
+  }
+
+  .stats,
+  .product-stats,
+  .inventory-stats,
+  .reports-stats,
+  .account-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .tld-cards {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================
+   SMALL PHONES
+   ========================================== */
+
+@media (max-width: 600px) {
+
+  .main {
+    padding: 15px;
+  }
+
+  .main > header {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .main > header h1 {
+    font-size: 22px;
+  }
+
+  .main > header p {
+    font-size: 12px;
+  }
+
+  .main > header .avatar {
+    padding: 11px;
+  }
+
+  .stats,
+  .product-stats,
+  .inventory-stats,
+  .reports-stats,
+  .account-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .stat {
+    padding: 14px;
+  }
+
+  .stat h2 {
+    font-size: 21px;
+    overflow-wrap: anywhere;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  .tld-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .tld-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .tld-monthly {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .products-header,
+  .inventory-header,
+  .reports-header,
+  .accounts-header,
+  .pos-heading {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .products-toolbar,
+  .inventory-toolbar,
+  .accounts-toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .product-filters {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .product-filters input,
+  .product-filters select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .pos-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pos-products,
+  .pos-checkout {
+    min-width: 0;
+  }
+
+  .tld-table-wrap,
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .tld-table,
+  .table-wrap table {
+    min-width: 420px;
+  }
+}
+
+/* Very narrow devices */
+
+@media (max-width: 380px) {
+
+  .stats,
+  .product-stats,
+  .inventory-stats,
+  .reports-stats,
+  .account-stats,
+  .tld-monthly {
+    grid-template-columns: 1fr;
+  }
+
+  .main {
+    padding: 12px;
+  }
+}
+
+/* Reduced-motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}
+
+/* ==========================================
+   TRAUTS SIDEBAR ICON FIX
+   ========================================== */
+
+.sidebar-nav .nav {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.sidebar-nav .nav svg,
+.sidebar-nav .nav i[data-lucide] {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.sidebar-nav .nav span {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-nav .nav {
+  min-height: 46px;
+}

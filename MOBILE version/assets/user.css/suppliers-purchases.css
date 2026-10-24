@@ -1,0 +1,226 @@
+
+/* TRAUTS SUPPLIERS & PURCHASES */
+
+.sp-header,
+.sp-toolbar,
+.sp-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sp-header {
+  margin-bottom: 22px;
+}
+
+.sp-header h2 {
+  margin: 0 0 5px;
+}
+
+.sp-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.sp-button {
+  background: #173f8a;
+  color: white;
+  border: none;
+  padding: 11px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sp-button:hover {
+  background: #102f6a;
+}
+
+.sp-button.secondary {
+  background: #e8eef8;
+  color: #173f8a;
+}
+
+.sp-button.danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sp-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.sp-stat,
+.sp-panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.sp-stat small {
+  display: block;
+  color: #64748b;
+  margin-bottom: 9px;
+}
+
+.sp-stat strong {
+  font-size: 23px;
+  color: #102747;
+}
+
+.sp-panel {
+  margin-bottom: 20px;
+}
+
+.sp-panel h3 {
+  margin-top: 0;
+  color: #102747;
+}
+
+.sp-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.sp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sp-field label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+}
+
+.sp-field input,
+.sp-field select,
+.sp-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
+  font: inherit;
+}
+
+.sp-full {
+  grid-column: 1 / -1;
+}
+
+.sp-table-wrap {
+  overflow-x: auto;
+}
+
+.sp-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 750px;
+}
+
+.sp-table th,
+.sp-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.sp-table th {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.sp-table td {
+  font-size: 13px;
+}
+
+.sp-small {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.sp-message {
+  margin: 12px 0;
+  font-weight: 600;
+}
+
+.sp-hidden {
+  display: none !important;
+}
+
+.sp-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.sp-tab {
+  padding: 10px 16px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sp-tab.active {
+  background: #173f8a;
+  color: white;
+  border-color: #173f8a;
+}
+
+.sp-pill {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: #e8eef8;
+  color: #173f8a;
+}
+
+.sp-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sp-row-actions button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+@media (max-width: 850px) {
+  .sp-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sp-form {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .sp-stats {
+    grid-template-columns: 1fr;
+  }
+}

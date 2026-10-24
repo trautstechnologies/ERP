@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Dashboard | TRAUTS Shop Manager</title>
+
+  <!-- MAIN STYLES -->
+  <link rel="stylesheet" href="../user.css/dashboard.css">
+
+  <!-- MODULE STYLES -->
+  <link rel="stylesheet" href="../user.css/products.css">
+  <link rel="stylesheet" href="../user.css/universal-products.css">
+  <link rel="stylesheet" href="../user.css/inventory.css">
+  <link rel="stylesheet" href="../user.css/sales.css">
+  <link rel="stylesheet" href="../user.css/manage-accounts.css">
+  <link rel="stylesheet" href="../user.css/reports.css">
+  <link rel="stylesheet" href="../user.css/settings.css">
+  <link rel="stylesheet" href="../user.css/suppliers-purchases.css">
+  <link rel="stylesheet" href="../user.css/expenses.css">
+  <link rel="stylesheet" href="../user.css/profit-loss.css">
+
+
+  <!-- ICONS -->
+  <script
+          src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"
+          defer>
+  </script>
+
+  <!-- MAIN JAVASCRIPT -->
+  <script src="../script.js/dashboard.js" defer></script>
+
+  <!-- MODULE JAVASCRIPT -->
+  <script src="../script.js/products.js" defer></script>
+  <script src="../script.js/universal-products.js" defer></script>
+  <script src="../script.js/inventory.js" defer></script>
+  <script src="../script.js/sales.js" defer></script>
+  <script src="../script.js/manage-accounts.js" defer></script>
+  <script src="../script.js/reports.js" defer></script>
+  <script src="../script.js/settings.js" defer></script>
+  <script src="../script.js/suppliers-purchases.js" defer></script>
+  <script src="../script.js/expenses.js" defer></script>
+  <script src="../script.js/profit-loss.js" defer></script>
+  <script src="../script.js/dashboard-overview.js" defer></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- =====================================
+       SIDEBAR
+       ===================================== -->
+
+  <aside class="sidebar" id="trautsSidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <img
+                src="../img/trauts-logo.jpg"
+                alt="TRAUTS Logo"
+                width="60"
+                height="60">
+      </div>
+
+      <div>
+        <h2>TRAUTS</h2>
+        <p>SHOP MANAGER</p>
+      </div>
+    </div>
+
+    <div class="menu-label">MAIN MENU</div>
+
+    <nav class="sidebar-nav">
+
+      <button type="button" class="nav active" data-page="Dashboard">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Products">
+        <i data-lucide="package"></i>
+        <span>Products</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Sales">
+        <i data-lucide="shopping-cart"></i>
+        <span>Sales</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Inventory">
+        <i data-lucide="boxes"></i>
+        <span>Inventory</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Suppliers & Purchases">
+        <i data-lucide="truck"></i>
+        <span>Suppliers & Purchases</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Expenses">
+        <i data-lucide="wallet"></i>
+        <span>Expenses</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Profit & Loss">
+        <i data-lucide="chart-no-axes-combined"></i>
+        <span>Profit & Loss</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Manage Accounts">
+        <i data-lucide="users-round"></i>
+        <span>Manage Accounts</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Reports">
+        <i data-lucide="chart-no-axes-column"></i>
+        <span>Reports</span>
+      </button>
+
+      <button type="button" class="nav" data-page="Settings">
+        <i data-lucide="settings"></i>
+        <span>Settings</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+
+        <div class="user-avatar">
+          <i data-lucide="user-round"></i>
+        </div>
+
+        <div class="user-info">
+          <strong>Administrator</strong>
+          <small>Shop Manager</small>
+        </div>
+
+      </div>
+
+      <button type="button" id="logoutBtn" class="logout">
+        <i data-lucide="log-out"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- =====================================
+       MAIN CONTENT
+       ===================================== -->
+
+  <main class="main">
+
+    <button
+            type="button"
+            id="mobileMenuBtn"
+            class="mobile-menu-btn"
+            aria-label="Open navigation menu"
+            aria-controls="trautsSidebar"
+            aria-expanded="false">
+      <i data-lucide="menu"></i>
+      <span>Menu</span>
+    </button>
+
+    <div
+            id="mobileSidebarBackdrop"
+            class="mobile-sidebar-backdrop"
+            hidden>
+    </div>
+
+    <header>
+
+
+      <!-- LIVE BUSINESS DASHBOARD -->
+      <section id="overview">
+
+        <!-- dashboard-overview.js inserts
+            live statistics, restock alerts,
+            recent sales and monthly summaries here -->
+
+      </section>
+
+      <!-- ===================================
+           PRODUCTS MANAGEMENT
+           =================================== -->
+
+      <section id="productsPage" hidden>
+
+        <div class="products-header">
+          <div>
+            <h2>Products & Services</h2>
+            <p>
+              Manage products for different business types
+            </p>
+          </div>
+
+          <button
+                  id="addProductBtn"
+                  class="product-primary"
+                  type="button">
+            <i data-lucide="plus"></i>
+            Add Product
+          </button>
+        </div>
+
+        <!-- PRODUCT STATISTICS -->
+
+        <div class="product-stats">
+
+          <article class="stat">
+            <p>Total Products</p>
+            <h2 id="productCount">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Categories</p>
+            <h2 id="categoryCount">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Low Stock</p>
+            <h2 id="lowStockCount">0</h2>
+          </article>
+
+        </div>
+
+        <!-- PRODUCT CATALOG -->
+
+        <section class="panel">
+
+          <div class="products-toolbar">
+            <h3>Product Catalog</h3>
+
+            <div class="product-filters">
+
+              <input
+                      id="productSearch"
+                      type="search"
+                      placeholder="Search products, SKU or category..."
+                      aria-label="Search products">
+
+              <select
+                      id="categoryFilter"
+                      aria-label="Filter category">
+                <option value="">All Categories</option>
+              </select>
+
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Cost (K)</th>
+                <th>Price (K)</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+
+              <tbody id="productTable"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+        <p id="productMessage" role="status"></p>
+
+      </section>
+
+      <!-- ===================================
+           UNIVERSAL ADD / EDIT PRODUCT MODAL
+           =================================== -->
+
+      <div
+              id="universalProductModal"
+              class="universal-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="universalFormTitle"
+              hidden>
+
+        <div class="universal-modal-card">
+
+          <div class="universal-modal-header">
+
+            <div>
+              <h2 id="universalFormTitle">Add Product</h2>
+              <p>
+                Create and manage products for any business
+              </p>
+            </div>
+
+            <button
+                    type="button"
+                    id="closeUniversalProduct"
+                    class="universal-close"
+                    aria-label="Close product form">
+              &times;
+            </button>
+
+          </div>
+
+          <form id="universalProductForm">
+
+            <div class="universal-form-grid">
+
+              <!-- NAME -->
+
+              <div class="universal-field">
+                <label for="universalName">
+                  Product / Service Name *
+                </label>
+
+                <input
+                        id="universalName"
+                        type="text"
+                        maxlength="120"
+                        placeholder="e.g. Cotton T-Shirt"
+                        required>
+              </div>
+
+              <!-- SKU -->
+
+              <div class="universal-field">
+                <label for="universalSku">
+                  SKU / Product Code *
+                </label>
+
+                <input
+                        id="universalSku"
+                        type="text"
+                        maxlength="60"
+                        placeholder="e.g. TSH-001"
+                        required>
+              </div>
+
+              <!-- ITEM TYPE -->
+
+              <div class="universal-field">
+                <label for="universalType">
+                  Item Type
+                </label>
+
+                <select id="universalType">
+                  <option value="physical">
+                    Physical Product
+                  </option>
+
+                  <option value="service">
+                    Service (Coming Soon)
+                  </option>
+                </select>
+              </div>
+
+              <!-- CATEGORY -->
+
+              <div class="universal-field">
+                <label for="universalCategory">
+                  Category *
+                </label>
+
+                <input
+                        id="universalCategory"
+                        type="text"
+                        list="universalCategoryOptions"
+                        maxlength="60"
+                        placeholder="Enter or select a category"
+                        required>
+
+                <datalist id="universalCategoryOptions">
+                  <option value="General"></option>
+                  <option value="Groceries"></option>
+                  <option value="Clothing"></option>
+                  <option value="Electronics"></option>
+                  <option value="Hardware"></option>
+                  <option value="Beauty & Cosmetics"></option>
+                  <option value="Food & Beverages"></option>
+                  <option value="Household"></option>
+                  <option value="Stationery"></option>
+                  <option value="Services"></option>
+                </datalist>
+              </div>
+
+              <!-- UNIT -->
+
+              <div class="universal-field">
+                <label for="universalUnit">
+                  Unit of Measurement
+                </label>
+
+                <select id="universalUnit">
+                  <option value="piece">Piece</option>
+                  <option value="kg">Kilogram (kg)</option>
+                  <option value="g">Gram (g)</option>
+                  <option value="litre">Litre</option>
+                  <option value="metre">Metre</option>
+                  <option value="box">Box</option>
+                  <option value="pack">Pack</option>
+                  <option value="service">Service</option>
+                </select>
+              </div>
+
+              <!-- BUYING COST -->
+
+              <div class="universal-field">
+                <label for="universalBuyingPrice">
+                  Buying Cost (K)
+                </label>
+
+                <input
+                        id="universalBuyingPrice"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        required>
+              </div>
+
+              <!-- SELLING PRICE -->
+
+              <div class="universal-field">
+                <label for="universalSellingPrice">
+                  Selling Price (K) *
+                </label>
+
+                <input
+                        id="universalSellingPrice"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        required>
+              </div>
+
+              <!-- STOCK -->
+
+              <div
+                      class="universal-field"
+                      id="universalStockGroup">
+
+                <label for="universalStock">
+                  Opening Stock
+                </label>
+
+                <input
+                        id="universalStock"
+                        type="number"
+                        min="0"
+                        step="1"
+                        value="0">
+              </div>
+
+              <!-- LOW STOCK -->
+
+              <div
+                      class="universal-field"
+                      id="universalThresholdGroup">
+
+                <label for="universalThreshold">
+                  Low-Stock Threshold
+                </label>
+
+                <input
+                        id="universalThreshold"
+                        type="number"
+                        min="0"
+                        step="1"
+                        value="5">
+              </div>
+
+              <!-- EXPIRY DATE -->
+
+              <div
+                      class="universal-field"
+                      id="universalExpiryGroup">
+
+                <label for="universalExpiry">
+                  Expiry Date (Optional)
+                </label>
+
+                <input
+                        id="universalExpiry"
+                        type="date">
+              </div>
+
+            </div>
+
+            <!-- PRODUCT VARIANTS -->
+
+            <div
+                    class="universal-variants"
+                    id="universalVariantsGroup">
+
+              <label>
+                <input
+                        type="checkbox"
+                        id="universalHasVariants">
+
+                This product has variants
+              </label>
+
+              <div id="universalVariantFields" hidden>
+
+                <p>
+                  Enter options separated by commas.
+                </p>
+
+                <div class="universal-form-grid">
+
+                  <div class="universal-field">
+                    <label for="universalSizes">
+                      Sizes / Models
+                    </label>
+
+                    <input
+                            id="universalSizes"
+                            type="text"
+                            placeholder="S, M, L, XL">
+                  </div>
+
+                  <div class="universal-field">
+                    <label for="universalColors">
+                      Colors / Styles
+                    </label>
+
+                    <input
+                            id="universalColors"
+                            type="text"
+                            placeholder="Black, White, Blue">
+                  </div>
+
+                </div>
+
+                <p class="universal-help">
+                  Variant options are descriptive for now.
+                  Separate stock and pricing for each
+                  variant will be added later.
+                </p>
+
+              </div>
+            </div>
+
+            <p
+                    id="universalProductMessage"
+                    role="status">
+            </p>
+
+            <div class="universal-form-actions">
+
+              <button
+                      type="button"
+                      id="cancelUniversalProduct">
+                Cancel
+              </button>
+
+              <button type="submit">
+                Save Product
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================
+           POINT OF SALE
+           =================================== -->
+
+      <section id="salesPage" hidden>
+
+        <div class="pos-heading">
+
+          <div>
+            <h2>Point of Sale</h2>
+            <p>Process customer purchases</p>
+          </div>
+
+          <button
+                  id="newSaleBtn"
+                  class="pos-secondary"
+                  type="button">
+            New Sale
+          </button>
+
+        </div>
+
+        <div class="pos-layout">
+
+          <!-- PRODUCT SELECTION -->
+
+          <section class="panel pos-products">
+
+            <h3>Select Products</h3>
+
+            <input
+                    id="posSearch"
+                    type="search"
+                    placeholder="Search product name or SKU..."
+                    aria-label="Search sale products">
+
+            <div
+                    id="posProductList"
+                    class="pos-product-list">
+            </div>
+
+          </section>
+
+          <!-- CHECKOUT -->
+
+          <section class="panel pos-checkout">
+
+            <h3>Current Sale</h3>
+
+            <div id="posCart"></div>
+
+            <div class="pos-totals">
+
+              <div>
+                <span>Subtotal</span>
+                <strong id="posSubtotal">K 0.00</strong>
+              </div>
+
+              <label for="posDiscount">
+                Discount (K)
+              </label>
+
+              <input
+                      id="posDiscount"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value="0">
+
+              <div class="pos-grand-total">
+                <span>Total</span>
+                <strong id="posTotal">K 0.00</strong>
+              </div>
+
+              <label for="posPaymentMethod">
+                Payment Method
+              </label>
+
+              <select id="posPaymentMethod">
+                <option value="cash">Cash</option>
+                <option value="mobile_money">
+                  Mobile Money
+                </option>
+                <option value="card">Card</option>
+              </select>
+
+              <label for="posAmountPaid">
+                Amount Received (K)
+              </label>
+
+              <input
+                      id="posAmountPaid"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value="0">
+
+              <div>
+                <span>Change</span>
+                <strong id="posChange">K 0.00</strong>
+              </div>
+
+            </div>
+
+            <button
+                    id="completeSaleBtn"
+                    class="pos-primary"
+                    type="button">
+              Complete Sale
+            </button>
+
+            <p id="posMessage" role="status"></p>
+
+          </section>
+
+        </div>
+
+        <!-- SALES HISTORY -->
+
+        <section class="panel pos-history-panel">
+
+          <h3>Recent Sales</h3>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Receipt</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Payment</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+
+              <tbody id="posSalesHistory"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+      </section>
+
+      <!-- ===================================
+           INVENTORY MANAGEMENT
+           =================================== -->
+
+      <section id="inventoryPage" hidden>
+
+        <div class="inventory-header">
+
+          <div>
+            <h2>Inventory Management</h2>
+            <p>
+              Monitor stock levels and track movements
+            </p>
+          </div>
+
+          <button
+                  id="recordMovementBtn"
+                  class="inventory-primary"
+                  type="button">
+            <i data-lucide="package-plus"></i>
+            Record Stock Movement
+          </button>
+
+        </div>
+
+        <!-- INVENTORY STATISTICS -->
+
+        <div class="inventory-stats">
+
+          <article class="stat">
+            <p>Total Stock Units</p>
+            <h2 id="inventoryUnits">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Low Stock Products</p>
+            <h2 id="inventoryLowStock">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Stock Value (Cost)</p>
+            <h2 id="inventoryValue">K 0.00</h2>
+          </article>
+
+        </div>
+
+        <!-- STOCK OVERVIEW -->
+
+        <section class="panel">
+
+          <div class="inventory-toolbar">
+
+            <h3>Stock Overview</h3>
+
+            <input
+                    id="inventorySearch"
+                    type="search"
+                    placeholder="Search product or SKU..."
+                    aria-label="Search inventory">
+
+          </div>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Quantity</th>
+                <th>Threshold</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+
+              <tbody id="inventoryTable"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+        <!-- STOCK MOVEMENT FORM -->
+
+        <section
+                id="movementFormPanel"
+                class="panel"
+                hidden>
+
+          <h3>Record Stock Movement</h3>
+
+          <form
+                  id="movementForm"
+                  class="inventory-form">
+
+            <label for="movementProduct">
+              Product
+            </label>
+
+            <select
+                    id="movementProduct"
+                    required>
+            </select>
+
+            <label for="movementType">
+              Movement Type
+            </label>
+
+            <select id="movementType" required>
+              <option value="in">Stock In</option>
+              <option value="out">Stock Out</option>
+              <option value="adjustment">
+                Stock Adjustment
+              </option>
+            </select>
+
+            <label
+                    for="movementQuantity"
+                    id="quantityLabel">
+              Quantity
+            </label>
+
+            <input
+                    id="movementQuantity"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required>
+
+            <label for="movementNote">
+              Reason / Notes
+            </label>
+
+            <textarea
+                    id="movementNote"
+                    rows="3"
+                    maxlength="300"
+                    placeholder="e.g. New delivery received">
+          </textarea>
+
+            <div class="inventory-form-actions">
+
+              <button
+                      type="submit"
+                      class="inventory-primary">
+                Save Movement
+              </button>
+
+              <button
+                      type="button"
+                      id="cancelMovementBtn"
+                      class="inventory-secondary">
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+        <!-- STOCK MOVEMENT HISTORY -->
+
+        <section class="panel">
+
+          <h3>Stock Movement History</h3>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Change</th>
+                <th>Balance</th>
+                <th>Notes</th>
+              </tr>
+              </thead>
+
+              <tbody id="movementHistory"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+        <p id="inventoryMessage" role="status"></p>
+
+      </section>
+
+      <!-- ===================================
+           REPORTS & ANALYTICS
+           =================================== -->
+
+      <section id="reportsPage" hidden>
+
+        <div class="reports-header">
+
+          <div>
+            <h2>Reports & Analytics</h2>
+            <p>Analyze business sales and performance</p>
+          </div>
+
+          <button
+                  id="exportReportBtn"
+                  class="reports-primary"
+                  type="button">
+            <i data-lucide="download"></i>
+            Export CSV
+          </button>
+
+        </div>
+
+        <!-- DATE FILTERS -->
+
+        <div class="reports-filters">
+
+          <div>
+            <label for="reportStart">From</label>
+            <input id="reportStart" type="date">
+          </div>
+
+          <div>
+            <label for="reportEnd">To</label>
+            <input id="reportEnd" type="date">
+          </div>
+
+          <button
+                  id="resetReportDates"
+                  class="reports-secondary"
+                  type="button">
+            All Time
+          </button>
+
+        </div>
+
+        <!-- REPORT STATISTICS -->
+
+        <div class="reports-stats">
+
+          <article class="stat">
+            <p>Total Revenue</p>
+            <h2 id="reportRevenue">K 0.00</h2>
+          </article>
+
+          <article class="stat">
+            <p>Transactions</p>
+            <h2 id="reportTransactions">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Items Sold</p>
+            <h2 id="reportItems">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Average Sale</p>
+            <h2 id="reportAverage">K 0.00</h2>
+          </article>
+
+        </div>
+
+        <!-- REPORT CHARTS -->
+
+        <div class="reports-grid">
+
+          <section class="panel">
+
+            <h3>Daily Revenue</h3>
+
+            <p class="reports-subtitle">
+              Revenue grouped by transaction date
+            </p>
+
+            <div
+                    id="reportRevenueChart"
+                    class="report-bar-chart">
+            </div>
+
+          </section>
+
+          <section class="panel">
+
+            <h3>Payment Methods</h3>
+
+            <div id="reportPayments"></div>
+
+          </section>
+
+        </div>
+
+        <!-- TOP SELLING PRODUCTS -->
+
+        <section class="panel reports-section">
+
+          <h3>Top-Selling Products</h3>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Product</th>
+                <th>Units Sold</th>
+                <th>Gross Sales</th>
+              </tr>
+              </thead>
+
+              <tbody id="reportTopProducts"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+        <!-- TRANSACTION HISTORY -->
+
+        <section class="panel reports-section">
+
+          <h3>Transaction History</h3>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Receipt</th>
+                <th>Date</th>
+                <th>Payment</th>
+                <th>Items</th>
+                <th>Total</th>
+              </tr>
+              </thead>
+
+              <tbody id="reportTransactionsTable"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+        <p id="reportMessage" role="status"></p>
+
+      </section>
+
+      <!-- ===================================
+           STAFF MANAGEMENT
+           =================================== -->
+
+      <section id="accountsPage" hidden>
+
+        <div class="accounts-header">
+
+          <div>
+            <h2>Staff Management</h2>
+            <p>Manage staff accounts and permissions</p>
+          </div>
+
+          <button
+                  id="addStaffBtn"
+                  class="account-primary"
+                  type="button">
+            <i data-lucide="user-plus"></i>
+            Add Staff
+          </button>
+
+        </div>
+
+        <!-- STAFF STATISTICS -->
+
+        <div class="account-stats">
+
+          <article class="stat">
+            <p>Total Staff</p>
+            <h2 id="totalStaff">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Active Accounts</p>
+            <h2 id="activeStaff">0</h2>
+          </article>
+
+          <article class="stat">
+            <p>Inactive Accounts</p>
+            <h2 id="inactiveStaff">0</h2>
+          </article>
+
+        </div>
+
+        <!-- STAFF DIRECTORY -->
+
+        <section class="panel">
+
+          <div class="accounts-toolbar">
+
+            <h3>Staff Directory</h3>
+
+            <input
+                    id="staffSearch"
+                    type="search"
+                    placeholder="Search staff..."
+                    aria-label="Search staff">
+
+          </div>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+
+              <tbody id="staffTable"></tbody>
+
+            </table>
+          </div>
+
+        </section>
+
+        <!-- STAFF FORM -->
+
+        <section
+                id="staffFormPanel"
+                class="panel"
+                hidden>
+
+          <h3>Create Staff Account</h3>
+
+          <form id="staffForm" class="staff-form">
+
+            <label for="staffName">
+              Full Name
+            </label>
+
+            <input
+                    id="staffName"
+                    type="text"
+                    required
+                    maxlength="100">
+
+            <label for="staffEmail">
+              Email Address
+            </label>
+
+            <input
+                    id="staffEmail"
+                    type="email"
+                    required>
+
+            <label for="staffRole">
+              Account Role
+            </label>
+
+            <select id="staffRole">
+              <option value="shopkeeper">
+                Shopkeeper
+              </option>
+              <option value="manager">
+                Manager
+              </option>
+            </select>
+
+            <div class="form-actions">
+
+              <button
+                      type="submit"
+                      class="account-primary">
+                Create Demo Account
+              </button>
+
+              <button
+                      type="button"
+                      id="cancelStaffBtn"
+                      class="account-secondary">
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+        <p id="accountsMessage" role="status"></p>
+
+      </section>
+
+      <!-- ===================================
+           SETTINGS
+           =================================== -->
+
+      <section id="settingsPage" hidden>
+
+        <div class="settings-header">
+          <div>
+            <h2>Settings</h2>
+            <p>
+              Manage business information and preferences
+            </p>
+          </div>
+        </div>
+
+        <form id="settingsForm">
+
+          <!-- BUSINESS INFORMATION -->
+
+          <section class="panel settings-panel">
+
+            <h3>Business Information</h3>
+
+            <div class="settings-grid">
+
+              <div class="settings-field">
+                <label for="settingShopName">
+                  Business Name
+                </label>
+
+                <input
+                        id="settingShopName"
+                        required
+                        maxlength="100">
+              </div>
+
+              <div class="settings-field">
+                <label for="settingShopPhone">
+                  Phone Number
+                </label>
+
+                <input
+                        id="settingShopPhone"
+                        type="tel"
+                        maxlength="30">
+              </div>
+
+              <div class="settings-field settings-full">
+                <label for="settingShopAddress">
+                  Business Address
+                </label>
+
+                <textarea
+                        id="settingShopAddress"
+                        rows="2"
+                        maxlength="250">
+              </textarea>
+              </div>
+
+              <div class="settings-field">
+                <label for="settingCurrency">
+                  Currency
+                </label>
+
+                <input
+                        id="settingCurrency"
+                        value="ZMW — Zambian Kwacha"
+                        disabled>
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- RECEIPT SETTINGS -->
+
+          <section class="panel settings-panel">
+
+            <h3>Receipt Preferences</h3>
+
+            <div class="settings-field">
+
+              <label for="settingReceiptFooter">
+                Receipt Footer Message
+              </label>
+
+              <textarea
+                      id="settingReceiptFooter"
+                      rows="3"
+                      maxlength="200">
+            </textarea>
+
+            </div>
+
+            <label class="settings-check">
+
+              <input
+                      id="settingPrintReceipt"
+                      type="checkbox">
+
+              Offer receipt printing after checkout
+
+            </label>
+
+          </section>
+
+          <!-- INVENTORY SETTINGS -->
+
+          <section class="panel settings-panel">
+
+            <h3>Inventory Preferences</h3>
+
+            <div class="settings-field">
+
+              <label for="settingLowStock">
+                Default Low-Stock Threshold
+              </label>
+
+              <input
+                      id="settingLowStock"
+                      type="number"
+                      min="0"
+                      step="1"
+                      required>
+
+              <small>
+                Used for new products. Existing products
+                retain their own thresholds.
+              </small>
+
+            </div>
+
+          </section>
+
+          <!-- MANAGER PROFILE -->
+
+          <section class="panel settings-panel">
+
+            <h3>Manager Profile</h3>
+
+            <div class="settings-grid">
+
+              <div class="settings-field">
+
+                <label for="settingManagerName">
+                  Display Name
+                </label>
+
+                <input
+                        id="settingManagerName"
+                        maxlength="100"
+                        required>
+
+              </div>
+
+              <div class="settings-field">
+
+                <label for="settingManagerEmail">
+                  Email
+                </label>
+
+                <input
+                        id="settingManagerEmail"
+                        type="email"
+                        required>
+
+              </div>
+
+            </div>
+
+            <p class="settings-note">
+              Profile changes are local demo preferences,
+              not changes to a real login account.
+            </p>
+
+          </section>
+
+          <!-- SETTINGS ACTIONS -->
+
+          <div class="settings-actions">
+
+            <button
+                    class="settings-primary"
+                    type="submit">
+              <i data-lucide="save"></i>
+              Save Settings
+            </button>
+
+            <button
+                    class="settings-secondary"
+                    type="button"
+                    id="resetSettingsBtn">
+              Restore Defaults
+            </button>
+
+          </div>
+
+          <p id="settingsMessage" role="status"></p>
+
+        </form>
+
+      </section>
+
+      <!-- ===================================
+           FALLBACK MODULE PAGE
+           =================================== -->
+
+      <section
+              id="modulePage"
+              class="panel"
+              hidden>
+
+        <h3 id="moduleTitle"></h3>
+        <p>This module is coming next.</p>
+
+      </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>

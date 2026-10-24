@@ -1,0 +1,439 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #edf3fa;
+  color: #172c4c;
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.brand-icon {
+  background: #173f8a;
+  color: white;
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 auto 12px;
+}
+
+.brand h1 {
+  font-size: 26px;
+}
+
+.brand p {
+  color: #64748b;
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-top: 5px;
+}
+
+.tabs {
+  display: flex;
+  background: #edf3fa;
+  padding: 5px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.tabs button {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  background: transparent;
+  font-weight: bold;
+  color: #64748b;
+}
+
+.tabs button.active {
+  background: white;
+  color: #173f8a;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #173f8a;
+}
+
+.hidden {
+  display: none;
+}
+
+.primary-btn {
+  width: 100%;
+  background: #173f8a;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #102f69;
+}
+
+#message {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+.footer {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 25px;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px;
+  }
+}
+
+
+/* PASSWORD VISIBILITY */
+
+.password-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrap input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 48px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 38px;
+    height: 38px;
+    padding: 0;
+
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: #64748b;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    z-index: 1;
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.password-toggle:not(.is-visible) .eye-slash {
+    display: none;
+}
+
+
+/* ==========================================
+   TRAUTS LOGIN LIGHT / DARK MODE
+   ========================================== */
+
+/* THEME BUTTON */
+
+.login-theme-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.login-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 50%;
+  border: 1px solid #b5c1d1;
+
+  background: #ffffff;
+  color: #17283f;
+
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.login-theme-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* DARK LOGIN BACKGROUND */
+
+html.trauts-dark {
+  color-scheme: dark;
+}
+
+html.trauts-dark body,
+html.trauts-dark .auth-container {
+  background: #0b1524 !important;
+  color: #e8eff9 !important;
+}
+
+/* LOGIN CARD */
+
+html.trauts-dark .auth-card {
+  background: #17283e !important;
+  color: #e8eff9 !important;
+  border-color: #364a63 !important;
+}
+
+/* BRAND */
+
+html.trauts-dark .brand h1 {
+  color: #ffffff !important;
+}
+
+html.trauts-dark .brand p,
+html.trauts-dark .footer {
+  color: #b6c7dc !important;
+}
+
+/* INPUT FIELDS */
+
+html.trauts-dark .form-group label {
+  color: #e8eff9 !important;
+}
+
+html.trauts-dark .form-group input {
+  background: #0d1c2e !important;
+  color: #ffffff !important;
+  border-color: #52647b !important;
+}
+
+html.trauts-dark .form-group input::placeholder {
+  color: #a8b8cb !important;
+}
+
+/* LOGIN / SIGNUP TABS */
+
+html.trauts-dark .tabs {
+  background: #101f32 !important;
+}
+
+html.trauts-dark .tabs button:not(.active) {
+  background: transparent !important;
+  color: #b6c7dc !important;
+}
+
+/* PASSWORD EYE */
+
+html.trauts-dark .password-toggle {
+  color: #d6e5f7 !important;
+}
+
+/* THEME BUTTON IN DARK MODE */
+
+html.trauts-dark .login-theme-toggle {
+  background: #29425e !important;
+  color: #ffffff !important;
+  border-color: #526c86 !important;
+}
+
+
+/* ==========================================
+   TRAUTS FORGOT PASSWORD
+   ========================================== */
+
+.forgot-password-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.forgot-password-link {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.forgot-password-link[hidden],
+.password-reset-overlay[hidden] {
+  display: none !important;
+}
+
+/* BACKDROP */
+
+.password-reset-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+/* RESET CARD */
+
+.password-reset-card {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  padding: 28px 24px;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #17283e;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+}
+
+.password-reset-card h2 {
+  margin: 0 32px 10px 0;
+  font-size: 22px;
+}
+
+.password-reset-description {
+  margin-bottom: 22px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+/* CLOSE BUTTON */
+
+.password-reset-close {
+  position: absolute;
+  top: 15px;
+  right: 16px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+/* FORM */
+
+#passwordResetForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#passwordResetForm label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#resetEmail {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #17283e;
+  font-size: 15px;
+}
+
+.password-reset-submit {
+  padding: 14px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.password-reset-message {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* DARK MODE */
+
+html.trauts-dark .password-reset-card {
+  background: #17283e;
+  color: #e8eff9;
+}
+
+html.trauts-dark .password-reset-description {
+  color: #b6c7dc;
+}
+
+html.trauts-dark #resetEmail {
+  background: #0d1c2e;
+  color: #ffffff;
+  border-color: #52647b;
+}
+
+html.trauts-dark .password-reset-submit {
+  color: #e8eff9;
+  border-color: #52647b;
+}

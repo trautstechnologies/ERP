@@ -1,0 +1,3350 @@
+
+/* TRAUTS Android: complete Dashboard, Sales, Products and Inventory mobile CSS. */
+
+.trauts-page-header {box-sizing:border-box; display:flex; justify-content:space-between; align-items:center; gap:12px; margin:0 0 16px; min-width:0;}
+.trauts-page-heading {min-width:0;}
+.trauts-page-eyebrow {font-size:11px; letter-spacing:.11em; font-weight:700; opacity:.65; margin:0 0 4px;}
+#trautsPageTitle {margin:0; line-height:1.2; font-size:clamp(1.35rem, 5vw, 1.85rem); overflow-wrap:anywhere;}
+.trauts-section-heading {margin:18px 0 12px; font-size:1.2rem; line-height:1.3;}
+#trautsOverviewHeading[hidden] {display:none !important;}
+.trauts-theme-toggle {flex:0 0 auto; width:44px; height:44px; border-radius:50%; border:1px solid #b5c1d1; background:#ffffff; color:#17283f; display:inline-flex; align-items:center; justify-content:center; font-size:25px; cursor:pointer; touch-action:manipulation;}
+.trauts-theme-toggle:focus-visible {outline:3px solid #508fda; outline-offset:2px;}
+
+@media (max-width: 767px) {
+  html, body {max-width:100%; overflow-x:hidden;}
+  .layout {display:block !important; width:100% !important; min-width:0 !important; max-width:100% !important;}
+  .main {box-sizing:border-box !important; margin-left:0 !important; width:100% !important; max-width:100% !important; min-width:0 !important; padding:16px 14px 28px !important; overflow-x:hidden;}
+  .trauts-page-header {margin-top:0; margin-bottom:10px;}
+  .mobile-menu-btn {display:inline-flex !important; align-items:center; justify-content:center; gap:8px; position:static !important; top:auto !important; right:auto !important; bottom:auto !important; left:auto !important; transform:none !important; margin:0 0 14px !important; min-height:44px; max-width:100%; touch-action:manipulation;}
+  .sidebar-brand {min-width:0;}
+  .main > section, .main > .panel, #overview,
+  .panel, .stat, .table-wrap, .pos-layout {min-width:0; max-width:100%; box-sizing:border-box;}
+  .product-stats, .inventory-stats, .reports-stats, .account-stats,
+  .reports-grid, .pos-layout, .universal-form-grid,
+  #overview .stats-grid, #overview .overview-grid,
+  #overview .dashboard-stats, #overview .overview-stats {display:grid !important; grid-template-columns:minmax(0, 1fr) !important; gap:12px;}
+  .products-header, .inventory-header, .reports-header,
+  .accounts-header, .pos-heading, .products-toolbar,
+  .inventory-toolbar, .accounts-toolbar {flex-wrap:wrap; gap:12px;}
+  .table-wrap {overflow-x:auto !important; -webkit-overflow-scrolling:touch;}
+  .table-wrap table {min-width:560px; width:max-content; max-width:none;}
+  .main input:not([type="checkbox"]):not([type="radio"]),
+  .main select, .main textarea {max-width:100%; box-sizing:border-box; font-size:16px;}
+  .main button, .sidebar button {touch-action:manipulation;}
+  #trautsSidebar {position:fixed !important; top:0 !important; left:0 !important; bottom:0 !important; width:min(85vw, 300px) !important; height:100dvh !important; max-height:100dvh; overflow-y:auto; overscroll-behavior:contain; z-index:10002 !important; transform:translateX(-105%) !important; visibility:hidden !important; transition:transform .25s ease, visibility .25s ease;}
+  #trautsSidebar.mobile-open {transform:translateX(0) !important; visibility:visible !important; opacity:1 !important; pointer-events:auto !important;}
+  #mobileSidebarBackdrop {position:fixed !important; inset:0 !important; background:rgba(0, 0, 0, .55); z-index:10001 !important;}
+  #mobileSidebarBackdrop[hidden] {display:none !important;}
+  .main > section[hidden],
+  #modulePage[hidden],
+  #movementFormPanel[hidden] {display:none !important;}
+}
+
+html.trauts-dark {color-scheme:dark; --trauts-bg:#0b1524; --trauts-card:#17283e; --trauts-inner:#20324a; --trauts-border:#364a63; --trauts-text:#e8eff9; --trauts-muted:#b6c7dc;}
+html.trauts-dark body,
+html.trauts-dark .layout,
+html.trauts-dark .main {background:#0b1524 !important; color:#e8eff9 !important;}
+html.trauts-dark .sidebar,
+html.trauts-dark #trautsSidebar {background:#101f32 !important; color:#e8eff9 !important;}
+html.trauts-dark .panel,
+html.trauts-dark .stat,
+html.trauts-dark .universal-modal-card,
+html.trauts-dark .product-stats article,
+html.trauts-dark .inventory-stats article,
+html.trauts-dark .reports-stats article,
+html.trauts-dark .account-stats article,
+html.trauts-dark .pos-checkout,
+html.trauts-dark .pos-products {background:#17283e !important; border-color:#304158 !important; color:#e8eff9 !important;}
+html.trauts-dark h1,
+html.trauts-dark h2,
+html.trauts-dark h3,
+html.trauts-dark p,
+html.trauts-dark label,
+html.trauts-dark strong,
+html.trauts-dark td,
+html.trauts-dark th,
+html.trauts-dark span {color:inherit;}
+html.trauts-dark .trauts-page-eyebrow,
+html.trauts-dark .reports-subtitle,
+html.trauts-dark .settings-note {color:#b6c7dc !important;}
+html.trauts-dark .trauts-theme-toggle {background:#29425e !important; color:#ffffff !important; border-color:#526c86 !important;}
+html.trauts-dark .main input:not([type="checkbox"]):not([type="radio"]),
+html.trauts-dark .main textarea,
+html.trauts-dark .main select {background:#0d1c2e !important; color:#f0f5fc !important; border-color:#52647b !important;}
+html.trauts-dark .main input::placeholder,
+html.trauts-dark .main textarea::placeholder {color:#b2c1d3 !important;}
+html.trauts-dark .main table,
+html.trauts-dark .main th,
+html.trauts-dark .main td,
+html.trauts-dark .sidebar-footer {border-color:#364a63 !important;}
+html.trauts-dark .main thead,
+html.trauts-dark .main tr:nth-child(even) {background:#20324a !important;}
+html.trauts-dark .sidebar-nav .nav:not(.active) {background:transparent !important; color:#d7e3f2 !important;}
+html.trauts-dark .sidebar-nav .nav.active {background:#315376 !important; color:#fff !important;}
+
+@media (max-width: 767px) {
+  html.trauts-dark .main :is(
+    .panel, .stat, .card, .summary-card, .metric-card,
+    .overview-card, .dashboard-card,
+    .expense-card, .supplier-card, .purchase-card, .profit-card,
+    .settings-panel, .reports-filters, .table-wrap
+  ) {background-color:var(--trauts-card) !important; color:var(--trauts-text) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark .main :is(.panel, .stat, .settings-panel) :is(h2, h3, h4, strong) {color:var(--trauts-text) !important;}
+  html.trauts-dark .main :is(
+    .products-header, .inventory-header, .pos-heading,
+    .reports-header, .accounts-header, .settings-header,
+    .trauts-stock-alert-header
+  ) :is(h2, h3) {color:var(--trauts-text) !important;}
+  html.trauts-dark .main :is(
+    .products-header, .inventory-header, .pos-heading,
+    .reports-header, .accounts-header, .settings-header,
+    .reports-subtitle, .settings-note
+  ) p {color:var(--trauts-muted) !important;}
+  html.trauts-dark #salesPage .pos-product,
+  html.trauts-dark #trautsQuickSaleModal .pos-product,
+  html.trauts-dark #salesPage .pos-cart-row,
+  html.trauts-dark #trautsQuickSaleModal .pos-cart-row,
+  html.trauts-dark #salesPage .trauts-stock-alert-row {background:var(--trauts-inner) !important; border-color:var(--trauts-border) !important; color:var(--trauts-text) !important;}
+  html.trauts-dark #salesPage .pos-product :is(h4, strong),
+  html.trauts-dark #trautsQuickSaleModal .pos-product :is(h4, strong),
+  html.trauts-dark #salesPage .pos-cart-row strong,
+  html.trauts-dark #trautsQuickSaleModal .pos-cart-row strong {color:var(--trauts-text) !important;}
+  html.trauts-dark #salesPage .pos-product p:not([style]),
+  html.trauts-dark #trautsQuickSaleModal .pos-product p:not([style]),
+  html.trauts-dark #salesPage .pos-cart-row small,
+  html.trauts-dark #trautsQuickSaleModal .pos-cart-row small,
+  html.trauts-dark #salesPage .trauts-stock-alert-row small {color:var(--trauts-muted) !important;}
+  html.trauts-dark #salesPage .trauts-stock-alerts {background:var(--trauts-card) !important; color:var(--trauts-text) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark #salesPage :is(.pos-totals, .pos-quantity),
+  html.trauts-dark #trautsQuickSaleModal :is(.pos-totals, .pos-quantity) {border-color:var(--trauts-border) !important; color:var(--trauts-text) !important;}
+  html.trauts-dark #salesPage .pos-quantity button,
+  html.trauts-dark #trautsQuickSaleModal .pos-quantity button {background:#29425e !important; color:#ffffff !important; border-color:#526c86 !important;}
+  html.trauts-dark #salesPage .pos-secondary,
+  html.trauts-dark #trautsQuickSaleModal .pos-secondary {background:var(--trauts-inner) !important; color:var(--trauts-text) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark #salesPage .pos-primary:not(:disabled),
+  html.trauts-dark #trautsQuickSaleModal .pos-primary:not(:disabled) {background:#2855a0 !important; color:#ffffff !important; border-color:#2855a0 !important;}
+  html.trauts-dark #salesPage .pos-primary:disabled,
+  html.trauts-dark #trautsQuickSaleModal .pos-primary:disabled {background:var(--trauts-inner) !important; color:var(--trauts-muted) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark #trautsQuickSaleModal :is(.pos-products, .pos-checkout) {background:var(--trauts-card) !important; color:var(--trauts-text) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark #trautsQuickSaleModal :is(input, select, textarea) {background:#0d1c2e !important; color:#f0f5fc !important; border-color:#52647b !important;}
+  html.trauts-dark #trautsQuickSaleModal input::placeholder {color:var(--trauts-muted) !important;}
+  html.trauts-dark .main .table-wrap table,
+  html.trauts-dark .main .table-wrap tbody {background:transparent !important; color:var(--trauts-text) !important;}
+  html.trauts-dark .main .table-wrap thead th {background:var(--trauts-inner) !important; color:var(--trauts-text) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark .main .table-wrap tbody td {background:transparent !important; color:var(--trauts-text) !important; border-color:var(--trauts-border) !important;}
+  html.trauts-dark .main .table-wrap tbody tr:nth-child(odd) {background:var(--trauts-card) !important;}
+  html.trauts-dark .main .table-wrap tbody tr:nth-child(even) {background:var(--trauts-inner) !important;}
+  html.trauts-dark .main :is(.subtitle, .hint, .description, .settings-note) {color:var(--trauts-muted) !important;}
+  html.trauts-dark #trautsLiveDashboard {--tld-background:#0b1524; --tld-surface:#17283e; --tld-subtle:#20324a; --tld-border:#364a63; --tld-text:#e8eff9; --tld-muted:#b6c7dc; color:var(--tld-text) !important;}
+  html.trauts-dark #trautsLiveDashboard :is(.tld-card, .tld-panel, .tld-chart-panel) {background:var(--tld-surface) !important; color:var(--tld-text) !important; border-color:var(--tld-border) !important;}
+  html.trauts-dark #trautsLiveDashboard :is(.tld-card strong, .tld-panel h3, .tld-heading h2) {color:var(--tld-text) !important;}
+  html.trauts-dark #trautsLiveDashboard :is(
+    #tldDateLabel, .tld-card > span, .tld-card small,
+    .tld-footnote, .tld-notice, .tld-panel-heading span,
+    .tld-chart-heading p, .tld-chart-axis
+  ) {color:var(--tld-muted) !important;}
+  html.trauts-dark #trautsLiveDashboard :is(.tld-monthly > div, .tld-table tbody tr) {background:var(--tld-subtle) !important; border-color:var(--tld-border) !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-table tbody td {background:transparent !important; color:var(--tld-text) !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-monthly strong {color:var(--tld-text) !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-monthly span {color:var(--tld-muted) !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-chart-ranges {background:var(--tld-subtle) !important; border-color:var(--tld-border) !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-range-btn {color:var(--tld-muted) !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-range-btn[aria-pressed="true"] {background:#315376 !important; color:#ffffff !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-chart-grid {stroke:#364a63 !important;}
+  html.trauts-dark #trautsLiveDashboard .tld-chart-axis {fill:#b6c7dc !important;}
+  html.trauts-dark #trautsLiveDashboard :is(
+    .tld-negative, .tld-card strong.tld-negative,
+    .tld-monthly strong.tld-negative
+  ) {color:#fca5a5 !important;}
+}
+
+@media (max-width: 767px) {
+  #salesPage .pos-heading {display:flex; flex-direction:column; align-items:stretch; gap:12px; margin-bottom:16px;}
+  #salesPage .pos-heading > div {min-width:0;}
+  #salesPage .pos-heading h2 {margin-bottom:4px;}
+  #salesPage #newSaleBtn {width:100%; min-height:48px; border-radius:12px; font-weight:700; touch-action:manipulation;}
+  #salesPage .trauts-stock-alerts {min-width:0; width:100%; box-sizing:border-box; padding:15px 13px; margin:0 0 18px; border-radius:16px; border:1px solid #dfe6ef;}
+  #salesPage .trauts-stock-alert-header {display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:8px 12px; margin-bottom:13px;}
+  #salesPage .trauts-stock-alert-header > div {min-width:0; flex:1 1 190px;}
+  #salesPage .trauts-stock-alert-header h3 {margin:0 0 4px; font-size:16px;}
+  #salesPage .trauts-stock-alert-header p {margin:0; font-size:12px;}
+  #salesPage #posAlertCount {white-space:nowrap; font-size:12px;}
+  #salesPage #posStockAlertList {display:grid; gap:9px;}
+  #salesPage .trauts-stock-alert-row {display:flex; flex-direction:column; align-items:flex-start; gap:9px; min-width:0; padding:12px; border:1px solid #dfe6ef; border-radius:12px;}
+  #salesPage .trauts-stock-alert-row > div {min-width:0; width:100%;}
+  #salesPage .trauts-stock-alert-row strong {display:block; overflow-wrap:anywhere; margin-bottom:3px;}
+  #salesPage .trauts-stock-alert-row small {display:block; line-height:1.5; overflow-wrap:anywhere; white-space:normal;}
+  #salesPage .trauts-stock-status {align-self:flex-start; max-width:100%; white-space:normal;}
+  #salesPage .pos-layout {display:grid !important; grid-template-columns:minmax(0, 1fr) !important; gap:14px !important;}
+  #salesPage .pos-products,
+  #salesPage .pos-checkout {width:100%; min-width:0; padding:16px 13px; border-radius:16px;}
+  #salesPage #posSearch {width:100%; min-height:46px;}
+  #salesPage .pos-product-list {display:grid; grid-template-columns:repeat(auto-fit, minmax(145px, 1fr)); gap:10px;}
+  #salesPage .pos-product {min-width:0; display:flex; flex-direction:column; gap:7px; padding:12px; border-radius:13px;}
+  #salesPage .pos-product :is(h4, p) {margin:0; overflow-wrap:anywhere; line-height:1.4;}
+  #salesPage .pos-product .pos-primary {width:100%; min-height:44px; margin-top:auto; border-radius:10px;}
+  #salesPage #posCart {min-width:0;}
+  #salesPage .pos-cart-row {min-width:0; gap:10px; flex-wrap:wrap;}
+  #salesPage #completeSaleBtn {width:100%; min-height:50px; border-radius:12px;}
+  #salesPage #posMessage {overflow-wrap:anywhere;}
+  html.trauts-dark #salesPage .trauts-stock-alerts {border-color:var(--trauts-border, #364a63); background:var(--trauts-card, #17283e);}
+  html.trauts-dark #salesPage .trauts-stock-alert-row {border-color:var(--trauts-border, #364a63); background:var(--trauts-inner, #20324a);}
+}
+
+@media (max-width: 767px) {
+  #productsPage {min-width:0;}
+  #productsPage .products-header {display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:12px !important; margin-bottom:14px;}
+  #productsPage .products-header > div {min-width:0;}
+  #productsPage .products-header h2 {margin:0 0 4px; font-size:21px; line-height:1.25;}
+  #productsPage .products-header p {margin:0; line-height:1.4; font-size:13px;}
+  #productsPage #addProductBtn {display:inline-flex !important; align-items:center !important; justify-content:center !important; width:100% !important; min-height:49px !important; padding:11px 16px !important; border-radius:12px !important; font-size:15px !important; font-weight:700 !important; background:#2855a0 !important; color:#fff !important; border:1px solid #2855a0 !important; touch-action:manipulation;}
+  #productsPage .product-stats {display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:8px !important; margin:0 0 16px;}
+  #productsPage .product-stats .stat {min-width:0; padding:13px 9px !important; border:1px solid #dfe6ef; border-radius:13px; box-sizing:border-box;}
+  #productsPage .product-stats .stat p {margin:0 0 7px; font-size:11px; line-height:1.4;}
+  #productsPage .product-stats .stat h2 {margin:0; font-size:clamp(19px,5.4vw,27px); line-height:1.1; overflow-wrap:anywhere;}
+  #productsPage > .panel {min-width:0; padding:15px 12px !important; border:1px solid #dfe6ef; border-radius:16px;}
+  #productsPage .products-toolbar {display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:12px !important; margin-bottom:14px;}
+  #productsPage .products-toolbar h3 {margin:0; font-size:17px;}
+  #productsPage .product-filters {display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:9px !important; width:100% !important; min-width:0;}
+  #productsPage #productSearch,
+  #productsPage #categoryFilter {width:100% !important; min-width:0 !important; max-width:100% !important; min-height:47px !important; padding:11px 12px; box-sizing:border-box; border-radius:11px; font-size:16px;}
+  #productsPage .table-wrap {width:100% !important; min-width:0 !important; max-width:100% !important; overflow:visible !important;}
+  #productsPage .table-wrap table,
+  #productsPage .table-wrap tbody#productTable {display:block !important; width:100% !important; min-width:0 !important; max-width:100% !important; border:0 !important; background:transparent !important;}
+  #productsPage .table-wrap thead {display:none !important;}
+  #productsPage #productTable > tr {display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:11px 10px !important; width:100% !important; min-width:0 !important; max-width:100% !important; box-sizing:border-box !important; margin:0 0 11px !important; padding:14px !important; border:1px solid #dfe6ef !important; border-radius:14px !important; background:#f6f8fc !important;}
+  #productsPage #productTable > tr > td {display:flex !important; flex-direction:column !important; justify-content:flex-start; gap:4px; min-width:0 !important; max-width:100% !important; width:auto !important; box-sizing:border-box !important; padding:0 !important; border:0 !important; background:transparent !important; color:#17283e; white-space:normal !important; overflow-wrap:anywhere; line-height:1.4; font-size:13px;}
+  #productsPage #productTable > tr > td::before {color:#65768c; font-size:10px; font-weight:600; letter-spacing:.03em; text-transform:uppercase;}
+  #productsPage #productTable > tr > td:nth-child(1) {grid-column:1 / -1; font-weight:700; font-size:16px;}
+  #productsPage #productTable > tr > td:nth-child(1)::before {content:"PRODUCT";}
+  #productsPage #productTable > tr > td:nth-child(2)::before {content:"SKU";}
+  #productsPage #productTable > tr > td:nth-child(3)::before {content:"CATEGORY";}
+  #productsPage #productTable > tr > td:nth-child(4)::before {content:"COST (K)";}
+  #productsPage #productTable > tr > td:nth-child(5)::before {content:"SELLING PRICE (K)";}
+  #productsPage #productTable > tr > td:nth-child(6)::before {content:"STOCK";}
+  #productsPage #productTable > tr > td:nth-child(7) {grid-column:1 / -1; display:block !important; padding-top:10px !important; border-top:1px solid #dfe6ef !important;}
+  #productsPage #productTable > tr > td:nth-child(7)::before {content:"ACTIONS"; display:block; margin-bottom:8px;}
+  #productsPage #productTable > tr > td:nth-child(7) button {min-height:43px !important; padding:9px 12px !important; margin:0 7px 7px 0 !important; border-radius:10px !important; max-width:100%; touch-action:manipulation;}
+  #productsPage #productTable > tr > td:nth-child(7) button:first-of-type {background:#2855a0 !important; color:#ffffff !important; border:1px solid #2855a0 !important;}
+  #productsPage #productTable > tr > td:nth-child(7) button:nth-of-type(2) {background:transparent !important; color:#a52b28 !important; border:1px solid #c28a89 !important;}
+  #productsPage #productTable > tr > td[colspan] {display:block !important; grid-column:1 / -1; font-size:13px; font-weight:400;}
+  #productsPage #productTable > tr > td[colspan]::before {content:none !important;}
+  #productsPage #productMessage {overflow-wrap:anywhere; font-size:13px;}
+  #universalProductModal[hidden] {display:none !important;}
+  #universalProductModal:not([hidden]) {position:fixed !important; inset:0 !important; z-index:31000 !important; display:flex !important; align-items:center !important; justify-content:center !important; box-sizing:border-box; padding:8px !important; overflow:hidden !important; background:rgba(5,14,27,.7) !important;}
+  #universalProductModal .universal-modal-card {width:100% !important; max-width:580px !important; max-height:calc(100dvh - 16px) !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch; box-sizing:border-box; margin:0 !important; padding:16px 13px 20px !important; border-radius:16px !important;}
+  #universalProductModal .universal-modal-header {display:flex !important; flex-direction:row !important; align-items:flex-start !important; justify-content:space-between !important; gap:10px !important;}
+  #universalProductModal .universal-modal-header h2 {font-size:21px; margin:0 0 4px;}
+  #universalProductModal #closeUniversalProduct {width:44px !important; height:44px !important; min-width:44px; flex:0 0 44px; border-radius:11px; font-size:24px;}
+  #universalProductModal .universal-form-grid {display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:12px !important;}
+  #universalProductModal .universal-field {min-width:0;}
+  #universalProductModal .universal-field > label {display:block; font-size:13px; margin-bottom:5px;}
+  #universalProductModal .universal-field > :is(input,select,textarea) {display:block; box-sizing:border-box; width:100% !important; max-width:100% !important; min-width:0 !important; min-height:45px; font-size:16px;}
+  #universalProductModal .universal-form-actions {display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:9px !important;}
+  #universalProductModal .universal-form-actions button {width:100% !important; min-height:47px !important; border-radius:11px;}
+  #universalProductModal #universalVariantFields[hidden] {display:none !important;}
+  html.trauts-dark #productsPage > .panel,
+  html.trauts-dark #productsPage .product-stats .stat {background:#17283e !important; border-color:#364a63 !important; color:#e8eff9 !important;}
+  html.trauts-dark #productsPage #productTable > tr {background:#20324a !important; border-color:#364a63 !important;}
+  html.trauts-dark #productsPage #productTable > tr > td {color:#e8eff9 !important;}
+  html.trauts-dark #productsPage #productTable > tr > td::before {color:#b6c7dc !important;}
+  html.trauts-dark #productsPage #productTable > tr > td:nth-child(7) {border-color:#364a63 !important;}
+  html.trauts-dark #productsPage #productTable > tr > td:nth-child(7) button:nth-of-type(2) {color:#fca5a5 !important; border-color:#b45353 !important;}
+  html.trauts-dark #universalProductModal .universal-modal-card {background:#17283e !important; color:#e8eff9 !important; border-color:#364a63 !important;}
+  html.trauts-dark #universalProductModal input:not([type="checkbox"]),
+  html.trauts-dark #universalProductModal select,
+  html.trauts-dark #universalProductModal textarea {background:#0d1c2e !important; border-color:#52647b !important; color:#e8eff9 !important;}
+  html.trauts-dark #universalProductModal input::placeholder {color:#b6c7dc !important;}
+}
+
+/* INVENTORY MOBILE LAYOUT */
+
+@media (max-width: 767px) {
+  #inventoryPage {min-width:0; max-width:100%;}
+  #inventoryPage .inventory-header {display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:13px !important; margin-bottom:16px;}
+  #inventoryPage .inventory-header > div {min-width:0;}
+  #inventoryPage .inventory-header h2 {margin:0 0 5px; font-size:21px; line-height:1.25;}
+  #inventoryPage .inventory-header p {margin:0; font-size:13px; line-height:1.5;}
+  #inventoryPage #recordMovementBtn {display:inline-flex !important; align-items:center; justify-content:center; gap:9px; width:100% !important; min-height:50px !important; padding:12px 16px !important; border-radius:12px !important; border:1px solid #2855a0 !important; background:#2855a0 !important; color:#fff !important; font-size:14px; font-weight:700; touch-action:manipulation;}
+  #inventoryPage .inventory-stats {display:grid !important; grid-template-columns:repeat(2, minmax(0, 1fr)) !important; gap:9px !important; margin-bottom:17px;}
+  #inventoryPage .inventory-stats .stat {min-width:0; box-sizing:border-box; padding:14px 12px !important; border:1px solid #dfe6ef; border-radius:14px; margin:0 !important; background:#fff;}
+  #inventoryPage .inventory-stats .stat:nth-child(3) {grid-column:1 / -1;}
+  #inventoryPage .inventory-stats .stat p {margin:0 0 8px; font-size:12px; line-height:1.4;}
+  #inventoryPage .inventory-stats .stat h2 {margin:0; font-size:clamp(20px, 5.5vw, 27px); line-height:1.2; overflow-wrap:anywhere;}
+  #inventoryPage > .panel {box-sizing:border-box; max-width:100%; min-width:0; margin:0 0 15px; padding:16px 12px !important; border:1px solid #dfe6ef; border-radius:16px;}
+  #inventoryPage > .panel > h3,
+  #inventoryPage .inventory-toolbar h3 {margin:0 0 12px; font-size:17px; line-height:1.3;}
+  #inventoryPage .inventory-toolbar {display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:3px; margin-bottom:14px;}
+  #inventoryPage #inventorySearch {display:block; width:100% !important; min-width:0; max-width:100% !important; min-height:48px; border-radius:11px; font-size:16px; box-sizing:border-box;}
+  #inventoryPage .table-wrap {width:100% !important; min-width:0 !important; max-width:100% !important; overflow:visible !important;}
+  #inventoryPage .table-wrap > table,
+  #inventoryPage #inventoryTable,
+  #inventoryPage #movementHistory {display:block !important; width:100% !important; max-width:100% !important; min-width:0 !important; border:0 !important; background:transparent !important;}
+  #inventoryPage .table-wrap thead {display:none !important;}
+  #inventoryPage #inventoryTable > tr,
+  #inventoryPage #movementHistory > tr {display:grid !important; grid-template-columns:repeat(2, minmax(0, 1fr)) !important; gap:11px 10px !important; box-sizing:border-box !important; width:100% !important; min-width:0 !important; max-width:100% !important; margin:0 0 11px !important; padding:14px !important; border:1px solid #dfe6ef !important; border-radius:14px !important; background:#f6f8fc !important;}
+  #inventoryPage #inventoryTable > tr > td,
+  #inventoryPage #movementHistory > tr > td {display:flex !important; flex-direction:column !important; align-items:flex-start; gap:4px; box-sizing:border-box !important; min-width:0 !important; max-width:100% !important; padding:0 !important; border:0 !important; background:transparent !important; color:#17283e; font-size:13px; line-height:1.45; white-space:normal !important; overflow-wrap:anywhere; text-align:left;}
+  #inventoryPage #inventoryTable > tr > td::before,
+  #inventoryPage #movementHistory > tr > td::before {display:block; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#617188;}
+  #inventoryPage #inventoryTable > tr > td:nth-child(1) {grid-column:1 / -1; font-size:16px; font-weight:700;}
+  #inventoryPage #inventoryTable > tr > td:nth-child(1)::before {content:"PRODUCT";}
+  #inventoryPage #inventoryTable > tr > td:nth-child(2)::before {content:"PRODUCT CODE";}
+  #inventoryPage #inventoryTable > tr > td:nth-child(3)::before {content:"AVAILABLE";}
+  #inventoryPage #inventoryTable > tr > td:nth-child(4)::before {content:"LOW-STOCK LIMIT";}
+  #inventoryPage #inventoryTable > tr > td:nth-child(5)::before {content:"STATUS";}
+  #inventoryPage #inventoryTable > tr > td:nth-child(6) {grid-column:1 / -1; padding-top:10px !important; border-top:1px solid #dfe6ef !important;}
+  #inventoryPage #inventoryTable > tr > td:nth-child(6)::before {content:"STOCK ACTION";}
+  #inventoryPage #inventoryTable > tr > td:nth-child(6) :is(button, a) {display:inline-flex; justify-content:center; align-items:center; text-align:center; min-height:44px !important; max-width:100%; padding:9px 14px; border-radius:10px; touch-action:manipulation;}
+  #inventoryPage #movementHistory > tr > td:nth-child(1)::before {content:"DATE";}
+  #inventoryPage #movementHistory > tr > td:nth-child(2)::before {content:"PRODUCT";}
+  #inventoryPage #movementHistory > tr > td:nth-child(3)::before {content:"MOVEMENT";}
+  #inventoryPage #movementHistory > tr > td:nth-child(4)::before {content:"QUANTITY CHANGE";}
+  #inventoryPage #movementHistory > tr > td:nth-child(5)::before {content:"BALANCE";}
+  #inventoryPage #movementHistory > tr > td:nth-child(6) {grid-column:1 / -1; padding-top:9px !important; border-top:1px solid #dfe6ef !important;}
+  #inventoryPage #movementHistory > tr > td:nth-child(6)::before {content:"REASON / NOTES";}
+  #inventoryPage #inventoryTable > tr > td[colspan],
+  #inventoryPage #movementHistory > tr > td[colspan] {grid-column:1 / -1 !important; display:block !important; font-size:13px; font-weight:400;}
+  #inventoryPage #inventoryTable > tr > td[colspan]::before,
+  #inventoryPage #movementHistory > tr > td[colspan]::before {content:none !important;}
+  #inventoryPage #movementFormPanel[hidden] {display:none !important;}
+  #inventoryPage #movementFormPanel:not([hidden]) {display:block !important; scroll-margin-top:16px;}
+  #inventoryPage #movementForm {display:grid !important; grid-template-columns:minmax(0, 1fr) !important; gap:8px !important; min-width:0; max-width:100%;}
+  #inventoryPage #movementForm > label {margin-top:5px; font-size:13px; font-weight:700; line-height:1.4;}
+  #inventoryPage #movementForm > :is(select, input, textarea) {display:block; width:100% !important; max-width:100% !important; min-width:0; min-height:47px; padding:10px 12px; margin:0 0 5px; border-radius:11px; border:1px solid #bac8d9; box-sizing:border-box; font-size:16px; line-height:1.35;}
+  #inventoryPage #movementForm > textarea {min-height:92px; resize:vertical;}
+  #inventoryPage #movementForm .inventory-form-actions {display:grid !important; grid-template-columns:minmax(0, 1fr) !important; gap:9px !important; margin-top:8px;}
+  #inventoryPage #movementForm .inventory-form-actions button {display:block; width:100% !important; min-height:48px !important; border-radius:11px !important; font-weight:700; padding:10px 13px; touch-action:manipulation;}
+  #inventoryPage #movementForm button[type="submit"] {color:#fff !important; background:#2855a0 !important; border:1px solid #2855a0 !important;}
+  #inventoryPage #inventoryMessage {font-size:13px; line-height:1.5; overflow-wrap:anywhere;}
+  html.trauts-dark #inventoryPage > .panel,
+  html.trauts-dark #inventoryPage .inventory-stats .stat {background:#17283e !important; color:#e8eff9 !important; border-color:#364a63 !important;}
+  html.trauts-dark #inventoryPage #inventoryTable > tr,
+  html.trauts-dark #inventoryPage #movementHistory > tr {background:#20324a !important; color:#e8eff9 !important; border-color:#364a63 !important;}
+  html.trauts-dark #inventoryPage #inventoryTable > tr > td,
+  html.trauts-dark #inventoryPage #movementHistory > tr > td {color:#e8eff9 !important;}
+  html.trauts-dark #inventoryPage #inventoryTable > tr > td::before,
+  html.trauts-dark #inventoryPage #movementHistory > tr > td::before {color:#b6c7dc !important;}
+  html.trauts-dark #inventoryPage #inventoryTable > tr > td:nth-child(6),
+  html.trauts-dark #inventoryPage #movementHistory > tr > td:nth-child(6) {border-color:#364a63 !important;}
+  html.trauts-dark #inventoryPage #movementForm > :is(input, select, textarea) {background:#0d1c2e !important; color:#f0f5fc !important; border-color:#52647b !important;}
+  html.trauts-dark #inventoryPage #movementForm .inventory-secondary {background:#29425e !important; color:#e8eff9 !important; border-color:#526c86 !important;}
+}
+
+
+/* ===========================================================
+   TRAUTS ANDROID — SUPPLIERS & PURCHASES
+   Mobile-only layout.
+   Does not modify purchase, payment or stock calculations.
+   =========================================================== */
+
+@media (max-width: 767px) {
+
+  #suppliersPurchasesPage {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #suppliersPurchasesPage [hidden],
+  #suppliersPurchasesPage .sp-panel[hidden],
+  #suppliersPurchasesPage #spPurchasesTab[hidden],
+  #suppliersPurchasesPage #spSuppliersTab[hidden] {
+    display: none !important;
+  }
+
+  /* PAGE HEADER */
+
+  #suppliersPurchasesPage .sp-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px;
+    margin: 0 0 15px;
+    min-width: 0;
+  }
+
+  #suppliersPurchasesPage .sp-header h2 {
+    margin: 0 0 4px;
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  #suppliersPurchasesPage .sp-header p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* SUMMARY STATISTICS */
+
+  #suppliersPurchasesPage .sp-stats {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    margin: 0 0 16px;
+    min-width: 0;
+  }
+
+  #suppliersPurchasesPage .sp-stat {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between;
+    min-width: 0;
+    padding: 13px 11px !important;
+    box-sizing: border-box;
+    margin: 0 !important;
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    border-radius: 13px;
+    gap: 7px;
+    box-shadow: none !important;
+  }
+
+  #suppliersPurchasesPage .sp-stat small {
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #617188;
+  }
+
+  #suppliersPurchasesPage .sp-stat strong {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(18px, 4.9vw, 24px);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  /* PURCHASES AND SUPPLIERS TABS */
+
+  #suppliersPurchasesPage .sp-tabs {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 15px;
+    min-width: 0;
+    padding: 4px;
+    border-radius: 13px;
+    background: #edf2f8;
+  }
+
+  #suppliersPurchasesPage .sp-tab {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+    min-height: 46px;
+    padding: 9px 8px;
+    margin: 0 !important;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #243952;
+    touch-action: manipulation;
+  }
+
+  #suppliersPurchasesPage .sp-tab.active {
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border-color: #2855a0 !important;
+  }
+
+  #suppliersPurchasesPage #spPurchasesTab,
+  #suppliersPurchasesPage #spSuppliersTab {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* CONTENT PANELS */
+
+  #suppliersPurchasesPage .sp-panel {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 15px 12px !important;
+    margin: 0 0 14px;
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    border-radius: 16px;
+  }
+
+  #suppliersPurchasesPage .sp-panel > h3 {
+    font-size: 17px;
+    line-height: 1.35;
+    margin: 0 0 13px;
+  }
+
+  #suppliersPurchasesPage .sp-toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin: 0 0 13px;
+    min-width: 0;
+  }
+
+  #suppliersPurchasesPage .sp-toolbar h3 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  /* NEW PURCHASE AND ADD SUPPLIER BUTTONS */
+
+  #suppliersPurchasesPage #spNewPurchase,
+  #suppliersPurchasesPage #spNewSupplier {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    min-height: 48px;
+    padding: 11px 15px;
+    border-radius: 11px;
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  /* CONVERT TABLES INTO PHONE-SIZED CARDS */
+
+  #suppliersPurchasesPage .sp-table-wrap {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  #suppliersPurchasesPage .sp-table,
+  #suppliersPurchasesPage #spPurchaseTable,
+  #suppliersPurchasesPage #spSupplierTable {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    border: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  #suppliersPurchasesPage .sp-table thead {
+    display: none !important;
+  }
+
+  #suppliersPurchasesPage #spPurchaseTable > tr,
+  #suppliersPurchasesPage #spSupplierTable > tr {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    padding: 14px !important;
+    margin: 0 0 11px !important;
+    border: 1px solid #dfe6ef !important;
+    border-radius: 14px;
+    background: #f6f8fc !important;
+  }
+
+  #suppliersPurchasesPage #spPurchaseTable > tr > td,
+  #suppliersPurchasesPage #spSupplierTable > tr > td {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #17283e;
+    text-align: left;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  #suppliersPurchasesPage #spPurchaseTable > tr > td::before,
+  #suppliersPurchasesPage #spSupplierTable > tr > td::before {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    color: #617188;
+  }
+
+  #suppliersPurchasesPage #spPurchaseTable > tr > td:nth-child(1),
+  #suppliersPurchasesPage #spSupplierTable > tr > td:nth-child(1) {
+    grid-column: 1 / -1;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* PURCHASE CARD LABELS */
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(1)::before {
+    content: "PURCHASE REFERENCE";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(2)::before {
+    content: "SUPPLIER";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(3)::before {
+    content: "PRODUCT";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(4)::before {
+    content: "ORDERED";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(5)::before {
+    content: "RECEIVED";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(6)::before {
+    content: "REMAINING";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(7)::before {
+    content: "PURCHASE TOTAL";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(8)::before {
+    content: "UNPAID BALANCE";
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(9) {
+    grid-column: 1 / -1;
+    padding-top: 11px !important;
+    border-top: 1px solid #dfe6ef !important;
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(9)::before {
+    content: "STATUS / ACTIONS";
+  }
+
+  /* SUPPLIER CARD LABELS */
+
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td:nth-child(1)::before {
+    content: "SUPPLIER";
+  }
+
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td:nth-child(2)::before {
+    content: "PHONE";
+  }
+
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td:nth-child(3)::before {
+    content: "ADDRESS";
+  }
+
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td:nth-child(4)::before {
+    content: "PRODUCTS SUPPLIED";
+  }
+
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td:nth-child(5)::before {
+    content: "BALANCE OWED";
+  }
+
+  /* EMPTY RECORD MESSAGES */
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td[colspan],
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td[colspan] {
+    grid-column: 1 / -1 !important;
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+  }
+
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td[colspan]::before,
+  #suppliersPurchasesPage
+  #spSupplierTable > tr > td[colspan]::before {
+    content: none !important;
+  }
+
+  /* RECEIVE AND PAY ACTIONS */
+
+  #suppliersPurchasesPage .sp-row-actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+    margin-top: 10px !important;
+  }
+
+  #suppliersPurchasesPage .sp-row-actions .sp-button {
+    flex: 1 1 105px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin: 0 !important;
+    white-space: normal;
+    touch-action: manipulation;
+  }
+
+  #suppliersPurchasesPage .sp-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    max-width: 100%;
+    padding: 6px 9px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  /* ALL FOUR SUPPLIER/PURCHASE FORMS */
+
+  #suppliersPurchasesPage .sp-form {
+    display: grid !important;
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+    gap: 11px !important;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  #suppliersPurchasesPage .sp-field,
+  #suppliersPurchasesPage .sp-full {
+    min-width: 0;
+    grid-column: 1 / -1 !important;
+  }
+
+  #suppliersPurchasesPage .sp-field label {
+    display: block;
+    margin: 0 0 5px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  #suppliersPurchasesPage .sp-field :is(
+    input,
+    select,
+    textarea
+  ) {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 47px;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 16px !important;
+    line-height: 1.35;
+    border: 1px solid #bac8d9;
+    border-radius: 11px;
+    background: #ffffff;
+    color: #17283e;
+  }
+
+  #suppliersPurchasesPage .sp-field textarea {
+    min-height: 85px;
+    resize: vertical;
+  }
+
+  /* SAVE AND CANCEL BUTTONS */
+
+  #suppliersPurchasesPage .sp-actions {
+    display: grid !important;
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+    gap: 9px !important;
+    margin-top: 5px;
+  }
+
+  #suppliersPurchasesPage .sp-actions .sp-button {
+    display: block;
+    width: 100% !important;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border-radius: 11px;
+    font-weight: 700;
+    margin: 0;
+    touch-action: manipulation;
+  }
+
+  #suppliersPurchasesPage
+  .sp-actions .sp-button:not(.secondary) {
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+  }
+
+  #suppliersPurchasesPage
+  .sp-actions .sp-button.secondary {
+    background: #eff3f9;
+    color: #243952;
+    border: 1px solid #bac8d9;
+  }
+
+  #suppliersPurchasesPage #spMessage {
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* DARK MODE */
+
+  html.trauts-dark #suppliersPurchasesPage .sp-stat,
+  html.trauts-dark #suppliersPurchasesPage .sp-panel {
+    background: #17283e !important;
+    color: #e8eff9 !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage .sp-stat small {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage .sp-tabs {
+    background: #20324a !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage .sp-tab {
+    color: #e8eff9;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage .sp-tab.active {
+    background: #315376 !important;
+    color: #ffffff !important;
+    border-color: #526c86 !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage #spPurchaseTable > tr,
+  html.trauts-dark
+  #suppliersPurchasesPage #spSupplierTable > tr {
+    background: #20324a !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage #spPurchaseTable > tr > td,
+  html.trauts-dark
+  #suppliersPurchasesPage #spSupplierTable > tr > td {
+    color: #e8eff9 !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage #spPurchaseTable > tr > td::before,
+  html.trauts-dark
+  #suppliersPurchasesPage #spSupplierTable > tr > td::before {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(9) {
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage .sp-field :is(
+    input,
+    select,
+    textarea
+  ) {
+    background: #0d1c2e !important;
+    color: #e8eff9 !important;
+    border-color: #52647b !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage
+  .sp-actions .sp-button.secondary {
+    background: #29425e;
+    color: #e8eff9;
+    border-color: #526c86;
+  }
+}
+
+/* ==========================================
+   TRAUTS ANDROID
+   SUPPLIERS STATUS + ACTION BUTTON VISIBILITY
+   SALES RECEIPT BUTTON VISIBILITY
+
+   Mobile only - styling changes, no logic.
+   ========================================== */
+
+@media (max-width: 767px) {
+
+  /* 1. STATUS: neutral, non-interactive label */
+
+  #suppliersPurchasesPage .sp-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    padding: 7px 11px !important;
+    border-radius: 8px !important;
+
+    background: #e5eaf1 !important;
+    color: #243952 !important;
+    border: 1px solid #aebed0 !important;
+
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    cursor: default !important;
+    box-shadow: none !important;
+  }
+
+  /* 2. ACTIONS: bright, clearly tappable buttons */
+
+  #suppliersPurchasesPage
+  .sp-row-actions button.sp-button {
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    min-height: 46px !important;
+    padding: 11px 16px !important;
+
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+    border-radius: 10px !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+    touch-action: manipulation;
+  }
+
+  /* 3. SALES: Receipt is a real, prominent button */
+
+  #salesPage .pos-history-panel
+  #posSalesHistory button.pos-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 11px 15px !important;
+
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+    border-radius: 10px !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+    touch-action: manipulation;
+  }
+
+  /* 4. DARK MODE: extra contrast */
+
+  html.trauts-dark
+  #suppliersPurchasesPage .sp-pill {
+    background: #304158 !important;
+    color: #f1f5f9 !important;
+    border-color: #70849b !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage
+  #spPurchaseTable > tr > td:nth-child(9)::before {
+    color: #e2e8f0 !important;
+  }
+
+  html.trauts-dark
+  #suppliersPurchasesPage
+  .sp-row-actions button.sp-button {
+    background: #336bc0 !important;
+    color: #ffffff !important;
+    border-color: #6897dd !important;
+  }
+
+  html.trauts-dark
+  #salesPage .pos-history-panel
+  #posSalesHistory button.pos-secondary {
+    background: #336bc0 !important;
+    color: #ffffff !important;
+    border-color: #6897dd !important;
+  }
+
+  /* 5. Visible keyboard focus */
+
+  #suppliersPurchasesPage
+  .sp-row-actions button:focus-visible,
+  #salesPage .pos-history-panel
+  #posSalesHistory button:focus-visible {
+    outline: 3px solid #7bb4ff !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* =========================================================
+   TRAUTS ANDROID — EXPENSES MOBILE PAGE
+   Paste at the END of dashboard-mobile.css.
+   CSS only. No data, calculations or desktop changes.
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  #expensesPage {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  #expensesPage [hidden],
+  #expensesPage #expFormPanel[hidden] {
+    display: none !important;
+  }
+
+  /* HEADER AND RECORD EXPENSE BUTTON */
+
+  #expensesPage .exp-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin: 0 0 16px;
+  }
+
+  #expensesPage .exp-header > div {
+    min-width: 0;
+  }
+
+  #expensesPage .exp-header h2 {
+    margin: 0 0 4px;
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  #expensesPage .exp-header p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  #expensesPage #expAddBtn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    min-height: 49px;
+    box-sizing: border-box;
+    border: 1px solid #2855a0 !important;
+    border-radius: 12px !important;
+    padding: 11px 15px;
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    font-size: 15px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  /* FOUR EXPENSE SUMMARY CARDS */
+
+  #expensesPage .exp-stats {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    margin: 0 0 16px;
+  }
+
+  #expensesPage .exp-stat {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 7px;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 13px 11px !important;
+    box-sizing: border-box;
+    border: 1px solid #dfe6ef !important;
+    border-radius: 13px;
+    background: #ffffff;
+    color: #17283e;
+  }
+
+  #expensesPage .exp-stat p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #617188;
+  }
+
+  #expensesPage .exp-stat h2 {
+    margin: 0;
+    font-size: clamp(17px, 4.6vw, 25px);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  /* EXPENSE FORM AND FILTER PANELS */
+
+  #expensesPage .exp-panel {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 16px 13px !important;
+    margin: 0 0 15px;
+    border: 1px solid #dfe6ef;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #17283e;
+  }
+
+  #expensesPage .exp-panel > h3,
+  #expensesPage .exp-toolbar h3 {
+    margin: 0 0 13px;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  #expensesPage .exp-toolbar {
+    margin: 0 0 12px;
+  }
+
+  #expensesPage .exp-form,
+  #expensesPage .exp-filters {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 11px !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  #expensesPage .exp-field,
+  #expensesPage .exp-full {
+    min-width: 0;
+    grid-column: 1 / -1 !important;
+  }
+
+  #expensesPage .exp-field label {
+    display: block;
+    margin: 0 0 5px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  #expensesPage .exp-field :is(
+    input,
+    select,
+    textarea
+  ) {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    min-height: 46px;
+    padding: 10px 12px;
+    font-size: 16px !important;
+    line-height: 1.35;
+    border: 1px solid #bac8d9;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #17283e;
+  }
+
+  #expensesPage .exp-field textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  /* SAVE, CANCEL AND CLEAR FILTER BUTTONS */
+
+  #expensesPage .exp-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+    margin-top: 4px;
+  }
+
+  #expensesPage .exp-actions > button {
+    width: 100% !important;
+    min-height: 47px;
+    margin: 0 !important;
+    padding: 10px 13px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  #expensesPage .exp-actions .exp-primary {
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+  }
+
+  #expensesPage .exp-actions .exp-secondary {
+    background: #edf2f8 !important;
+    color: #243952 !important;
+    border: 1px solid #bac8d9 !important;
+  }
+
+  /* EXPENSE HISTORY: TABLE TO MOBILE CARDS */
+
+  #expensesPage .exp-table-wrap {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  #expensesPage .exp-table,
+  #expensesPage #expTable {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  #expensesPage .exp-table thead {
+    display: none !important;
+  }
+
+  #expensesPage #expTable > tr {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 11px 10px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 11px !important;
+    padding: 14px !important;
+    border: 1px solid #dfe6ef !important;
+    border-radius: 14px;
+    background: #f6f8fc !important;
+  }
+
+  #expensesPage #expTable > tr > td {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start;
+    gap: 4px;
+    box-sizing: border-box !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #17283e;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  #expensesPage #expTable > tr > td::before {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .035em;
+    color: #617188;
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(1)::before {
+    content: "DATE";
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(2)::before {
+    content: "CATEGORY";
+  }
+
+  #expensesPage #expTable > tr > td:nth-child(3) {
+    grid-column: 1 / -1;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(3)::before {
+    content: "DESCRIPTION";
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(4)::before {
+    content: "PAID TO";
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(5)::before {
+    content: "PAYMENT";
+  }
+
+  #expensesPage #expTable > tr > td:nth-child(6) {
+    grid-column: 1 / -1;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(6)::before {
+    content: "AMOUNT";
+  }
+
+  #expensesPage #expTable > tr > td:nth-child(7) {
+    grid-column: 1 / -1;
+    padding-top: 10px !important;
+    border-top: 1px solid #dfe6ef !important;
+  }
+
+  #expensesPage #expTable
+  > tr > td:nth-child(7)::before {
+    content: "ACTIONS";
+    margin-bottom: 7px;
+  }
+
+  /* EMPTY HISTORY */
+
+  #expensesPage #expTable > tr > td[colspan] {
+    grid-column: 1 / -1 !important;
+    display: block !important;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  #expensesPage #expTable
+  > tr > td[colspan]::before {
+    content: none !important;
+  }
+
+  /* EDIT: BLUE BUTTON / DELETE: RED BUTTON */
+
+  #expensesPage #expTable .exp-row-actions {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    width: 100%;
+    margin-top: 2px;
+  }
+
+  #expensesPage #expTable .exp-row-actions button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 46px;
+    padding: 10px 9px;
+    margin: 0 !important;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 1 !important;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  #expensesPage #expTable
+  .exp-row-actions .exp-secondary {
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+  }
+
+  #expensesPage #expTable
+  .exp-row-actions .exp-danger {
+    background: #fff1f0 !important;
+    color: #a52222 !important;
+    border: 1px solid #c37b7b !important;
+  }
+
+  #expensesPage #expMessage {
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* DARK MODE */
+
+  html.trauts-dark #expensesPage .exp-stat,
+  html.trauts-dark #expensesPage .exp-panel {
+    background: #17283e !important;
+    color: #e8eff9 !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #expensesPage .exp-stat p {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark #expensesPage #expTable > tr {
+    background: #20324a !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #expensesPage
+  #expTable > tr > td {
+    color: #e8eff9 !important;
+  }
+
+  html.trauts-dark #expensesPage
+  #expTable > tr > td::before {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark #expensesPage
+  #expTable > tr > td:nth-child(7) {
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #expensesPage .exp-field :is(
+    input,
+    select,
+    textarea
+  ) {
+    background: #0d1c2e !important;
+    color: #e8eff9 !important;
+    border-color: #52647b !important;
+  }
+
+  html.trauts-dark #expensesPage
+  .exp-field :is(input, textarea)::placeholder {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark #expensesPage
+  .exp-actions .exp-secondary {
+    background: #29425e !important;
+    color: #e8eff9 !important;
+    border-color: #526c86 !important;
+  }
+
+  html.trauts-dark #expensesPage
+  #expTable .exp-row-actions .exp-secondary {
+    background: #336bc0 !important;
+    color: #ffffff !important;
+    border-color: #6897dd !important;
+  }
+
+  html.trauts-dark #expensesPage
+  #expTable .exp-row-actions .exp-danger {
+    background: #462832 !important;
+    color: #ffd4d4 !important;
+    border-color: #b86d74 !important;
+  }
+
+  /* ACCESSIBILITY */
+
+  #expensesPage button:focus-visible {
+    outline: 3px solid #7bb4ff !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* ============================================================
+   TRAUTS ANDROID — PROFIT & LOSS MOBILE LAYOUT
+   Append ONCE to dashboard-mobile.css
+   Pure CSS — no changes to accounting or report logic.
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+  #profitLossPage {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+  }
+
+  #profitLossPage [hidden] {
+    display: none !important;
+  }
+
+  /* HEADER AND EXPORT BUTTON */
+
+  #profitLossPage .pl-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin: 0 0 16px;
+    min-width: 0;
+  }
+
+  #profitLossPage .pl-header > div {
+    min-width: 0;
+  }
+
+  #profitLossPage .pl-header h2 {
+    margin: 0 0 5px;
+    font-size: 22px;
+    line-height: 1.25;
+  }
+
+  #profitLossPage .pl-header p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  #profitLossPage #plExportBtn {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 100% !important;
+    min-height: 48px;
+    padding: 11px 15px;
+    border-radius: 11px;
+    background: #2855a0 !important;
+    border: 1px solid #2855a0 !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  /* REPORT PERIOD AND DATE FILTERS */
+
+  #profitLossPage .pl-panel {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 16px 13px !important;
+    margin: 0 0 14px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    color: #17283e;
+  }
+
+  #profitLossPage .pl-panel > h3 {
+    margin: 0 0 13px;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  #profitLossPage .pl-filters {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #profitLossPage .pl-filters .pl-field {
+    min-width: 0;
+    grid-column: 1 / -1;
+  }
+
+  #profitLossPage .pl-field label {
+    display: block;
+    margin: 0 0 5px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  #profitLossPage .pl-field input {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 47px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #bac8d9;
+    background: #ffffff;
+    color: #17283e;
+    font-size: 16px !important;
+  }
+
+  #profitLossPage .pl-filters > button {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100% !important;
+    min-height: 46px;
+    padding: 10px 7px;
+    margin: 0 !important;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  #profitLossPage #plThisMonth {
+    background: #2855a0 !important;
+    border: 1px solid #2855a0 !important;
+    color: #ffffff !important;
+  }
+
+  #profitLossPage #plAllTime {
+    background: #edf2f8 !important;
+    border: 1px solid #bac8d9 !important;
+    color: #243952 !important;
+  }
+
+  /* HISTORICAL COST WARNING */
+
+  #profitLossPage .pl-warning {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 0 15px;
+    padding: 12px 13px;
+    border: 1px solid #dbb879;
+    border-radius: 12px;
+    background: #fff7e7;
+    color: #754c16;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* SIX FINANCIAL SUMMARY CARDS */
+
+  #profitLossPage .pl-stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    width: 100%;
+    min-width: 0;
+    margin: 0 0 16px;
+  }
+
+  #profitLossPage .pl-stats .pl-stat {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between;
+    gap: 9px;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0 !important;
+    padding: 14px 11px !important;
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    border-radius: 14px;
+    color: #17283e;
+    box-shadow: none !important;
+  }
+
+  #profitLossPage .pl-stats .pl-stat p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #617188;
+  }
+
+  #profitLossPage .pl-stats .pl-stat h2 {
+    margin: 0;
+    min-width: 0;
+    max-width: 100%;
+    font-size: clamp(17px, 4.6vw, 25px);
+    line-height: 1.25;
+    letter-spacing: -.025em;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Full-width Net Profit and Margin */
+
+  #profitLossPage .pl-stats .pl-stat:last-child {
+    grid-column: 1 / -1;
+  }
+
+  #profitLossPage .pl-stats .pl-stat.highlight {
+    grid-column: 1 / -1;
+    background: #eaf2ff !important;
+    border: 1px solid #9ab8e2 !important;
+    padding: 16px 14px !important;
+  }
+
+  #profitLossPage .pl-stats .pl-stat.highlight p {
+    font-size: 12px;
+    color: #365780;
+  }
+
+  #profitLossPage .pl-stats .pl-stat.highlight h2 {
+    font-size: clamp(25px, 7vw, 34px);
+  }
+
+  /* POSITIVE AND NEGATIVE RESULTS */
+
+  #profitLossPage .pl-negative {
+    color: #b42318 !important;
+  }
+
+  #profitLossPage .pl-positive {
+    color: #17633a !important;
+  }
+
+  /* PROFIT CALCULATION AND SUPPLIER SUMMARY */
+
+  #profitLossPage .pl-summary-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto) !important;
+    align-items: start;
+    gap: 7px 10px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e7f0;
+    background: transparent !important;
+  }
+
+  #profitLossPage .pl-summary-row:last-of-type {
+    border-bottom: 0;
+  }
+
+  #profitLossPage .pl-summary-row > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+    font-size: 13px;
+    color: #4e6077;
+  }
+
+  #profitLossPage .pl-summary-row > strong {
+    min-width: 0;
+    max-width: 100%;
+    text-align: right;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: #17283e;
+  }
+
+  #profitLossPage .pl-summary-row.total {
+    align-items: center;
+    margin-top: 5px;
+    padding: 14px 11px;
+    border: 1px solid #9ab8e2;
+    border-radius: 11px;
+    background: #eaf2ff !important;
+  }
+
+  #profitLossPage .pl-summary-row.total > :is(span, strong) {
+    font-weight: 800;
+  }
+
+  #profitLossPage .pl-summary-row.total > strong {
+    font-size: 17px;
+  }
+
+  #profitLossPage .pl-note {
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    color: #5b6e82;
+  }
+
+  /* MONTHLY BREAKDOWN AND CATEGORY TABLES */
+
+  #profitLossPage .pl-table-wrap {
+    display: block !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  #profitLossPage .pl-table-wrap .pl-table,
+  #profitLossPage #plMonthlyTable,
+  #profitLossPage #plExpenseCategories {
+    display: block !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  #profitLossPage .pl-table thead {
+    display: none !important;
+  }
+
+  #profitLossPage #plMonthlyTable > tr,
+  #profitLossPage #plExpenseCategories > tr {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 11px 9px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 0 10px !important;
+    padding: 13px !important;
+    border: 1px solid #dfe6ef !important;
+    border-radius: 13px;
+    background: #f6f8fc !important;
+  }
+
+  #profitLossPage #plMonthlyTable > tr > td,
+  #profitLossPage #plExpenseCategories > tr > td {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    background: transparent !important;
+    text-align: left !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #17283e;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #profitLossPage #plMonthlyTable > tr > td::before,
+  #profitLossPage #plExpenseCategories > tr > td::before {
+    display: block;
+    color: #617188;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: .035em;
+  }
+
+  /* MONTHLY BREAKDOWN LABELS */
+
+  #profitLossPage #plMonthlyTable > tr > td:nth-child(1) {
+    grid-column: 1 / -1;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td:nth-child(1)::before {
+    content: "MONTH";
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td:nth-child(2)::before {
+    content: "REVENUE";
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td:nth-child(3)::before {
+    content: "COST OF GOODS SOLD";
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td:nth-child(4)::before {
+    content: "EXPENSES";
+  }
+
+  #profitLossPage #plMonthlyTable > tr > td:nth-child(5) {
+    grid-column: 1 / -1;
+    padding-top: 9px !important;
+    border-top: 1px solid #dfe6ef !important;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td:nth-child(5)::before {
+    content: "NET PROFIT";
+  }
+
+  /* EXPENSE CATEGORY LABELS */
+
+  #profitLossPage
+  #plExpenseCategories > tr > td:nth-child(1)::before {
+    content: "CATEGORY";
+  }
+
+  #profitLossPage
+  #plExpenseCategories > tr > td:nth-child(1) {
+    font-weight: 700;
+  }
+
+  #profitLossPage
+  #plExpenseCategories > tr > td:nth-child(2)::before {
+    content: "AMOUNT";
+  }
+
+  /* EMPTY TABLE MESSAGES */
+
+  #profitLossPage #plMonthlyTable > tr > td[colspan],
+  #profitLossPage #plExpenseCategories > tr > td[colspan] {
+    grid-column: 1 / -1 !important;
+    display: block !important;
+    font-weight: 400;
+    font-size: 13px;
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td[colspan]::before,
+  #profitLossPage
+  #plExpenseCategories > tr > td[colspan]::before {
+    content: none !important;
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td.pl-positive {
+    color: #17633a !important;
+  }
+
+  #profitLossPage
+  #plMonthlyTable > tr > td.pl-negative {
+    color: #b42318 !important;
+  }
+
+  /* DARK MODE */
+
+  html.trauts-dark #profitLossPage .pl-panel,
+  html.trauts-dark #profitLossPage .pl-stat {
+    background: #17283e !important;
+    color: #e8eff9 !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-stat p,
+  html.trauts-dark #profitLossPage .pl-note,
+  html.trauts-dark #profitLossPage .pl-summary-row > span {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-summary-row {
+    border-color: #364a63;
+  }
+
+  html.trauts-dark #profitLossPage .pl-summary-row > strong {
+    color: #e8eff9;
+  }
+
+  html.trauts-dark #profitLossPage .pl-stat.highlight,
+  html.trauts-dark #profitLossPage .pl-summary-row.total {
+    background: #203b59 !important;
+    border-color: #517da7 !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-stat.highlight p,
+  html.trauts-dark
+  #profitLossPage .pl-summary-row.total > span {
+    color: #d7e7fa !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-warning {
+    background: #382d1c !important;
+    border-color: #9a773d !important;
+    color: #ffe7ae !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-field input {
+    color-scheme: dark;
+    background: #0d1c2e !important;
+    color: #f0f5fc !important;
+    border-color: #52647b !important;
+  }
+
+  html.trauts-dark #profitLossPage #plAllTime {
+    background: #29425e !important;
+    border-color: #526c86 !important;
+    color: #ffffff !important;
+  }
+
+  html.trauts-dark #profitLossPage #plExportBtn,
+  html.trauts-dark #profitLossPage #plThisMonth {
+    background: #336bc0 !important;
+    border-color: #6897dd !important;
+    color: #ffffff !important;
+  }
+
+  html.trauts-dark
+  #profitLossPage #plMonthlyTable > tr,
+  html.trauts-dark
+  #profitLossPage #plExpenseCategories > tr {
+    background: #20324a !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #profitLossPage #plMonthlyTable > tr > td,
+  html.trauts-dark
+  #profitLossPage #plExpenseCategories > tr > td {
+    color: #e8eff9;
+  }
+
+  html.trauts-dark
+  #profitLossPage #plMonthlyTable > tr > td::before,
+  html.trauts-dark
+  #profitLossPage #plExpenseCategories > tr > td::before {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #profitLossPage
+  #plMonthlyTable > tr > td:nth-child(5) {
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-positive,
+  html.trauts-dark
+  #profitLossPage #plMonthlyTable > tr > td.pl-positive {
+    color: #86efac !important;
+  }
+
+  html.trauts-dark #profitLossPage .pl-negative,
+  html.trauts-dark
+  #profitLossPage #plMonthlyTable > tr > td.pl-negative {
+    color: #fca5a5 !important;
+  }
+
+  /* KEYBOARD FOCUS */
+
+  #profitLossPage button:focus-visible,
+  #profitLossPage input:focus-visible {
+    outline: 3px solid #7bb4ff !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* ============================================================
+   TRAUTS ANDROID — MANAGE ACCOUNTS / STAFF MANAGEMENT
+   Append once to user.css/dashboard-mobile.css.
+   CSS only: no changes to accounts, roles, or saved data.
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+  #accountsPage {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #accountsPage[hidden],
+  #accountsPage [hidden],
+  #accountsPage #staffFormPanel[hidden] {
+    display: none !important;
+  }
+
+  /* HEADER AND ADD STAFF BUTTON */
+
+  #accountsPage .accounts-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    min-width: 0;
+    margin: 0 0 16px;
+  }
+
+  #accountsPage .accounts-header > div {
+    min-width: 0;
+  }
+
+  #accountsPage .accounts-header h2 {
+    margin: 0 0 5px;
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  #accountsPage .accounts-header p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  #accountsPage #addStaffBtn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100% !important;
+    min-height: 49px;
+    box-sizing: border-box;
+    padding: 11px 15px;
+    border: 1px solid #2855a0 !important;
+    border-radius: 11px;
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  #accountsPage #addStaffBtn svg,
+  #accountsPage #addStaffBtn i {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ACCOUNT STATISTICS */
+
+  #accountsPage .account-stats {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    min-width: 0;
+    margin: 0 0 16px;
+  }
+
+  #accountsPage .account-stats > .stat {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between;
+    gap: 7px;
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 13px 12px !important;
+    border-radius: 13px;
+    border: 1px solid #dfe6ef !important;
+    background: #ffffff;
+    color: #17283e;
+    box-shadow: none !important;
+  }
+
+  #accountsPage .account-stats > .stat:first-child {
+    grid-column: 1 / -1;
+  }
+
+  #accountsPage .account-stats > .stat p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #617188;
+  }
+
+  #accountsPage .account-stats > .stat h2 {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* STAFF DIRECTORY AND FORM PANELS */
+
+  #accountsPage > .panel {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 0 14px;
+    padding: 15px 12px !important;
+    border-radius: 16px;
+    border: 1px solid #dfe6ef;
+    background: #ffffff;
+    color: #17283e;
+  }
+
+  #accountsPage > .panel > h3,
+  #accountsPage .accounts-toolbar h3 {
+    margin: 0 0 11px;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  #accountsPage .accounts-toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 9px !important;
+    min-width: 0;
+    margin-bottom: 14px;
+  }
+
+  /* SEARCH FIELD */
+
+  #accountsPage #staffSearch {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    min-height: 47px;
+    padding: 10px 12px;
+    border: 1px solid #bac8d9;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #17283e;
+    font-size: 16px !important;
+  }
+
+  /* STAFF TABLE BECOMES MOBILE CARDS */
+
+  #accountsPage .table-wrap {
+    display: block !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  #accountsPage .table-wrap table,
+  #accountsPage #staffTable {
+    display: block !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  #accountsPage .table-wrap thead {
+    display: none !important;
+  }
+
+  #accountsPage #staffTable > tr {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px 9px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 10px !important;
+    padding: 13px !important;
+    border-radius: 13px;
+    border: 1px solid #dfe6ef !important;
+    background: #f6f8fc !important;
+  }
+
+  #accountsPage #staffTable > tr > td {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 5px;
+    box-sizing: border-box !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #17283e;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left !important;
+    overflow-wrap: anywhere;
+    white-space: normal !important;
+  }
+
+  #accountsPage #staffTable > tr > td::before {
+    display: block;
+    color: #617188;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .035em;
+    line-height: 1.4;
+  }
+
+  /* NAME */
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(1) {
+    grid-column: 1 / -1;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(1)::before {
+    content: "STAFF MEMBER";
+  }
+
+  /* EMAIL */
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(2)::before {
+    content: "EMAIL";
+  }
+
+  /* ROLE */
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(3)::before {
+    content: "ROLE";
+  }
+
+  /* STATUS: INFORMATION, NOT AN ACTION */
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(4)::before {
+    content: "STATUS";
+  }
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(4) {
+    font-weight: 700;
+  }
+
+  /* ACTIONS */
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) {
+    grid-column: 1 / -1;
+    padding-top: 10px !important;
+    border-top: 1px solid #dfe6ef !important;
+  }
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(5)::before {
+    content: "ACTIONS";
+  }
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) button,
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) .account-primary,
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) .account-secondary {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 44px;
+    min-width: 105px;
+    max-width: 100%;
+    margin: 3px 5px 3px 0;
+    padding: 9px 11px;
+    border: 1px solid #2855a0 !important;
+    border-radius: 10px;
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+    white-space: normal;
+  }
+
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) button:disabled {
+    opacity: .5 !important;
+    cursor: not-allowed;
+  }
+
+  /* EMPTY DIRECTORY */
+
+  #accountsPage #staffTable > tr > td[colspan] {
+    grid-column: 1 / -1 !important;
+    display: block !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+  }
+
+  #accountsPage
+  #staffTable > tr > td[colspan]::before {
+    content: none !important;
+  }
+
+  /* ADD STAFF FORM */
+
+  #accountsPage #staffForm {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #accountsPage #staffForm > label {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  #accountsPage #staffForm > input,
+  #accountsPage #staffForm > select {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 47px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #bac8d9;
+    background: #ffffff;
+    color: #17283e;
+    font-size: 16px !important;
+  }
+
+  /* CREATE AND CANCEL BUTTONS */
+
+  #accountsPage #staffForm .form-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+    min-width: 0;
+    margin-top: 8px;
+  }
+
+  #accountsPage #staffForm .form-actions > button {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-height: 48px;
+    margin: 0 !important;
+    padding: 11px 13px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  #accountsPage
+  #staffForm .form-actions .account-primary {
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    border: 1px solid #2855a0 !important;
+  }
+
+  #accountsPage
+  #staffForm .form-actions .account-secondary {
+    background: #edf2f8 !important;
+    color: #243952 !important;
+    border: 1px solid #bac8d9 !important;
+  }
+
+  #accountsPage #accountsMessage {
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* DARK MODE */
+
+  html.trauts-dark #accountsPage > .panel,
+  html.trauts-dark
+  #accountsPage .account-stats > .stat {
+    background: #17283e !important;
+    color: #e8eff9 !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #accountsPage .account-stats > .stat p {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark #accountsPage #staffTable > tr {
+    background: #20324a !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #accountsPage #staffTable > tr > td {
+    color: #e8eff9 !important;
+  }
+
+  html.trauts-dark
+  #accountsPage #staffTable > tr > td::before {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) {
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #accountsPage #staffSearch,
+  html.trauts-dark
+  #accountsPage #staffForm > input,
+  html.trauts-dark
+  #accountsPage #staffForm > select {
+    color-scheme: dark;
+    background: #0d1c2e !important;
+    color: #e8eff9 !important;
+    border-color: #52647b !important;
+  }
+
+  html.trauts-dark
+  #accountsPage #staffSearch::placeholder {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #accountsPage
+  #staffTable > tr > td:nth-child(5) button {
+    background: #336bc0 !important;
+    color: #ffffff !important;
+    border-color: #6897dd !important;
+  }
+
+  html.trauts-dark
+  #accountsPage
+  #staffForm .form-actions .account-secondary {
+    background: #29425e !important;
+    color: #e8eff9 !important;
+    border-color: #526c86 !important;
+  }
+
+  html.trauts-dark #accountsPage #addStaffBtn,
+  html.trauts-dark
+  #accountsPage
+  #staffForm .form-actions .account-primary {
+    background: #336bc0 !important;
+    color: #ffffff !important;
+    border-color: #6897dd !important;
+  }
+
+  /* ACCESSIBILITY */
+
+  #accountsPage button:focus-visible,
+  #accountsPage input:focus-visible,
+  #accountsPage select:focus-visible {
+    outline: 3px solid #7bb4ff !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* ==========================================================
+   TRAUTS ANDROID — REPORTS & ANALYTICS MOBILE
+   Append to the bottom of dashboard-mobile.css.
+   CSS only. Preserves report computations, data, desktop.
+   ========================================================== */
+@media (max-width: 767px) {
+  #reportsPage {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #reportsPage[hidden],
+  #reportsPage [hidden] {
+    display: none !important;
+  }
+
+  /* HEADER AND EXPORT BUTTON */
+
+  #reportsPage .reports-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    min-width: 0;
+    margin: 0 0 16px;
+  }
+
+  #reportsPage .reports-header > div {
+    min-width: 0;
+  }
+
+  #reportsPage .reports-header h2 {
+    margin: 0 0 5px;
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  #reportsPage .reports-header p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  #reportsPage #exportReportBtn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-height: 48px;
+    margin: 0 !important;
+    padding: 11px 14px;
+    border: 1px solid #2855a0 !important;
+    border-radius: 11px;
+    background: #2855a0 !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 1 !important;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  #reportsPage #exportReportBtn svg,
+  #reportsPage #exportReportBtn i {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  /* DATE FILTERS */
+
+  #reportsPage .reports-filters {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 11px !important;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin: 0 0 16px;
+    padding: 14px 12px;
+    background: #ffffff;
+    border: 1px solid #dfe6ef;
+    border-radius: 14px;
+  }
+
+  #reportsPage .reports-filters > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #reportsPage .reports-filters label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #4e6077;
+  }
+
+  #reportsPage .reports-filters input[type="date"] {
+    box-sizing: border-box;
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px;
+    padding: 9px 11px;
+    border: 1px solid #bac8d9;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #17283e;
+    font-size: 16px !important;
+  }
+
+  #reportsPage #resetReportDates {
+    box-sizing: border-box;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 100% !important;
+    min-height: 46px;
+    margin: 0 !important;
+    padding: 10px 12px;
+    background: #edf2f8 !important;
+    color: #243952 !important;
+    border: 1px solid #bac8d9 !important;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 1 !important;
+    touch-action: manipulation;
+  }
+
+  /* FOUR SUMMARY CARDS */
+
+  #reportsPage .reports-stats {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    min-width: 0;
+    margin: 0 0 16px;
+  }
+
+  #reportsPage .reports-stats > .stat {
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 7px;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 13px 11px !important;
+    background: #ffffff;
+    border: 1px solid #dfe6ef !important;
+    border-radius: 13px;
+    color: #17283e;
+    box-shadow: none !important;
+  }
+
+  #reportsPage .reports-stats > .stat p {
+    margin: 0;
+    color: #617188;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  #reportsPage .reports-stats > .stat h2 {
+    margin: 0;
+    font-size: clamp(17px, 4.6vw, 25px);
+    line-height: 1.25;
+    letter-spacing: -.02em;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* CHART SECTIONS */
+
+  #reportsPage .reports-grid {
+    display: grid !important;
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+    gap: 13px !important;
+    width: 100%;
+    min-width: 0;
+    margin: 0 0 14px;
+  }
+
+  #reportsPage .panel {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    margin-bottom: 14px;
+    padding: 15px 12px !important;
+    border: 1px solid #dfe6ef;
+    border-radius: 15px;
+    background: #ffffff;
+    color: #17283e;
+  }
+
+  #reportsPage .reports-grid > .panel {
+    margin: 0;
+  }
+
+  #reportsPage .panel > h3 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  #reportsPage .reports-subtitle {
+    margin: 0 0 12px;
+    color: #617188;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  #reportsPage #reportRevenueChart,
+  #reportsPage #reportPayments {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  #reportsPage #reportRevenueChart :is(svg, canvas),
+  #reportsPage #reportPayments :is(svg, canvas) {
+    max-width: 100%;
+  }
+
+  /* TABLES BECOME MOBILE CARDS */
+
+  #reportsPage .table-wrap {
+    box-sizing: border-box;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  #reportsPage .table-wrap table,
+  #reportsPage #reportTopProducts,
+  #reportsPage #reportTransactionsTable {
+    display: block !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  #reportsPage .table-wrap thead {
+    display: none !important;
+  }
+
+  #reportsPage #reportTopProducts > tr,
+  #reportsPage #reportTransactionsTable > tr {
+    display: grid !important;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    gap: 11px 10px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 0 10px !important;
+    padding: 14px 12px !important;
+    border: 1px solid #dfe6ef !important;
+    border-radius: 13px;
+    background: #f6f8fc !important;
+  }
+
+  #reportsPage #reportTopProducts > tr > td,
+  #reportsPage #reportTransactionsTable > tr > td {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px;
+    box-sizing: border-box !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    text-align: left !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    color: #17283e;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  #reportsPage #reportTopProducts > tr > td::before,
+  #reportsPage #reportTransactionsTable > tr > td::before {
+    display: block;
+    color: #617188;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .035em;
+    line-height: 1.4;
+  }
+
+  /* TOP-SELLING PRODUCTS */
+
+  #reportsPage
+  #reportTopProducts > tr > td:first-child {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #reportsPage
+  #reportTopProducts > tr > td:nth-child(1)::before {
+    content: "PRODUCT";
+  }
+
+  #reportsPage
+  #reportTopProducts > tr > td:nth-child(2)::before {
+    content: "UNITS SOLD";
+  }
+
+  #reportsPage
+  #reportTopProducts > tr > td:nth-child(3)::before {
+    content: "GROSS SALES";
+  }
+
+  /* TRANSACTION HISTORY */
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(1) {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(1)::before {
+    content: "RECEIPT";
+  }
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(2)::before {
+    content: "DATE";
+  }
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(3)::before {
+    content: "PAYMENT METHOD";
+  }
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(4)::before {
+    content: "ITEMS";
+  }
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(5) {
+    grid-column: 1 / -1;
+    padding-top: 9px !important;
+    border-top: 1px solid #dfe6ef !important;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(5)::before {
+    content: "TOTAL";
+  }
+
+  /* EMPTY TABLE MESSAGES */
+
+  #reportsPage
+  #reportTopProducts > tr > td[colspan],
+  #reportsPage
+  #reportTransactionsTable > tr > td[colspan] {
+    grid-column: 1 / -1 !important;
+    display: block !important;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  #reportsPage
+  #reportTopProducts > tr > td[colspan]::before,
+  #reportsPage
+  #reportTransactionsTable > tr > td[colspan]::before {
+    content: none !important;
+  }
+
+  #reportsPage #reportMessage {
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* DARK MODE */
+
+  html.trauts-dark #reportsPage .reports-filters,
+  html.trauts-dark #reportsPage .reports-stats > .stat,
+  html.trauts-dark #reportsPage .panel {
+    background: #17283e !important;
+    color: #e8eff9 !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #reportsPage .reports-filters label,
+  html.trauts-dark #reportsPage .reports-stats > .stat p,
+  html.trauts-dark #reportsPage .reports-subtitle {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #reportsPage .reports-filters input[type="date"] {
+    color-scheme: dark;
+    background: #0d1c2e !important;
+    color: #e8eff9 !important;
+    border-color: #52647b !important;
+  }
+
+  html.trauts-dark #reportsPage #resetReportDates {
+    background: #29425e !important;
+    color: #ffffff !important;
+    border-color: #526c86 !important;
+  }
+
+  html.trauts-dark #reportsPage #exportReportBtn {
+    background: #336bc0 !important;
+    color: #ffffff !important;
+    border-color: #6897dd !important;
+  }
+
+  html.trauts-dark
+  #reportsPage #reportTopProducts > tr,
+  html.trauts-dark
+  #reportsPage #reportTransactionsTable > tr {
+    background: #20324a !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark
+  #reportsPage #reportTopProducts > tr > td,
+  html.trauts-dark
+  #reportsPage #reportTransactionsTable > tr > td {
+    color: #e8eff9 !important;
+  }
+
+  html.trauts-dark
+  #reportsPage #reportTopProducts > tr > td::before,
+  html.trauts-dark
+  #reportsPage #reportTransactionsTable > tr > td::before {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #reportsPage
+  #reportTransactionsTable > tr > td:nth-child(5) {
+    border-color: #364a63 !important;
+  }
+
+  /* ACCESSIBILITY */
+
+  #reportsPage button:focus-visible,
+  #reportsPage input:focus-visible {
+    outline: 3px solid #7bb4ff !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* ============================================================
+   TRAUTS ANDROID — SETTINGS MOBILE LAYOUT
+   Append ONCE to dashboard-mobile.css
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+  #settingsPage {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #settingsPage[hidden],
+  #settingsPage [hidden] {
+    display: none !important;
+  }
+
+  #settingsPage .settings-header {
+    display: block;
+    margin: 0 0 16px;
+  }
+
+  #settingsPage .settings-header h2 {
+    font-size: 22px;
+    line-height: 1.3;
+    margin: 0 0 5px;
+  }
+
+  #settingsPage .settings-header p {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  #settingsPage #settingsForm {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  #settingsPage .settings-panel {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 15px 13px !important;
+    margin: 0 0 13px !important;
+    background: #fff;
+    color: #17283e;
+    border: 1px solid #dfe6ef;
+    border-radius: 15px;
+  }
+
+  #settingsPage .settings-panel h3 {
+    font-size: 17px;
+    line-height: 1.35;
+    margin: 0 0 13px;
+  }
+
+  #settingsPage .settings-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+    min-width: 0;
+  }
+
+  #settingsPage .settings-field {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  #settingsPage .settings-field label {
+    display: block;
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  #settingsPage .settings-field input,
+  #settingsPage .settings-field textarea,
+  #settingsPage .settings-field select {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 47px;
+    padding: 10px 11px;
+    font-size: 16px !important;
+    line-height: 1.4;
+    border: 1px solid #bac8d9;
+    border-radius: 10px;
+    background: #fff;
+    color: #17283e;
+  }
+
+  #settingsPage .settings-field textarea {
+    min-height: 82px;
+    resize: vertical;
+  }
+
+  #settingsPage .settings-field input:disabled {
+    opacity: 1;
+    background: #edf2f8 !important;
+    color: #4e6077 !important;
+  }
+
+  #settingsPage .settings-field small,
+  #settingsPage .settings-note {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #617188;
+  }
+
+  #settingsPage .settings-check {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  #settingsPage .settings-check input[type="checkbox"] {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+  }
+
+  #settingsPage .settings-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+    margin: 0 0 13px;
+  }
+
+  #settingsPage .settings-actions button {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-height: 48px;
+    padding: 11px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+    opacity: 1 !important;
+  }
+
+  #settingsPage .settings-primary {
+    background: #2855a0 !important;
+    color: #fff !important;
+    border: 1px solid #2855a0 !important;
+  }
+
+  #settingsPage .settings-secondary {
+    background: #edf2f8 !important;
+    color: #243952 !important;
+    border: 1px solid #bac8d9 !important;
+  }
+
+  #settingsPage #settingsMessage {
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  /* DANGEROUS DATA RESET SECTION */
+
+  #settingsPage #trautsResetLocalDataSection {
+    border-color: #dca4a4 !important;
+  }
+
+  #settingsPage #trautsResetLocalDataSection h3 {
+    color: #a52222 !important;
+  }
+
+  #settingsPage #trautsResetLocalDataSection p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #8b2020;
+  }
+
+  #settingsPage #trautsResetAllLocalBtn {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 48px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #b42318 !important;
+    color: #fff !important;
+    border: 1px solid #b42318 !important;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: manipulation;
+  }
+
+  /* DARK MODE */
+
+  html.trauts-dark #settingsPage .settings-panel {
+    background: #17283e !important;
+    color: #e8eff9 !important;
+    border-color: #364a63 !important;
+  }
+
+  html.trauts-dark #settingsPage .settings-field small,
+  html.trauts-dark #settingsPage .settings-note {
+    color: #b6c7dc !important;
+  }
+
+  html.trauts-dark
+  #settingsPage .settings-field input,
+  html.trauts-dark
+  #settingsPage .settings-field textarea,
+  html.trauts-dark
+  #settingsPage .settings-field select {
+    color-scheme: dark;
+    background: #0d1c2e !important;
+    color: #e8eff9 !important;
+    border-color: #52647b !important;
+  }
+
+  html.trauts-dark
+  #settingsPage .settings-field input:disabled {
+    background: #29425e !important;
+    color: #cbd5e1 !important;
+  }
+
+  html.trauts-dark #settingsPage .settings-secondary {
+    background: #29425e !important;
+    color: #fff !important;
+    border-color: #526c86 !important;
+  }
+
+  html.trauts-dark #settingsPage .settings-primary {
+    background: #336bc0 !important;
+    color: #fff !important;
+    border-color: #6897dd !important;
+  }
+
+  html.trauts-dark
+  #settingsPage #trautsResetLocalDataSection {
+    border-color: #9d6464 !important;
+  }
+
+  html.trauts-dark
+  #settingsPage #trautsResetLocalDataSection h3 {
+    color: #fecaca !important;
+  }
+
+  html.trauts-dark
+  #settingsPage #trautsResetLocalDataSection p {
+    color: #fdd4d4 !important;
+  }
+
+  /* LONG BUSINESS NAMES */
+
+  .trauts-page-header .trauts-page-eyebrow,
+  .sidebar-brand > div:last-child > p,
+  .sidebar-footer .user-info small {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  #settingsPage button:focus-visible,
+  #settingsPage input:focus-visible,
+  #settingsPage textarea:focus-visible {
+    outline: 3px solid #7bb4ff;
+    outline-offset: 2px;
+  }
+}

@@ -1,0 +1,122 @@
+
+/* TRAUTS SHOPKEEPER PORTAL */
+
+.shopkeeper-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.shopkeeper-panel {
+  margin-top: 20px;
+}
+
+.shopkeeper-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.shop-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  border-radius: 9px;
+  padding: 16px 20px;
+  background: #173f8a;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shop-action.secondary {
+  background: #e2e8f0;
+  color: #173f8a;
+}
+
+.shop-action svg {
+  width: 19px;
+  height: 19px;
+}
+
+.shop-search {
+  width: 100%;
+  max-width: 350px;
+  padding: 12px;
+  margin: 18px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.shop-product-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(180px, 1fr)
+  );
+  gap: 14px;
+}
+
+.shop-product-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  background: #f8fafc;
+}
+
+.shop-product-card h4 {
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+
+.shop-product-card p,
+.shop-hint {
+  font-size: 12px;
+  color: #64748b;
+}
+
+#shopInventory table,
+#shopHistory table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#shopInventory th,
+#shopInventory td,
+#shopHistory th,
+#shopHistory td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  font-size: 12px;
+}
+
+#shopInventory th,
+#shopHistory th {
+  color: #64748b;
+}
+
+#shopPosMessage {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .shopkeeper-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-action {
+    flex: 1;
+    justify-content: center;
+  }
+}
