@@ -64,4 +64,6 @@ On sign-in/navigation, `is_organization_owner()` determines owner access. Owners
 
 Ordinary managers/workers cannot open the owner route. A missing owner-check RPC leaves existing store login working with no owner menu; other RPC failures are reported. Ownership is rechecked on navigation, so a revoked owner loses the menu and owner route. Backend authorization still controls every overview request.
 
-No additional SQL migration is included in this frontend update. It expects the ownership SQL already supplied in the chat, including the existing account assignments. Hosted acceptance should confirm owner labels, the organization's other stores/team, ordinary-manager and worker restrictions, and a new owner signup.
+The owner-label/overview integration expects the ownership SQL already supplied in the chat, including the existing account assignments. That base ownership setup is separate from the store-creation extension below. Hosted acceptance should confirm owner labels, the organization's other stores/team, ordinary-manager and worker restrictions, and a new owner signup.
+
+The separate [store-creation extension](owner-store-creation.md) adds **Add store** to the Organization page without changing the signup or owner-assignment flow. Install its new SQL patch to enable that action.

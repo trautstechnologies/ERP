@@ -70,7 +70,11 @@ On **Organization** you can:
 - Search by store, staff name or phone number. Clear the search to see all rows again.
 - Select **View store** to see that branch's details and its team, including staff start dates.
 
-The organization page is read-only. The other operational pages continue to manage the assigned store shown in the header. Managers who are not owners remain restricted to their own store; ordinary workers do not get the Organization page. New organization-owner signups create a separate business and first store. Existing owners are assigned administratively.
+To add a branch, select **Add store**. Enter its store name, an optional address, store type and timezone. For Zambia use **Africa/Lusaka**. Select **Create store**. The new store appears in your Stores list with an empty team. Store names must be different within your business, even if an existing store is inactive.
+
+New stores belong automatically to your organization. Creating a store requires internet. Your current store assignment stays the same, and an administrator must separately assign a manager to the new store. If a save is uncertain, retry the same open form instead of opening another form; it keeps the same request reference.
+
+The other operational pages continue to manage the assigned store shown in the header. Managers who are not owners remain restricted to their own store; ordinary workers do not get the Organization page. New organization-owner signups create a separate business and first store. Existing owners are assigned administratively.
 
 ### Moving around
 

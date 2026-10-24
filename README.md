@@ -101,3 +101,5 @@ Organization owners retain manager operations for their assigned store and get a
 ### Mobile and offline use
 
 Open `/mobile.html` for the mobile interface. It uses the same Supabase backend and role checks as the web app. Both versions include a remembered dark theme. Production builds cache application files and support cached page reads plus queued offline sales. See [mobile and offline instructions](docs/mobile-offline.md) for setup, synchronization, and recovery limits.
+
+Organization owners can add branches from **Organization → Add store** after installing [the store-creation SQL patch](database/patches/20261024_owner_create_store.sql). See [installation and API details](docs/owner-store-creation.md).

@@ -7,7 +7,7 @@ const ids = {
   product: '44444444-4444-4444-8444-444444444444', sale: '55555555-5555-4555-8555-555555555555', item: '66666666-6666-4666-8666-666666666666',
 };
 
-async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true, recoveryRequestStatus = 200, passwordUpdateStatus = 200, owner = false, ownerApiMissing = false, overviewDenied = false } = {}) {
+async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true, recoveryRequestStatus = 200, passwordUpdateStatus = 200, owner = false, ownerApiMissing = false, overviewDenied = false, failStoreOnce = false } = {}) {
   const calls = [], errors = [];
   const access = { owner: owner && role === 'manager' };
   page.on('pageerror', error => errors.push(error.message));
@@ -21,6 +21,7 @@ async function backend(page, { role = 'manager', failSaleOnce = false, signupMod
     organizations: [{ organization_id: ids.org, organization_name: 'TRAUTS Retail', currency_code: 'ZMW' }],
     products: [{ product_id: ids.product, store_id: ids.store, product_name: 'Test Product', sku: 'TEST-001', selling_price: 20, buying_price: 10, category: 'General', selling_unit_code: 'each', batch_tracking: false, requires_expiry: false, active: true, variant_attributes: {} }],
     selling_units: [{ unit_code: 'each', display_name: 'Each', decimal_places: 0 }, { unit_code: 'kg', display_name: 'Kilogram', decimal_places: 3 }],
+    store_types: [{ store_type_code: 'general_retail', display_name: 'General retail', description: 'Retail' }],
     product_groups: [], suppliers: [], supplier_phones: [], purchases: [], purchase_items: [], expenses: [],
     sales: [{ sale_id: ids.sale, store_id: ids.store, user_id: userId, sale_date: '2026-10-16T09:00:00Z', status: 'completed', total_amount: 60, payment_method: 'cash' }],
     sales_items: [{ sales_item_id: ids.item, store_id: ids.store, sale_id: ids.sale, product_id: ids.product, quantity: 3, unit_price: 20, line_total: 60 }],
@@ -56,6 +57,15 @@ async function backend(page, { role = 'manager', failSaleOnce = false, signupMod
       if (name === 'get_organization_overview') return !access.owner || overviewDenied
         ? reply({ code: '42501', message: 'An active organization owner account is required' }, 403)
         : reply(data.organization_overview);
+      if (name === 'create_organization_store') {
+        if (!access.owner) return reply({ code: '42501', message: 'An active organization owner account is required' }, 403);
+        if (failStoreOnce) { failStoreOnce = false; return reply({ code: 'XX000', message: 'Store creation could not be confirmed; retry the original request.' }, 503); }
+        if (!data.organization_overview.stores.some(s => s.store_id === body.p_request_id)) {
+          data.organization_overview.stores.push({ store_id: body.p_request_id, store_name: body.p_store_name, address: body.p_address,
+            store_type: body.p_store_type_code, time_zone: body.p_time_zone, active: true, staff: [] });
+        }
+        return reply(body.p_request_id);
+      }
       if (name === 'owner_signup_available') return reply(signupReady);
       if (name === 'get_sale_batches') return reply([]);
       if (name === 'record_sale') {
@@ -1023,4 +1033,69 @@ test('concurrent tabs synchronize the same durable request only once', async ({ 
     await syncSales();
   })));
   expect([...first.calls, ...second.calls].filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
+});
+
+for (const mobile of [false, true]) {
+  test(`owner creates an organization store through the scoped RPC on ${mobile ? 'mobile' : 'web'}`, async ({ page }) => {
+    const state = await backend(page, { owner: true });
+    organizationFixture(state);
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 });
+    if (mobile) {
+      await page.goto('/mobile.html');
+      await page.getByLabel('Email address').fill('manager@example.com');
+      await page.getByLabel('Password', { exact: true }).fill('Test-password-123!');
+      await page.getByRole('button', { name: 'Login', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+    } else await login(page);
+    if (mobile) await page.getByRole('button', { name: 'Menu', exact: true }).click();
+    await page.getByRole('link', { name: 'Organization', exact: true }).click();
+    await page.getByRole('button', { name: 'Add store', exact: true }).click();
+    const modal = page.getByRole('dialog');
+    await expect(modal).toContainText('creating a store does not assign a manager or move staff');
+    await modal.getByLabel('Store name', { exact: true }).fill('  East Park Branch  ');
+    await modal.getByLabel('Address (optional)', { exact: true }).fill('  Great East Road  ');
+    await expect(modal.getByLabel('Timezone', { exact: true })).toHaveValue('Africa/Lusaka');
+    await modal.getByRole('button', { name: 'Create store', exact: true }).click();
+    await expect(modal).toHaveCount(0);
+    await expect(page.locator('[data-organization-stores]')).toContainText('East Park Branch');
+    const calls = state.calls.filter(c => c.path.endsWith('/rpc/create_organization_store'));
+    expect(calls).toHaveLength(1);
+    expect(calls[0].body).toEqual({ p_request_id: expect.any(String), p_store_name: 'East Park Branch', p_address: 'Great East Road', p_store_type_code: 'general_retail', p_time_zone: 'Africa/Lusaka' });
+    expect(state.calls.filter(c => c.path === '/rest/v1/stores' && c.method !== 'GET')).toHaveLength(0);
+    expect(state.data.profiles[0].store_id).toBe(ids.store);
+    expect(state.errors).toEqual([]);
+  });
+}
+
+test('store creation retains one request and payload after an uncertain response', async ({ page }) => {
+  const state = await backend(page, { owner: true, failStoreOnce: true });
+  organizationFixture(state);
+  await login(page);
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await page.getByRole('button', { name: 'Add store', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Store name', { exact: true }).fill('New Branch');
+  await modal.getByRole('button', { name: 'Create store', exact: true }).click();
+  await expect(modal.locator('.form-error')).toContainText('could not be confirmed');
+  await expect(modal.getByLabel('Store name', { exact: true })).toHaveAttribute('readonly', '');
+  await modal.getByRole('button', { name: 'Create store', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  const calls = state.calls.filter(c => c.path.endsWith('/rpc/create_organization_store'));
+  expect(calls).toHaveLength(2);
+  expect(calls[0].body).toEqual(calls[1].body);
+  expect(state.data.organization_overview.stores.filter(s => s.store_name === 'New Branch')).toHaveLength(1);
+});
+
+test('revoked owner cannot submit an already-open Add store form', async ({ page }) => {
+  const state = await backend(page, { owner: true });
+  organizationFixture(state);
+  await login(page);
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await page.getByRole('button', { name: 'Add store', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Store name', { exact: true }).fill('Forbidden Branch');
+  state.access.owner = false;
+  await modal.getByRole('button', { name: 'Create store', exact: true }).click();
+  await expect(modal.locator('.form-error')).toContainText('permission');
+  expect(state.data.organization_overview.stores).toHaveLength(2);
 });
