@@ -2,7 +2,7 @@ import './styles/original/dashboard.css';
 import './styles/app.css';
 import { createIcons, LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardList, Wallet, ChartNoAxesCombined, UsersRound, ChartNoAxesColumn, CalendarDays, Undo2, History, Settings, LogOut, Menu } from 'lucide';
 import { configured, configurationError, supabase, recoveryContext } from './lib/client.js';
-import { list, unwrap, signupOwner } from './lib/api.js';
+import { list, unwrap, signupOwner, organizationOwnerAccess } from './lib/api.js';
 import { $, e, notify, closeDialog } from './lib/ui.js';
 import { installSearchableSelects } from './lib/searchable-select.js';
 import { forgotPassword, resetPassword, clearRecoveryUrl } from './lib/password-recovery.js';
@@ -12,10 +12,12 @@ import { overview, products, inventory } from './pages/catalog.js';
 import { sales, purchases, suppliers, expenses, accounts } from './pages/operations.js';
 import { batches, returns, audit } from './pages/stock.js';
 import { reports, summary, settings } from './pages/reports.js';
+import { organizationPage } from './pages/organization.js';
 
 installSearchableSelects();
 
 const routes = {
+  organization: ['Organization', 'boxes', organizationPage],
   dashboard: ['Dashboard', 'layout-dashboard', overview],
   products: ['Products', 'package', products],
   sales: ['Sales', 'shopping-cart', sales],
@@ -35,6 +37,7 @@ const icons = { LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardL
 
 let profile, store, organization, generation = 0, shellUser, sessionUser;
 let currentKey = 'dashboard';
+let isOwner = false;
 let recoveryActive = false;
 const app = $('#app');
 
@@ -50,13 +53,14 @@ async function loadIdentity() {
   if (!stores[0]?.active) { profile = null; throw new Error('Your store is inactive or unavailable. Contact an administrator.'); }
   profile = next; store = stores[0];
   organization = store.organization_id ? (await list('organizations', { filters: { organization_id: store.organization_id } }))[0] : null;
+  isOwner = await organizationOwnerAccess();
   return data.user;
 }
 
 function login(message = '', { success = false, email = '' } = {}) {
   generation++;
-  closeDialog(); shellUser = null; profile = store = organization = null;
-  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username" value="${e(email)}"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><button type="button" class="auth-link" id="forgotPasswordBtn">Forgot password?</button><p class="auth-help">Need an account? Contact your manager. Worker accounts are created by a manager.</p><button type="button" class="secondary-btn auth-signup" id="signupBtn" hidden>Create a business account</button><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
+  closeDialog(); shellUser = null; isOwner = false; profile = store = organization = null;
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username" value="${e(email)}"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><button type="button" class="auth-link" id="forgotPasswordBtn">Forgot password?</button><p class="auth-help">Need an account? Contact your manager. Worker accounts are created by a manager.</p><button type="button" class="secondary-btn auth-signup" id="signupBtn" hidden>Sign up as organization owner</button><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
   mountBranding(app);
   $('#forgotPasswordBtn').onclick = () => {
     const email = $('#loginForm [name="email"]').value;
@@ -87,7 +91,7 @@ function login(message = '', { success = false, email = '' } = {}) {
 function ownerSignup() {
   generation++;
   closeDialog();
-  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Create your business</h2><p class="muted">Set up a new business and store. You will be its manager. Staff accounts are created by a manager after setup.</p><form id="signupForm"><label class="form-group">Your name<input name="user_name" required maxlength="150" autocomplete="name"></label><label class="form-group">Business name<input name="organization_name" required maxlength="150" autocomplete="organization"></label><label class="form-group">Store name<input name="store_name" required maxlength="150"></label><label class="form-group">Email address<input name="email" type="email" required autocomplete="email"></label><label class="form-group">Phone number (optional)<input name="phone" type="tel" maxlength="30" autocomplete="tel"></label><label class="form-group">Password<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label><p class="muted">Use at least 12 characters.</p><label class="form-group">Confirm password<input name="confirm_password" type="password" required autocomplete="new-password"></label><p id="signupError" role="alert"></p><button class="primary-btn" type="submit">Create business</button><button class="secondary-btn auth-signup" type="button" id="backToLogin">Back to login</button></form></section></main>`;
+  app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Create an organization owner account</h2><p class="muted">Set up a new business and store. You will be its organization owner, with manager access to your assigned store. Staff accounts are created by a manager after setup.</p><form id="signupForm"><label class="form-group">Your name<input name="user_name" required maxlength="150" autocomplete="name"></label><label class="form-group">Business / organization name<input name="organization_name" required maxlength="150" autocomplete="organization"></label><label class="form-group">Store name<input name="store_name" required maxlength="150"></label><label class="form-group">Email address<input name="email" type="email" required autocomplete="email"></label><label class="form-group">Phone number (optional)<input name="phone" type="tel" maxlength="30" autocomplete="tel"></label><label class="form-group">Password<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label><p class="muted">Use at least 12 characters.</p><label class="form-group">Confirm password<input name="confirm_password" type="password" required autocomplete="new-password"></label><p id="signupError" role="alert"></p><button class="primary-btn" type="submit">Create business</button><button class="secondary-btn auth-signup" type="button" id="backToLogin">Back to login</button></form></section></main>`;
   mountBranding(app);
   $('#backToLogin').onclick = () => login();
   $('#signupForm').onsubmit = async event => {
@@ -129,9 +133,9 @@ function ownerSignup() {
 }
 
 function shell() {
-  shellUser = `${profile.user_id}:${profile.role}:${profile.store_id}`;
-  const allowed = Object.entries(routes).filter(([key]) => profile.role === 'manager' || !managerPages.has(key));
-  app.innerHTML = `<div class="layout"><aside class="sidebar" id="trautsSidebar">${branding(true)}<div class="menu-label">MAIN MENU</div><nav class="sidebar-nav">${allowed.map(([key, [name, icon]]) => `<a class="nav" href="#/${key}" data-route="${key}"><i data-lucide="${icon}"></i><span>${name}</span></a>`).join('')}</nav><div class="sidebar-footer"><div class="user-profile"><div class="user-avatar">${e(profile.user_name?.slice(0, 1) || 'U')}</div><div class="user-info"><strong>${e(profile.user_name)}</strong><small>${e(profile.role === 'manager' ? 'Shop Manager' : 'Shopkeeper')}</small></div></div><button id="logoutBtn" class="logout"><i data-lucide="log-out"></i>Logout</button></div></aside><main class="main"><button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="trautsSidebar" aria-expanded="false"><i data-lucide="menu"></i>Menu</button><header class="app-header"><div><p class="eyebrow">${e(organization?.organization_name || 'YOUR BUSINESS')}</p><h1 id="pageTitle">Dashboard</h1><p>${e(store.store_name)} · ${e(store.time_zone)} · ${e(profile.role === 'manager' ? 'Manager workspace' : 'Shopkeeper workspace')}</p></div></header><p id="appMessage" hidden></p><section id="pageContent" aria-live="polite"></section><footer class="page-footer">TRAUTS Shop Manager · ${e(store.store_name)} · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></footer></main></div>`;
+  shellUser = `${profile.user_id}:${profile.role}:${profile.store_id}:${isOwner}`;
+  const allowed = Object.entries(routes).filter(([key]) => (key !== 'organization' || isOwner) && (profile.role === 'manager' || !managerPages.has(key)));
+  app.innerHTML = `<div class="layout"><aside class="sidebar" id="trautsSidebar">${branding(true)}<div class="menu-label">MAIN MENU</div><nav class="sidebar-nav">${allowed.map(([key, [name, icon]]) => `<a class="nav" href="#/${key}" data-route="${key}"><i data-lucide="${icon}"></i><span>${name}</span></a>`).join('')}</nav><div class="sidebar-footer"><div class="user-profile"><div class="user-avatar">${e(profile.user_name?.slice(0, 1) || 'U')}</div><div class="user-info"><strong>${e(profile.user_name)}</strong><small>${e(isOwner ? 'Organization Owner' : profile.role === 'manager' ? 'Shop Manager' : 'Shopkeeper')}</small></div></div><button id="logoutBtn" class="logout"><i data-lucide="log-out"></i>Logout</button></div></aside><main class="main"><button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="trautsSidebar" aria-expanded="false"><i data-lucide="menu"></i>Menu</button><header class="app-header"><div><p class="eyebrow">${e(organization?.organization_name || 'YOUR BUSINESS')}</p><h1 id="pageTitle">Dashboard</h1><p>${e(store.store_name)} · ${e(store.time_zone)} · ${e(isOwner ? 'Organization owner workspace' : profile.role === 'manager' ? 'Manager workspace' : 'Shopkeeper workspace')}</p></div></header><p id="appMessage" hidden></p><section id="pageContent" aria-live="polite"></section><footer class="page-footer">TRAUTS Shop Manager · ${e(store.store_name)} · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></footer></main></div>`;
   mountBranding(app);
   $('#logoutBtn').onclick = async () => {
     $('#logoutBtn').disabled = true;
@@ -161,12 +165,13 @@ async function render() {
   try {
     await loadIdentity();
     if (token !== generation) return;
-    if (shellUser !== `${profile.user_id}:${profile.role}:${profile.store_id}`) shell();
+    if (shellUser !== `${profile.user_id}:${profile.role}:${profile.store_id}:${isOwner}`) shell();
     const [path, query = ''] = location.hash.replace(/^#\/?/, '').split('?');
     const requested = path || 'dashboard';
     const intent = requested === 'sales' && new URLSearchParams(query).get('action') === 'new' ? 'new-sale' : null;
     currentKey = routes[requested] ? requested : 'dashboard';
     if (managerPages.has(currentKey) && profile.role !== 'manager') currentKey = 'dashboard';
+    if (currentKey === 'organization' && !isOwner) currentKey = 'dashboard';
     $('#pageTitle').textContent = routes[currentKey][0];
     document.title = `${routes[currentKey][0]} | TRAUTS`;
     document.querySelectorAll('[data-route]').forEach(node => node.classList.toggle('active', node.dataset.route === currentKey));
@@ -178,6 +183,7 @@ async function render() {
     const ctx = {
       profile: captured, store: { ...store }, organization,
       intent,
+      owner: isOwner,
       manager: profile.role === 'manager',
       money: value => new Intl.NumberFormat('en-ZM', organization?.currency_code ? { style: 'currency', currency: organization.currency_code } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0)),
       async guard() {
@@ -220,7 +226,7 @@ function beginRecovery(userId) {
   if (recoveryActive && $('#passwordResetForm')) return;
   recoveryActive = true;
   generation++;
-  shellUser = null; profile = store = organization = null;
+  shellUser = null; isOwner = false; profile = store = organization = null;
   resetPassword({ userId,
     onComplete: message => { finishRecovery(); login(message, { success: true }); },
     onCancel: () => { finishRecovery(); login(); },

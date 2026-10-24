@@ -95,3 +95,5 @@ The handoff describes the implementation developed in this session. This checkou
 Products use whole-item quantities and have no variant/group setup in the UI. Prices still allow cents. Before using the updated frontend for live writes, apply the database step in [Simple products and whole quantities](docs/simple-products.md). The patch stops without changes if historical fractional records need reconciliation.
 
 Forgot password is available from the login page. Configure the [Supabase email and recovery redirect settings](docs/password-recovery.md) to send working reset links; no SQL change is needed.
+
+Organization owners retain manager operations for their assigned store and get an Organization page for viewing all their business stores and staff. It uses the previously supplied ownership SQL (`is_organization_owner()` and `get_organization_overview()`); this frontend update does not apply database changes. See [owner-signup.md](docs/owner-signup.md).

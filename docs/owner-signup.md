@@ -1,6 +1,6 @@
 # Business owner signup
 
-The initial login page offers **Create a business account** after the database signup patch has been installed. This creates a new business, one store and an active manager profile. It cannot join an existing store or choose an existing organization. Managers still create workers through Manage Accounts.
+The initial login page offers **Sign up as organization owner** after the database signup patch has been installed. This creates a new business, one store and an active manager profile. It cannot join an existing store or choose an existing organization. Managers still create workers through Manage Accounts.
 
 ## Deploy
 
@@ -55,3 +55,13 @@ docker stop erp-owner-check
 ```
 
 The fixture has the supplied columns, constraints and worker-trigger behaviour. It verifies separate stores/businesses, defaults, malformed/injected metadata rejection, late failure rollback, unchanged worker provisioning, no metadata-update escalation, private execution grants, and provisioning by an Auth writer without application-table write permission. It does not reproduce the entire hosted Auth service or RLS policy set; run hosted acceptance after deployment.
+
+## Organization ownership in the frontend
+
+After applying the separately supplied organization-ownership SQL, new owner signups also receive an organization ownership record. The frontend continues to use the existing Auth signup payload; it never writes owner records or chooses a role/tenant ID. `profiles.role` remains `manager`, so existing store operations and worker creation remain compatible.
+
+On sign-in/navigation, `is_organization_owner()` determines owner access. Owners see their label in the sidebar, header, their own team row and Settings. The Organization page calls `get_organization_overview()` without organization/store parameters. It renders the returned business, stores and their `staff` arrays, with search and read-only branch details. No direct cross-store table permissions or operational store switching are added.
+
+Ordinary managers/workers cannot open the owner route. A missing owner-check RPC leaves existing store login working with no owner menu; other RPC failures are reported. Ownership is rechecked on navigation, so a revoked owner loses the menu and owner route. Backend authorization still controls every overview request.
+
+No additional SQL migration is included in this frontend update. It expects the ownership SQL already supplied in the chat, including the existing account assignments. Hosted acceptance should confirm owner labels, the organization's other stores/team, ordinary-manager and worker restrictions, and a new owner signup.

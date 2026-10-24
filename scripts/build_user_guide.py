@@ -121,10 +121,10 @@ def build_html(content, logo: Path | None):
 *{{box-sizing:border-box}}html{{scroll-behavior:smooth}}body{{margin:0;background:#edf3fa;color:#172c4c;font:15px/1.75 Arial,sans-serif}}main{{max-width:1000px;margin:30px auto;background:white;padding:42px;border-radius:16px;border:1px solid #e2e8f0}}header{{display:flex;gap:28px;align-items:center;border-bottom:3px solid #173f8a;padding-bottom:24px}}h1{{font-size:30px;line-height:1.3;margin:0 0 8px}}h2{{color:#173f8a;font-size:23px;line-height:1.4;margin-top:42px;border-bottom:1px solid #e2e8f0;padding-bottom:9px;scroll-margin-top:20px}}h3{{font-size:17px;margin:25px 0 10px}}p,li{{overflow-wrap:anywhere}}li{{padding-left:4px;margin:5px 0}}.logo{{object-fit:contain;flex-shrink:0}}.subtitle{{color:#64748b;margin:6px 0}}.tools{{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}}.tools a,.tools button{{background:#173f8a;color:#fff;border:0;border-radius:8px;padding:10px 15px;font:inherit;text-decoration:none;cursor:pointer}}nav{{background:#f3f6fb;padding:20px 24px;border-radius:10px}}nav ol{{columns:2;column-gap:28px;margin-bottom:0;padding-left:20px}}nav li{{break-inside:avoid;font-size:13px}}nav a{{color:#173f8a;text-decoration:none}}table{{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6;margin:15px 0}}td,th{{padding:11px 12px;border:1px solid #e2e8f0;text-align:left;vertical-align:top}}th{{background:#edf3fa}}.table-wrap{{overflow-x:auto}}code{{background:#edf3fa;padding:2px 4px}}footer{{border-top:1px solid #e2e8f0;margin-top:35px;padding-top:15px;color:#64748b;font-size:12px}}a:focus-visible,button:focus-visible{{outline:3px solid #77a6f4;outline-offset:3px}}
 @media(max-width:650px){{body{{font-size:14px}}main{{margin:0;padding:22px 17px;border-radius:0}}header{{gap:14px;align-items:start}}.logo{{width:85px;height:85px}}h1{{font-size:23px}}nav ol{{columns:1}}h2{{font-size:21px}}td,th{{padding:8px}}}}
 @media print{{body{{background:white;font-size:10pt}}main{{margin:0;padding:0;border:0;max-width:none}}.tools{{display:none}}h2,h3{{break-after:avoid}}tr{{break-inside:avoid}}thead{{display:table-header-group}}a{{color:inherit;text-decoration:none}}nav{{break-after:page}}}}
-</style></head><body><main><header>{image}<div><h1>TRAUTS Shop Manager<br>User Guide</h1><p class="subtitle">A practical guide for managers and ordinary workers</p><p class="subtitle">Updated 19 October 2026</p></div></header>
+</style></head><body><main><header>{image}<div><h1>TRAUTS Shop Manager<br>User Guide</h1><p class="subtitle">A practical guide for managers and ordinary workers</p><p class="subtitle">Updated 24 October 2026</p></div></header>
 <div class="tools"><a href="./user-guide.pdf" download="TRAUTS-User-Guide.pdf">Download PDF</a><button type="button" onclick="window.print()">Print this guide</button><a href="./">Open the app</a></div>
 <nav aria-label="Guide contents"><b>Contents</b><ol>{toc}</ol></nav>
-{''.join(parts)}<footer>TRAUTS Technologies · Shop Manager User Guide · Current app functionality, 19 October 2026</footer></main></body></html>'''
+{''.join(parts)}<footer>TRAUTS Technologies · Shop Manager User Guide · Current app functionality, 24 October 2026</footer></main></body></html>'''
     (PUBLIC / 'user-guide.html').write_text(document, encoding='utf-8')
 
 
@@ -176,7 +176,7 @@ def build_pdf(content, logo: Path | None):
             canvas.drawString(margin, height - 24, 'TRAUTS SHOP MANAGER · USER GUIDE')
         canvas.setFillColor(MUTED)
         canvas.setFont(regular, 7)
-        canvas.drawString(margin, 26, 'TRAUTS Technologies · 19 October 2026')
+        canvas.drawString(margin, 26, 'TRAUTS Technologies · 24 October 2026')
         canvas.drawRightString(width - margin, 26, f'Page {document.page}')
         canvas.restoreState()
 
@@ -188,7 +188,7 @@ def build_pdf(content, logo: Path | None):
         story += [Image(str(logo), width=185, height=185 * img_h / img_w), Spacer(1, 25)]
     story += [Paragraph('TRAUTS Shop Manager<br/>User Guide', cover_title),
               Paragraph('A practical guide for managers<br/>and ordinary workers', cover_subtitle),
-              Spacer(1, 25), Paragraph('Updated 19 October 2026', cover_subtitle),
+              Spacer(1, 25), Paragraph('Updated 24 October 2026', cover_subtitle),
               Spacer(1, 35), Paragraph('Every page, everyday tasks, and clear explanations<br/>of what happens when you save.', cover_subtitle), PageBreak()]
     toc = TableOfContents()
     toc.levelStyles = [ParagraphStyle('GuideContents', parent=body, fontSize=10, leading=19, leftIndent=0, firstLineIndent=0, spaceBefore=3)]

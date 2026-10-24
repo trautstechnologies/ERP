@@ -108,7 +108,7 @@ export async function expenses(ctx) {
 
 export async function accounts(ctx) {
   const data = await scoped(ctx, 'profiles');
-  const render = search => table(['Name', 'Phone', 'Role', 'Status', 'Actions'], data.filter(p => matches(p, search)).map(p => row([e(p.user_name), e(p.phone || '—'), e(p.role === 'user' ? 'Worker' : 'Manager'), badge(p.status), p.role === 'user' ? button('Edit worker', 'edit', p.user_id) : 'Administrative account'])));
+  const render = search => table(['Name', 'Phone', 'Role', 'Status', 'Actions'], data.filter(p => matches(p, search)).map(p => row([e(p.user_name), e(p.phone || '—'), e(ctx.owner && p.user_id === ctx.profile.user_id ? 'Organization Owner' : p.role === 'user' ? 'Worker' : 'Manager'), badge(p.status), p.role === 'user' ? button('Edit worker', 'edit', p.user_id) : 'Administrative account'])));
   const root = ctx.mount(`${heading('Manage accounts', 'Create workers in this store and manage their active status.', button('Create worker', 'add', '', false))}${note('Login emails are held by Supabase Auth, not the profiles table. This page never invents an email or allows store/role reassignment.')}${panel('Store team', `${searchBox()}<div data-table>${render('')}</div>`)}`);
   if (!root) return;
   searchable(root, render);

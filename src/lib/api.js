@@ -95,3 +95,11 @@ export async function signupOwner({ email, password, user_name, organization_nam
   }
   return { confirmation_required: !result.data.session };
 }
+
+
+export async function organizationOwnerAccess() {
+  const result = await supabase.rpc('is_organization_owner');
+  // Older installations keep their store login until the separately supplied SQL is installed.
+  if (result.error?.code === 'PGRST202' || result.error?.code === '42883') return false;
+  return (await unwrap(result)) === true;
+}

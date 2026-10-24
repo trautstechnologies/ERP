@@ -1,6 +1,6 @@
 # TRAUTS Shop Manager — User Guide
 
-For store managers and ordinary workers. Updated 19 October 2026.
+For store managers and ordinary workers. Updated 24 October 2026.
 
 This guide describes the current app. Your account determines which pages and buttons you can use. Some actions also depend on the features your administrator has enabled.
 
@@ -13,15 +13,15 @@ This guide describes the current app. Your account determines which pages and bu
 3. Select **Login**.
 4. Check the store name shown at the top of the screen before recording anything.
 
-Business owners can create a new business and store using **Create a business account** on the login page, when signup is enabled. A manager creates ordinary worker accounts through **Manage Accounts**; workers should not use business signup to join an existing store. New workers can sign in without confirming an email.
+Business owners can create a new business and store using **Sign up as organization owner** on the login page, when signup is enabled. A manager creates ordinary worker accounts through **Manage Accounts**; workers should not use business signup to join an existing store. New workers can sign in without confirming an email.
 
-### Create a business account
+### Sign up as organization owner
 
-1. Select **Create a business account** on the login page.
-2. Enter your name, business name, store name and email address. Phone number is optional.
+1. Select **Sign up as organization owner** on the login page.
+2. Enter your name, **Business / organization name**, store name and email address. Phone number is optional.
 3. Choose a password of at least 12 characters and enter it again in **Confirm password**.
 4. Select **Create business** once and wait for the result.
-5. If email confirmation is enabled, check your inbox, confirm the email and sign in. Otherwise, your manager dashboard opens immediately.
+5. If email confirmation is enabled, check your inbox, confirm the email and sign in. Otherwise, your owner dashboard opens immediately.
 
 Your new store starts as general retail, with ZMW currency and Zambia's Africa/Lusaka timezone. Add products, receive stock and create worker accounts to get started. Signup creates a new business and store; it does not give access to another person's store. If the signup button is absent, ask the administrator to finish enabling signup. Use **Back to login** to return without creating an account.
 
@@ -57,6 +57,20 @@ If the email does not arrive, contact the administrator to check email delivery.
 | Audit History and Settings | Not available | View history/store settings and set the timezone |
 
 A manager's access is limited to their own store. Being in the same organization does not give access to other stores. There is no store-switching button in this version.
+
+### Organization owners
+
+Owners have all manager actions for their assigned store, plus an **Organization** page. Your account label shows **Organization Owner**. The organization is the business; each store is a branch within that business.
+
+On **Organization** you can:
+
+- View the business name, legal name, currency and tax number, when recorded.
+- See every store in your organization, including inactive stores, with its address, type, timezone, status and staff counts.
+- View all managers and workers, their assigned stores, phone numbers and account status.
+- Search by store, staff name or phone number. Clear the search to see all rows again.
+- Select **View store** to see that branch's details and its team, including staff start dates.
+
+The organization page is read-only. The other operational pages continue to manage the assigned store shown in the header. Managers who are not owners remain restricted to their own store; ordinary workers do not get the Organization page. New organization-owner signups create a separate business and first store. Existing owners are assigned administratively.
 
 ### Moving around
 

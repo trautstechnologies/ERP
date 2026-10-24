@@ -7,8 +7,9 @@ const ids = {
   product: '44444444-4444-4444-8444-444444444444', sale: '55555555-5555-4555-8555-555555555555', item: '66666666-6666-4666-8666-666666666666',
 };
 
-async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true, recoveryRequestStatus = 200, passwordUpdateStatus = 200 } = {}) {
+async function backend(page, { role = 'manager', failSaleOnce = false, signupMode = 'session', signupReady = true, recoveryRequestStatus = 200, passwordUpdateStatus = 200, owner = false, ownerApiMissing = false, overviewDenied = false } = {}) {
   const calls = [], errors = [];
+  const access = { owner: owner && role === 'manager' };
   page.on('pageerror', error => errors.push(error.message));
   const userId = ids[role];
   const now = Math.floor(Date.now() / 1000);
@@ -50,6 +51,11 @@ async function backend(page, { role = 'manager', failSaleOnce = false, signupMod
     if (url.pathname === '/functions/v1/create-worker') return reply({ user_id: ids.worker, user_name: body.user_name, role: 'user', confirmation_required: false }, 201);
     if (url.pathname.includes('/rpc/')) {
       const name = url.pathname.split('/').pop();
+      if (name === 'is_organization_owner') return ownerApiMissing
+        ? reply({ code: 'PGRST202', message: 'Function not deployed' }, 404) : reply(access.owner);
+      if (name === 'get_organization_overview') return !access.owner || overviewDenied
+        ? reply({ code: '42501', message: 'An active organization owner account is required' }, 403)
+        : reply(data.organization_overview);
       if (name === 'owner_signup_available') return reply(signupReady);
       if (name === 'get_sale_batches') return reply([]);
       if (name === 'record_sale') {
@@ -77,7 +83,7 @@ async function backend(page, { role = 'manager', failSaleOnce = false, signupMod
     return reply(request.headers().accept?.includes('vnd.pgrst.object') ? rows[0] : rows);
   });
   const recoveryUrl = `/?auth=recovery#${new URLSearchParams({ access_token: accessToken, refresh_token: 'test-recovery-refresh', expires_in: '3600', token_type: 'bearer', type: 'recovery' })}`;
-  return { calls, errors, data, recoveryUrl };
+  return { calls, errors, data, recoveryUrl, access };
 }
 
 async function login(page, role = 'manager') {
@@ -601,9 +607,9 @@ test('blank SKUs are generated per product and clearing an existing SKU preserve
 
 async function fillBusinessSignup(page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Create a business account', exact: true }).click();
+  await page.getByRole('button', { name: 'Sign up as organization owner', exact: true }).click();
   await page.getByLabel('Your name', { exact: true }).fill('New Owner');
-  await page.getByLabel('Business name', { exact: true }).fill('New Retail Business');
+  await page.getByLabel('Business / organization name', { exact: true }).fill('New Retail Business');
   await page.getByLabel('Store name', { exact: true }).fill('New Lusaka Store');
   await page.getByLabel('Email address').fill('owner@example.com');
   await page.getByLabel('Phone number (optional)').fill('0971234567');
@@ -659,7 +665,7 @@ test('signup remains unavailable before backend provisioning is enabled while lo
   expect(state.calls.filter(c => c.path === '/auth/v1/signup')).toHaveLength(0);
   await page.getByRole('button', { name: 'Logout', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Create a business account', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Sign up as organization owner', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Login', exact: true })).toBeVisible();
 });
 
@@ -760,4 +766,132 @@ test('a changed recovery account cannot update another user password', async ({ 
   await page.getByRole('button', { name: 'Update password', exact: true }).click();
   await expect(page.locator('#recoveryMessage')).toContainText('expired or changed');
   expect(state.calls.filter(c => c.method === 'PUT')).toHaveLength(0);
+});
+
+
+function organizationFixture(state) {
+  const secondStore = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  state.data.organization_overview = {
+    organization: { ...state.data.organizations[0], legal_name: 'TRAUTS Retail Limited', tax_number: 'TAX-123' },
+    stores: [
+      { ...state.data.stores[0], store_type: 'general_retail', address: 'Kabwata', staff: [
+        { ...state.data.profiles[0], is_owner: true, start_date: '2026-01-01' },
+        { user_id: 'local-worker', user_name: 'Kabwata Worker', role: 'user', phone: '0971111111', status: 'active', start_date: '2026-02-01' },
+      ] },
+      { store_id: secondStore, store_name: 'TRAUTS Store B', address: 'Town Centre', store_type: 'general_retail', time_zone: 'Africa/Lusaka', active: false, staff: [
+        { user_id: 'branch-manager', user_name: 'Branch Manager', role: 'manager', phone: '0972222222', status: 'active', start_date: '2026-03-01' },
+        { user_id: 'branch-worker', user_name: 'Branch Worker', role: 'user', phone: '0973333333', status: 'inactive', start_date: '2026-04-01' },
+      ] },
+    ],
+  };
+}
+
+test('owners see their organization stores and teams, readable details and manager actions', async ({ page }) => {
+  const state = await backend(page, { owner: true });
+  organizationFixture(state);
+  await login(page);
+  await expect(page.locator('.sidebar .user-info')).toContainText('Organization Owner');
+  await expect(page.getByRole('link', { name: 'Manage Accounts', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.locator('[data-organization-stores]')).toContainText('TRAUTS Store B');
+  await expect(page.locator('[data-organization-team]')).toContainText('Branch Manager');
+  await expect(page.locator('[data-organization-team]')).toContainText('Branch Worker');
+  await expect(page.locator('[data-organization-team]')).toContainText('Organization Owner');
+  expect(await page.locator('#pageContent').innerText()).not.toContain(ids.store);
+  expect(await page.locator('#pageContent').innerText()).not.toContain(ids.manager);
+  expect(state.calls.find(c => c.path.endsWith('/rpc/get_organization_overview')).body).toEqual({});
+  await page.getByRole('searchbox', { name: 'Search organization' }).fill('Branch Worker');
+  await expect(page.locator('[data-organization-team]')).toContainText('Branch Worker');
+  await expect(page.locator('[data-organization-team]')).not.toContainText('Kabwata Worker');
+  await page.getByRole('searchbox', { name: 'Search organization' }).fill('');
+  await page.locator('[data-organization-stores] tr').filter({ hasText: 'TRAUTS Store B' }).getByRole('button', { name: 'View store', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('Town Centre');
+  await expect(page.getByRole('dialog')).toContainText('0973333333');
+  await expect(page.getByRole('dialog')).not.toContainText('Kabwata Worker');
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).first().click();
+  await page.getByRole('link', { name: 'Sales', exact: true }).click();
+  await page.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('Record sale');
+  await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('link', { name: 'Manage Accounts', exact: true }).click();
+  await expect(page.locator('[data-table]')).toContainText('Organization Owner');
+  await page.getByRole('link', { name: 'Settings', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Store settings' })).toBeVisible();
+  await expect(page.locator('#pageContent')).toContainText('Organization Owner');
+  for (const call of state.calls.filter(c => c.path === '/rest/v1/sales')) expect(new URLSearchParams(call.query).get('store_id')).toBe(`eq.${ids.store}`);
+  expect(state.errors).toEqual([]);
+});
+
+for (const role of ['manager', 'worker']) {
+  test(`ordinary ${role} cannot navigate to the organization page`, async ({ page }) => {
+    const state = await backend(page, { role });
+    await login(page, role);
+    await expect(page.getByRole('link', { name: 'Organization', exact: true })).toHaveCount(0);
+    await page.evaluate(() => { location.hash = '#/organization'; });
+    await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+    expect(state.calls.some(c => c.path.endsWith('/rpc/get_organization_overview'))).toBe(false);
+    await expect(page.locator('.sidebar .user-info')).not.toContainText('Organization Owner');
+  });
+}
+
+test('owner revocation rebuilds navigation and removes organization access', async ({ page }) => {
+  const state = await backend(page, { owner: true });
+  organizationFixture(state);
+  await login(page);
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.locator('[data-organization-team]')).toContainText('Branch Worker');
+  state.access.owner = false;
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Organization', exact: true })).toHaveCount(0);
+  await expect(page.locator('.sidebar .user-info')).toContainText('Shop Manager');
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/get_organization_overview'))).toHaveLength(1);
+});
+
+test('missing owner SQL keeps existing manager login working', async ({ page }) => {
+  await backend(page, { ownerApiMissing: true });
+  await login(page);
+  await expect(page.getByRole('link', { name: 'Organization', exact: true })).toHaveCount(0);
+});
+
+test('backend denial of an owner overview reveals no other-store details', async ({ page }) => {
+  const state = await backend(page, { owner: true, overviewDenied: true });
+  organizationFixture(state);
+  await login(page);
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Unable to load this page' })).toBeVisible();
+  await expect(page.locator('#pageContent')).not.toContainText('Branch Worker');
+  await expect(page.locator('#appMessage')).toContainText('permission');
+});
+
+test('owner signup retains the established Auth flow and displays owner access after setup', async ({ page }) => {
+  const state = await backend(page, { owner: true });
+  organizationFixture(state);
+  await fillBusinessSignup(page);
+  await expect(page.getByRole('heading', { name: 'Create an organization owner account' })).toBeVisible();
+  await page.getByRole('button', { name: 'Create business', exact: true }).click();
+  await expect(page.locator('.sidebar .user-info')).toContainText('Organization Owner');
+  await expect(page.getByRole('link', { name: 'Organization', exact: true })).toBeVisible();
+  const signup = state.calls.find(c => c.path === '/auth/v1/signup');
+  expect(Object.keys(signup.body.data.erp_owner_signup).sort()).toEqual(['organization_name','phone','store_name','user_name']);
+  expect(state.calls.filter(c => ['/rest/v1/organization_owners','/rest/v1/profiles','/rest/v1/stores'].includes(c.path) && c.method === 'POST')).toHaveLength(0);
+});
+
+test('organization directory remains usable on desktop and mobile', async ({ page }) => {
+  const state = await backend(page, { owner: true });
+  organizationFixture(state);
+  await login(page);
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.locator('[data-organization-team]')).toContainText('Branch Worker');
+  await page.screenshot({ path: test.info().outputPath('organization-desktop.png'), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Menu', exact: true }).click();
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.locator('.sidebar')).not.toHaveClass(/mobile-open/);
+  await expect(page.locator('[data-organization-stores]')).toContainText('TRAUTS Store B');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.getByRole('searchbox', { name: 'Search organization' }).fill('0973333333');
+  await expect(page.locator('[data-organization-team]')).toContainText('Branch Worker');
+  await expect(page.locator('[data-organization-team]')).not.toContainText('Kabwata Worker');
+  await page.screenshot({ path: test.info().outputPath('organization-mobile.png'), fullPage: true });
 });
