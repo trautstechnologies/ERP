@@ -97,3 +97,7 @@ Products use whole-item quantities and have no variant/group setup in the UI. Pr
 Forgot password is available from the login page. Configure the [Supabase email and recovery redirect settings](docs/password-recovery.md) to send working reset links; no SQL change is needed.
 
 Organization owners retain manager operations for their assigned store and get an Organization page for viewing all their business stores and staff. It uses the previously supplied ownership SQL (`is_organization_owner()` and `get_organization_overview()`); this frontend update does not apply database changes. See [owner-signup.md](docs/owner-signup.md).
+
+### Mobile and offline use
+
+Open `/mobile.html` for the mobile interface. It uses the same Supabase backend and role checks as the web app. Both versions include a remembered dark theme. Production builds cache application files and support cached page reads plus queued offline sales. See [mobile and offline instructions](docs/mobile-offline.md) for setup, synchronization, and recovery limits.

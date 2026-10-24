@@ -895,3 +895,132 @@ test('organization directory remains usable on desktop and mobile', async ({ pag
   await expect(page.locator('[data-organization-team]')).not.toContainText('Kabwata Worker');
   await page.screenshot({ path: test.info().outputPath('organization-mobile.png'), fullPage: true });
 });
+
+test('offline sale stays local, survives navigation and synchronizes once after reconnect', async ({ page, context }) => {
+  const state = await backend(page);
+  await login(page);
+  await page.getByRole('link', { name: 'Sales', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Record sale', exact: true })).toBeVisible();
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Product', { exact: true }).selectOption(ids.product);
+  await modal.getByLabel('Quantity', { exact: true }).fill('1');
+  await modal.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  await expect(page.locator('#syncStatus')).toContainText('1 sale(s)');
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+  await page.getByRole('link', { name: 'Offline & sync', exact: true }).click();
+  await expect(page.getByRole('cell', { name: 'pending', exact: true })).toBeVisible();
+  await context.setOffline(false);
+  await expect(page.getByRole('cell', { name: 'synced', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Sync now', exact: true }).click();
+  await expect(page.getByRole('cell', { name: 'synced', exact: true })).toBeVisible();
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
+  expect(state.errors).toEqual([]);
+});
+
+test('mobile entry retains its shell, exposes backend pages and remembers dark mode', async ({ page }) => {
+  const state = await backend(page, { owner: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/mobile.html');
+  await page.getByLabel('Email address').fill('manager@example.com');
+  await page.getByLabel('Password', { exact: true }).fill('Test-password-123!');
+  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  await expect(page.locator('.trauts-page-header')).toBeVisible();
+  await page.getByRole('button', { name: 'Menu', exact: true }).click();
+  for (const name of ['Organization', 'Batches & Expiry', 'Returns & Refunds', 'Audit History', 'Offline & sync']) {
+    await expect(page.getByRole('link', { name, exact: true })).toBeVisible();
+  }
+  await page.getByRole('link', { name: 'Sales', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Record sale', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Switch to dark mode' }).click();
+  await expect(page.locator('html')).toHaveClass(/trauts-dark/);
+  await page.reload();
+  await expect(page.locator('html')).toHaveClass(/trauts-dark/);
+  await expect(page.getByRole('button', { name: 'Record sale', exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: '/tmp/trauts-mobile-dark.png', fullPage: true });
+  expect(state.errors).toEqual([]);
+});
+
+test('rejected offline uploads remain under review with their original request identity', async ({ page, context }) => {
+  const state = await backend(page, { failSaleOnce: true });
+  await login(page);
+  await page.getByRole('link', { name: 'Sales', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Record sale', exact: true })).toBeVisible();
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Product', { exact: true }).selectOption(ids.product);
+  await modal.getByLabel('Quantity', { exact: true }).fill('1');
+  await modal.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  await page.getByRole('link', { name: 'Offline & sync', exact: true }).click();
+  await context.setOffline(false);
+  await expect(page.getByRole('cell', { name: 'review', exact: true })).toBeVisible();
+  await expect(page.getByText('Temporary database error', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Sync now', exact: true }).click();
+  await expect(page.getByRole('cell', { name: 'review', exact: true })).toBeVisible();
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Review / retry' }).click();
+  await expect(page.getByRole('cell', { name: 'synced', exact: true })).toBeVisible();
+  const calls = state.calls.filter(c => c.path.endsWith('/rpc/record_sale'));
+  expect(calls).toHaveLength(2);
+  expect(calls[0].body).toEqual(calls[1].body);
+});
+
+test('offline cached access is partitioned by account and expires after 24 hours', async ({ page }) => {
+  await backend(page);
+  await login(page);
+  const result = await page.evaluate(async () => {
+    const { storage, setOfflineIdentity, queueEntries } = await import('/src/lib/offline.js');
+    const manager = '22222222-2222-4222-8222-222222222222';
+    const store = '11111111-1111-4111-8111-111111111111';
+    await storage(`${manager}:${store}:queue`, [{ id: 'local-private-request', status: 'pending' }]);
+    setOfflineIdentity({ profile: { user_id: 'another-user', store_id: store } });
+    const differentUser = await queueEntries();
+    setOfflineIdentity({ profile: { user_id: manager, store_id: 'another-store' } });
+    const differentStore = await queueEntries();
+    const saved = await storage('identity:' + manager);
+    await storage('identity:' + manager, { ...saved, saved: Date.now() - 86400001 });
+    return { differentUser, differentStore };
+  });
+  expect(result).toEqual({ differentUser: [], differentStore: [] });
+  await page.evaluate(() => { Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false }); location.hash = '#/sales'; });
+  await expect(page.getByText('Sign in online to prepare offline access', { exact: false })).toBeVisible();
+});
+
+test('lost acknowledgement can be resolved by matching server sale and item history', async ({ page }) => {
+  const state = await backend(page);
+  await login(page);
+  await page.evaluate(async ({ sale, product, manager, store }) => {
+    const { storage } = await import('/src/lib/offline.js');
+    await storage(`${manager}:${store}:queue`, [{ id: sale, status: 'sending', created: new Date().toISOString(), body: { p_request_id: sale, p_payment_method: 'cash', p_items: [{ product_id: product, quantity: 3 }] } }]);
+  }, ids);
+  await page.getByRole('link', { name: 'Offline & sync', exact: true }).click();
+  await page.getByRole('button', { name: 'Check server', exact: true }).click();
+  await expect(page.getByRole('cell', { name: 'synced', exact: true })).toBeVisible();
+  await expect(page.getByText('Confirmed against server transaction history.')).toBeVisible();
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+});
+
+test('concurrent tabs synchronize the same durable request only once', async ({ page, context }) => {
+  const first = await backend(page);
+  await login(page);
+  const secondPage = await context.newPage();
+  const second = await backend(secondPage);
+  await secondPage.goto('/');
+  await expect(secondPage.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+  const body = { p_request_id: '99999999-9999-4999-8999-999999999999', p_payment_method: 'cash', p_items: [{ product_id: ids.product, quantity: 1 }] };
+  await Promise.all([page, secondPage].map(tab => tab.evaluate(async payload => {
+    const { queueSale } = await import('/src/lib/offline.js');
+    await queueSale(payload);
+  }, body)));
+  await Promise.all([page, secondPage].map(tab => tab.evaluate(async () => {
+    const { syncSales } = await import('/src/lib/offline.js');
+    await syncSales();
+  })));
+  expect([...first.calls, ...second.calls].filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
+});

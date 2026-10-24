@@ -108,7 +108,8 @@ export function actionForm(title, content, submit, context, { mutation = false, 
         originalStates ??= [...form.querySelectorAll('input,select,textarea')].map(input => ({ input, disabled: input.disabled, readOnly: input.readOnly }));
         originalStates.forEach(({ input }) => { input.readOnly = true; if (input.tagName === 'SELECT' || input.type === 'checkbox') input.disabled = true; });
       }
-      await submit(payload || values, id);
+      const result = await submit(payload || values, id);
+      node.dataset.queued = String(result?.offline === true);
     } catch (error) {
       const uncertain = error.httpStatus === 0 || error.httpStatus >= 500 || error.code === '23505' || error instanceof TypeError;
       if (!uncertain) {
@@ -119,7 +120,7 @@ export function actionForm(title, content, submit, context, { mutation = false, 
       node.dataset.frozen = String(uncertain);
       throw error;
     }
-    try { await context.refresh(); notify('Saved. Data refreshed.'); }
+    try { await context.refresh(); notify(node.dataset.queued === 'true' ? 'Saved on this device. Sale pending sync; stock has not been confirmed.' : 'Saved. Data refreshed.'); }
     catch { notify('Saved, but the page could not refresh. Refresh before starting another action.', true); }
   }, { submitLabel: label });
   if (mutation) $('.dialog-body', node).insertAdjacentHTML('beforeend', supportDetails({ 'Request ID': id }) + '<p class="request-id">If a save is uncertain, check the history before starting another request. Your original entries are retained for retry.</p>');

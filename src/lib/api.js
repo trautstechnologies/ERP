@@ -1,3 +1,4 @@
+import { cacheKey, storage, queueSale } from './offline.js';
 import { supabase } from './client.js';
 
 const identities = {
@@ -28,7 +29,14 @@ export async function unwrap(result) {
 }
 
 // Fetch every page, not only PostgREST's first page. All sort keys are stable.
-export async function list(table, { select = '*', filters = {}, order, scope } = {}) {
+export async function list(table, { select = '*', filters = {}, order, scope, cache = true } = {}) {
+  const cacheId = JSON.stringify([table, select, filters, order, scope]);
+  const dataKey = cache ? cacheKey('cache:' + cacheId) : null;
+  if (!navigator.onLine) {
+    const saved = dataKey && await storage(dataKey);
+    if (!saved) throw new Error('This page has not been saved on this device. Open it online first.');
+    return saved.data;
+  }
   const rows = [];
   const ordering = order || identities[table] || 'report_date';
   const pageSize = 250;
@@ -39,31 +47,43 @@ export async function list(table, { select = '*', filters = {}, order, scope } =
     for (const [field, value] of Object.entries(filters)) query = value === null ? query.is(field, null) : query.eq(field, value);
     const data = await unwrap(await query.range(start, start + pageSize - 1));
     rows.push(...data);
-    if (data.length < pageSize) return rows;
+    if (data.length < pageSize) {
+      try { if (dataKey) await storage(dataKey, { data: rows, saved: Date.now() }); } catch { /* Online reads remain usable if storage is full. */ }
+      return rows;
+    }
   }
 }
 
 export async function insert(table, body) {
+  if (!navigator.onLine) throw new Error('This action requires an internet connection.');
   return unwrap(await supabase.from(table).insert(body).select().single());
 }
 
 export async function patch(table, idField, id, body, storeId) {
+  if (!navigator.onLine) throw new Error('This action requires an internet connection.');
   return unwrap(await supabase.from(table).update(body).eq(idField, id).eq('store_id', storeId).select().single());
 }
 
 export async function updateSupplierPhone(id, supplierId, phone) {
+  if (!navigator.onLine) throw new Error('This action requires an internet connection.');
   return unwrap(await supabase.from('supplier_phones').update({ phone }).eq('supplier_phone_id', id).eq('supplier_id', supplierId).select().single());
 }
 
 export async function deleteSupplierPhone(id, supplierId) {
+  if (!navigator.onLine) throw new Error('This action requires an internet connection.');
   return unwrap(await supabase.from('supplier_phones').delete().eq('supplier_phone_id', id).eq('supplier_id', supplierId).select().single());
 }
 
 export async function rpc(name, body) {
+  if (!navigator.onLine) {
+    if (name === 'record_sale') return queueSale(body);
+    throw new Error('This action requires an internet connection.');
+  }
   return unwrap(await supabase.rpc(name, body));
 }
 
 export async function createWorker(body) {
+  if (!navigator.onLine) throw new Error('This action requires an internet connection.');
   const result = await supabase.functions.invoke('create-worker', { body });
   if (result.error) {
     let message = result.error.message;

@@ -22,7 +22,7 @@ export async function sales(ctx) {
   searchable(root, render, { placeholder: 'Search products, staff, payment or status…' });
   const openSale = () => {
     const modal = actionForm('Record sale', select('Payment method', 'payment_method', payOptions()) + lineEditor(products), async (values, id) => {
-      await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products) });
+      return await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products) });
     }, ctx, { mutation: true, label: 'Record sale' });
     setupLines(modal, products);
   };

@@ -583,3 +583,18 @@ Do not send passwords or payment credentials in screenshots or support messages.
 | Request ID / transaction ID | A long unique reference used to locate and reconcile an action |
 
 The app records business activity. Real payments, safe handling/disposal of goods, account administration and any additional industry requirements still follow your store's approved processes.
+
+
+## Mobile version, dark mode and offline sales
+
+Choose **Mobile version** at the bottom of a page to open the mobile interface. Use **Menu** to switch pages. Choose **Web version** to return to the normal web interface. The sun or moon button changes between light and dark colors and remembers your choice on this device.
+
+To prepare for offline use, sign in while connected and visit the pages you will need. Allow the first load to finish. Previously visited pages can then show saved information when your connection drops. This saved information can be out of date. First login requires internet; saved access lasts up to 24 hours after the last online account check.
+
+You can record a sale offline. The app saves it on this device and marks it **pending sync**. It has not yet become a confirmed sale and does not reserve stock. Open **Offline & sync** to see the items, save time, payment method and status of each saved sale.
+
+When you reconnect with the app open, pending sales upload automatically. You can also press **Sync now**. The server checks your access, stock and current prices. A successful upload becomes **synced**. If stock or access has changed, the request stays available for review with an explanation.
+
+If an upload was interrupted, press **Check server** to check whether the sale already exists. The app compares the original reference, account, store, payment method and quantities. Use **Review / retry** only after checking the transaction; it keeps the same reference. Do not enter the same sale again as a new transaction.
+
+Keep your browser data until every pending sale is resolved. Clearing site data can permanently remove unsynced sales. Purchases, returns, refunds, stock changes, product edits and account management require internet. This mobile version runs in a browser; it is not an Android installation file.
