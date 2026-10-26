@@ -107,7 +107,7 @@ The Dashboard gives a quick view of activity. A worker sees their own completed 
 
 ### Actions
 
-- Select **Record sale** to go straight to the sale form in Sales.
+- On the web app, select **Record sale** to go straight to the sale form in Sales. On mobile, it opens the product picker and cart while you stay on the dashboard.
 - Select **Dashboard** in the menu again to reload the figures.
 - Open **Sales** for the full sales history. Open **Inventory** or **Reports** for more stock detail.
 
@@ -161,7 +161,7 @@ Use Sales to record customer purchases and review sale history. Workers see thei
 
 The app uses the current selling prices automatically. You cannot type a different price, discount or tax adjustment in this sale form. The saved total is the final amount recorded by the system.
 
-Selecting a payment method records how payment was made. It does not charge a card, collect Mobile Money or transfer money. There is no cash-tender/change calculation in this form.
+Selecting a payment method records how payment was made. It does not charge a card, collect Mobile Money or transfer money. The web form has no cash-tender/change calculation. The mobile form has an optional cash calculator, described below.
 
 Enter whole quantities such as 1, 2 or 3. Fractional quantities such as 0.5 are not accepted. Prices and payment amounts still allow cents.
 
@@ -602,3 +602,21 @@ When you reconnect with the app open, pending sales upload automatically. You ca
 If an upload was interrupted, press **Check server** to check whether the sale already exists. The app compares the original reference, account, store, payment method and quantities. Use **Review / retry** only after checking the transaction; it keeps the same reference. Do not enter the same sale again as a new transaction.
 
 Keep your browser data until every pending sale is resolved. Clearing site data can permanently remove unsynced sales. Purchases, returns, refunds, stock changes, product edits and account management require internet. This mobile version runs in a browser; it is not an Android installation file.
+
+
+## Original mobile layout and sale window
+
+The mobile interface uses the original dashboard cards, card-style product and inventory lists, and large action buttons. **Suppliers & Purchases** opens one section with separate Suppliers and Purchases tabs. Organization, returns, batches, audit and offline-sync pages remain available according to your access.
+
+On the mobile dashboard, **Record sale** opens the sale window without leaving the dashboard. On the Sales page, choose **New Sale**:
+
+1. Search for a product by name or SKU.
+2. Press **Add to Sale** on each product you want.
+3. Use **+**, **−**, or the quantity field to change whole-item quantities. Use **Remove** to remove an item.
+4. Choose the payment method. The subtotal and total shown are estimates until the sale is accepted.
+5. If useful, enter **Amount received** to calculate estimated cash change. This calculator does not record a separate payment or transfer money.
+6. Press **Complete sale** once. If offline, the sale is saved as pending sync. If a save is uncertain, keep the window open and retry the same request; the cart is locked to prevent accidental changes.
+
+On mobile Inventory, managers can use **Record Stock Movement** to choose a product, enter a positive quantity for stock in or a negative quantity for stock out, and give a reason. Tracked products use **Batches & Expiry**. Stock changes require internet.
+
+The restored layout uses current backend figures and supported fields. It does not use the old demonstration records or estimated profit calculations.

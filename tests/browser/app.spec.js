@@ -943,12 +943,12 @@ test('mobile entry retains its shell, exposes backend pages and remembers dark m
     await expect(page.getByRole('link', { name, exact: true })).toBeVisible();
   }
   await page.getByRole('link', { name: 'Sales', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Record sale', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'New Sale', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Switch to dark mode' }).click();
   await expect(page.locator('html')).toHaveClass(/trauts-dark/);
   await page.reload();
   await expect(page.locator('html')).toHaveClass(/trauts-dark/);
-  await expect(page.getByRole('button', { name: 'Record sale', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'New Sale', exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: '/tmp/trauts-mobile-dark.png', fullPage: true });
   expect(state.errors).toEqual([]);
@@ -1045,7 +1045,7 @@ for (const mobile of [false, true]) {
       await page.getByLabel('Email address').fill('manager@example.com');
       await page.getByLabel('Password', { exact: true }).fill('Test-password-123!');
       await page.getByRole('button', { name: 'Login', exact: true }).click();
-      await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Business Overview', exact: true })).toBeVisible();
     } else await login(page);
     if (mobile) await page.getByRole('button', { name: 'Menu', exact: true }).click();
     await page.getByRole('link', { name: 'Organization', exact: true }).click();
@@ -1098,4 +1098,163 @@ test('revoked owner cannot submit an already-open Add store form', async ({ page
   await modal.getByRole('button', { name: 'Create store', exact: true }).click();
   await expect(modal.locator('.form-error')).toContainText('permission');
   expect(state.data.organization_overview.stores).toHaveLength(2);
+});
+
+async function loginMobile(page, role = 'manager') {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/mobile.html');
+  await page.getByLabel('Email address').fill(`${role}@example.com`);
+  await page.getByLabel('Password', { exact: true }).fill('Test-password-123!');
+  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Business Overview', exact: true })).toBeVisible();
+}
+
+async function mobilePage(page, name) {
+  await page.getByRole('button', { name: 'Menu', exact: true }).click();
+  await page.getByRole('link', { name, exact: true }).click();
+}
+
+test('original mobile dashboard cards and chart use live scoped records and open the cart in place', async ({ page }) => {
+  const state = await backend(page);
+  await loginMobile(page);
+  await expect(page.locator('#trautsLiveDashboard .tld-card')).toHaveCount(6);
+  expect(await page.locator('.tld-cards').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(2);
+  await page.getByRole('button', { name: '30 days', exact: true }).click();
+  await expect(page.getByRole('img', { name: 'Completed gross sales over the last 30 days' })).toBeVisible();
+  await page.screenshot({ path: '/tmp/mobile-restored-dashboard.png', fullPage: true });
+  await page.getByRole('button', { name: 'Record sale', exact: true }).click();
+  await expect(page.locator('#trautsQuickSaleModal .pos-products')).toBeVisible();
+  await expect(page.locator('#trautsQuickSaleModal .pos-checkout')).toBeVisible();
+  expect(page.url()).not.toContain('#/sales');
+  await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click();
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+  expect(state.errors).toEqual([]);
+});
+
+test('original mobile product cards keep correct backend labels and edit handlers after searching', async ({ page }) => {
+  const state = await backend(page);
+  await loginMobile(page);
+  await mobilePage(page, 'Products');
+  const cards = page.locator('#productTable');
+  await expect(cards.locator('tr')).toHaveCount(1);
+  await expect(cards.locator('tr')).toHaveCSS('display', 'grid');
+  await expect.poll(() => cards.locator('td').evaluateAll(cells => cells.map(c => c.dataset.label))).toEqual(['Product / SKU', 'Category', 'Unit', 'Buying price', 'Selling price', 'Sellable', 'Status', 'Actions']);
+  await page.getByRole('searchbox', { name: 'Search records', exact: true }).fill('no matching product');
+  await expect(cards).toContainText('No records to display');
+  await page.getByRole('searchbox', { name: 'Search records', exact: true }).fill('Test Product');
+  await expect(cards.locator('tr')).toHaveCount(1);
+  await expect.poll(() => cards.locator('td').first().getAttribute('data-label')).toBe('Product / SKU');
+  await page.getByRole('button', { name: 'Switch to dark mode' }).click();
+  await page.screenshot({ path: '/tmp/mobile-restored-products-dark.png', fullPage: true });
+  await cards.getByRole('button', { name: 'Edit', exact: true }).click();
+  await expect(page.getByRole('dialog').getByLabel('SKU', { exact: true })).not.toHaveAttribute('required', '');
+  await expect(page.getByRole('dialog').getByLabel('Product name', { exact: true })).toHaveValue('Test Product');
+  await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(state.errors).toEqual([]);
+});
+
+test('mobile product picker and cart calculate previews while submitting only the supported sale payload', async ({ page }) => {
+  const state = await backend(page);
+  await loginMobile(page);
+  await mobilePage(page, 'Sales');
+  await page.getByRole('button', { name: 'New Sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByRole('button', { name: 'Add Test Product', exact: true }).click();
+  await modal.getByRole('button', { name: 'Increase Test Product', exact: true }).click();
+  await expect(modal.locator('#posTotal')).toContainText('40.00');
+  await modal.getByLabel('Amount received (optional cash calculator)', { exact: true }).fill('50');
+  await expect(modal.locator('#posChange')).toContainText('10.00');
+  await modal.getByLabel('Quantity for Test Product', { exact: true }).fill('2.5');
+  await modal.getByRole('button', { name: 'Complete sale', exact: true }).click();
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+  await modal.getByLabel('Quantity for Test Product', { exact: true }).fill('2');
+  await modal.getByLabel('Payment method', { exact: true }).selectOption('mobile_money');
+  await page.screenshot({ path: '/tmp/mobile-restored-cart.png', fullPage: true });
+  await modal.getByRole('button', { name: 'Complete sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  const requests = state.calls.filter(c => c.path.endsWith('/rpc/record_sale'));
+  expect(requests).toHaveLength(1);
+  expect(requests[0].body).toEqual({ p_request_id: expect.any(String), p_payment_method: 'mobile_money', p_items: [{ product_id: ids.product, quantity: 2 }] });
+  expect(state.errors).toEqual([]);
+});
+
+test('mobile cart retains the same frozen request after an uncertain sale response', async ({ page }) => {
+  const state = await backend(page, { failSaleOnce: true });
+  await loginMobile(page);
+  await page.getByRole('button', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByRole('button', { name: 'Add Test Product', exact: true }).click();
+  await modal.getByRole('button', { name: 'Complete sale', exact: true }).click();
+  await expect(modal.locator('.form-error')).toContainText('Temporary database error');
+  await expect(modal.getByRole('button', { name: 'Add Test Product', exact: true })).toBeDisabled();
+  await expect(modal.getByLabel('Quantity for Test Product', { exact: true })).toHaveAttribute('readonly', '');
+  await modal.getByRole('button', { name: 'Complete sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  const requests = state.calls.filter(c => c.path.endsWith('/rpc/record_sale'));
+  expect(requests).toHaveLength(2);
+  expect(requests[0].body).toEqual(requests[1].body);
+  expect(state.errors).toEqual([]);
+});
+
+test('restored mobile cart saves offline and synchronizes once on reconnect', async ({ page, context }) => {
+  const state = await backend(page);
+  await loginMobile(page);
+  await context.setOffline(true);
+  await page.getByRole('button', { name: 'Record sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByRole('button', { name: 'Add Test Product', exact: true }).click();
+  await modal.getByRole('button', { name: 'Complete sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  await expect(page.locator('#syncStatus')).toContainText('1 sale(s)');
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(0);
+  await mobilePage(page, 'Offline & sync');
+  await expect(page.locator('td[data-label="Status"]')).toHaveText('pending');
+  await context.setOffline(false);
+  await expect(page.locator('td[data-label="Status"]')).toHaveText('synced');
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
+  expect(state.errors).toEqual([]);
+});
+
+test('restored mobile stock movement and grouped supplier navigation retain backend actions', async ({ page }) => {
+  const state = await backend(page);
+  await loginMobile(page);
+  await mobilePage(page, 'Inventory');
+  await expect(page.locator('.inventory-stats .stat')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Record Stock Movement', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByLabel('Product', { exact: true }).selectOption(ids.product);
+  await modal.getByLabel('Quantity change (positive or negative)', { exact: true }).fill('-2');
+  await modal.getByLabel('Reason', { exact: true }).fill('Damaged stock');
+  await modal.getByRole('button', { name: 'Save movement', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  const request = state.calls.find(c => c.path.endsWith('/rpc/adjust_stock'));
+  expect(request.body).toMatchObject({ p_product_id: ids.product, p_quantity_change: -2, p_reason: 'Damaged stock' });
+  await mobilePage(page, 'Suppliers & Purchases');
+  await expect(page.locator('.sp-tabs')).toBeVisible();
+  await page.locator('.sp-tabs').getByRole('link', { name: 'Purchases', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Receive purchase', exact: true })).toBeVisible();
+  await expect(page.locator('[data-mobile-supply-nav]')).toHaveClass(/active/);
+  expect(state.errors).toEqual([]);
+});
+
+test('restoring the original mobile layout keeps worker access limited while allowing sales', async ({ page }) => {
+  const state = await backend(page, { role: 'worker' });
+  await loginMobile(page, 'worker');
+  await page.getByRole('button', { name: 'Menu', exact: true }).click();
+  for (const name of ['Organization', 'Suppliers & Purchases', 'Manage Accounts', 'Settings', 'Returns & Refunds']) {
+    await expect(page.getByRole('link', { name, exact: true })).toHaveCount(0);
+  }
+  await page.getByRole('link', { name: 'Inventory', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Inventory Management', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Record Stock Movement', exact: true })).toHaveCount(0);
+  await mobilePage(page, 'Sales');
+  await expect(page.getByRole('button', { name: 'Cancel sale', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'New Sale', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.getByRole('button', { name: 'Add Test Product', exact: true }).click();
+  await modal.getByRole('button', { name: 'Complete sale', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
+  expect(state.errors).toEqual([]);
 });

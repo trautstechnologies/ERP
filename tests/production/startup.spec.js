@@ -55,7 +55,7 @@ test('a previously prepared mobile account can reopen cached data offline after 
   await page.getByLabel('Email address').fill('worker@example.com');
   await page.getByLabel('Password', { exact: true }).fill('Test-password-123!');
   await page.getByRole('button', { name: 'Login', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Business Overview', exact: true })).toBeVisible();
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
     if (!navigator.serviceWorker.controller) await new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
@@ -67,7 +67,7 @@ test('a previously prepared mobile account can reopen cached data offline after 
   await page.unrouteAll({ behavior: 'wait' });
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Your business at a glance' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Business Overview', exact: true })).toBeVisible();
   await expect(page.locator('#syncStatus')).toContainText('Offline');
   await expect(page.locator('.user-info')).toContainText('Offline worker');
 });

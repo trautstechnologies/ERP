@@ -1,3 +1,4 @@
+import { openMobileSale } from './mobile-sale.js';
 import { list, insert, patch, rpc, createWorker, updateSupplierPhone, deleteSupplierPhone } from '../lib/api.js';
 import { $, e, badge, timestamp, dateLabel, supportDetails, options, select, field, button, table, row, panel, note, dialog, actionForm, notify } from '../lib/ui.js';
 import { price, paymentLabel } from '../lib/domain.js';
@@ -13,14 +14,15 @@ async function transactionDetails(ctx, sale, products, isPurchase = false) {
 }
 
 export async function sales(ctx) {
-  const [data, products, saleItems, staff] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), scoped(ctx, 'sales_items'), ctx.manager ? scoped(ctx, 'profiles') : [ctx.profile]]);
+  const [data, products, saleItems, staff, inventory] = await Promise.all([scoped(ctx, 'sales'), scoped(ctx, 'products'), scoped(ctx, 'sales_items'), ctx.manager ? scoped(ctx, 'profiles') : [ctx.profile], ctx.mobile ? scoped(ctx, 'sellable_inventory') : []]);
   const render = search => table(['Items sold', 'Recorded by', 'Date', 'Payment', 'Status', 'Total', 'Actions'], [...data].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).filter(s => matches({ ...s, items: itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products), staff: nameOf(staff, s.user_id, 'user_id', 'user_name'), payment_label: paymentLabel(s.payment_method) }, search)).map(s => row([
     e(itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products)), e(nameOf(staff, s.user_id, 'user_id', 'user_name')), e(timestamp(s.sale_date, ctx.store.time_zone)), e(paymentLabel(s.payment_method)), badge(s.status), e(ctx.money(s.total_amount)), `<div class="actions">${button('Details', 'details', s.sale_id)}${ctx.manager && s.status === 'completed' ? button('Cancel sale', 'reverse', s.sale_id) : ''}</div>`,
   ])));
-  const root = ctx.mount(`${heading('Sales', ctx.manager ? 'Store sales, original item history and cancellations' : 'Record a sale and review your transactions', button('Record sale', 'add', '', false))}${panel('Sales history', `${searchBox()}<div data-table>${render('')}</div>`)}`);
+  const root = ctx.mount(`${heading('Sales', ctx.manager ? 'Store sales, original item history and cancellations' : 'Record a sale and review your transactions', button('Record sale', 'add', '', false))}${panel('Sales history', `${searchBox()}<div data-table>${render('')}</div>`)}`, { products, inventory });
   if (!root) return;
   searchable(root, render, { placeholder: 'Search products, staff, payment or status…' });
   const openSale = () => {
+    if (ctx.mobile) return openMobileSale(ctx, products, inventory);
     const modal = actionForm('Record sale', select('Payment method', 'payment_method', payOptions()) + lineEditor(products), async (values, id) => {
       return await rpc('record_sale', { p_request_id: id, p_payment_method: values.payment_method, p_items: parseLines(values, products) });
     }, ctx, { mutation: true, label: 'Record sale' });

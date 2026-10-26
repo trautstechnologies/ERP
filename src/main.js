@@ -1,3 +1,4 @@
+import { restoreMobileLayout } from './lib/mobile-layout.js';
 import { mountMobileShell } from './lib/mobile-shell.js';
 import './lib/theme.js';
 import { storage, setOfflineIdentity, queueEntries, syncSales } from './lib/offline.js';
@@ -43,6 +44,7 @@ const icons = { LayoutDashboard, Package, ShoppingCart, Boxes, Truck, ClipboardL
 let profile, store, organization, generation = 0, shellUser, sessionUser;
 let currentKey = 'dashboard';
 let isOwner = false;
+let disposeMobilePage;
 let recoveryActive = false;
 const app = $('#app');
 
@@ -74,6 +76,7 @@ async function loadIdentity() {
 
 function login(message = '', { success = false, email = '' } = {}) {
   generation++;
+  disposeMobilePage?.(); disposeMobilePage = null;
   setOfflineIdentity(null);
   closeDialog(); shellUser = null; isOwner = false; profile = store = organization = null;
   app.innerHTML = `<main class="auth-container"><section class="auth-card">${branding()}<h2>Welcome back</h2><p class="muted">Sign in to your assigned store.</p><form id="loginForm"><label class="form-group">Email address<input name="email" type="email" required autocomplete="username" value="${e(email)}"></label><label class="form-group">Password<input name="password" type="password" required autocomplete="current-password"></label><button class="primary-btn" type="submit">Login</button><p id="loginError" role="alert">${e(message)}</p></form><button type="button" class="auth-link" id="forgotPasswordBtn">Forgot password?</button><p class="auth-help">Need an account? Contact your manager. Worker accounts are created by a manager.</p><button type="button" class="secondary-btn auth-signup" id="signupBtn" hidden>Sign up as organization owner</button><p class="footer">© Powered by Trauts technologies · <a href="${import.meta.env.BASE_URL}user-guide.html" target="_blank" rel="noopener">User guide</a></p></section></main>`;
@@ -180,6 +183,7 @@ function shell() {
 async function render() {
   if (recoveryActive) return;
   const token = ++generation;
+  disposeMobilePage?.(); disposeMobilePage = null;
   closeDialog();
   try {
     await loadIdentity();
@@ -204,6 +208,7 @@ async function render() {
       profile: captured, store: { ...store }, organization,
       intent,
       owner: isOwner,
+      mobile: document.documentElement.hasAttribute('data-mobile-app'),
       manager: profile.role === 'manager',
       money: value => new Intl.NumberFormat('en-ZM', organization?.currency_code ? { style: 'currency', currency: organization.currency_code } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0)),
       async guard() {
@@ -211,11 +216,13 @@ async function render() {
         if (profile.user_id !== captured.user_id || profile.store_id !== captured.store_id || profile.role !== captured.role) throw new Error('Your account assignment changed. Reload before continuing.');
       },
       refresh: () => render(),
-      mount(html) {
+      mount(html, presentation) {
         if (token !== generation) return null;
         // Give each page its own event root; old delegated handlers leave with it.
         const root = document.createElement('div');
         root.innerHTML = html;
+        disposeMobilePage?.();
+        disposeMobilePage = restoreMobileLayout(root, currentKey, ctx, presentation);
         $('#pageContent').replaceChildren(root);
         iconRefresh();
         return root;

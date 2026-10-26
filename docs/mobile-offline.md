@@ -27,3 +27,10 @@ The service worker caches only application assets, never Supabase requests, toke
 ## Theme
 
 The sun/moon button is available on login and application pages in both versions. Dark colors match the mobile palette: background `#0b1524`, cards `#17283e`, inner surfaces `#20324a`, text `#e8eff9`. The choice is stored on the device; without a saved choice, the operating system preference is used.
+
+
+## Restored mobile presentation (26 October 2026)
+
+The uploaded mobile module styles are reused, with presentation adapters for the live backend's actual columns. The dashboard restores six summary cards, the gross-sales chart with 7-/30-day controls, restock/recent-sales sections and monthly metrics. Mobile lists use labeled cards; labels come from the real table headers and survive searching/filtering. New backend pages use the same card treatment. Suppliers and Purchases share the original navigation group with two route-backed tabs.
+
+Dashboard Record sale and Sales → New Sale open the original-style product picker and cart. The cart submits through the existing `record_sale` RPC or offline queue using the same UUID/frozen-payload handling. Quantity editing stays whole-item-only; prices/totals remain server-authoritative. The optional received/change calculator is a client-side aid, not an added payment API. Dashboard statistics use the scoped backend records, not the demo profit/debt fields. Desktop web presentation remains separate.
