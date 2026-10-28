@@ -1258,3 +1258,29 @@ test('restoring the original mobile layout keeps worker access limited while all
   expect(state.calls.filter(c => c.path.endsWith('/rpc/record_sale'))).toHaveLength(1);
   expect(state.errors).toEqual([]);
 });
+
+for (const mobile of [false, true]) {
+  test(`today's sales deducts returns once and preserves negative net totals on ${mobile ? 'mobile' : 'web'}`, async ({ page }) => {
+    const state = await backend(page, { owner: true });
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Lusaka', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    state.data.daily_net_sales_report = [{ store_id: ids.store, report_date: today, gross_sales: '100.00', returns_total: '20.00', net_sales: '80.00' }];
+    state.data.daily_refund_report = [{ store_id: ids.store, report_date: today, refund_total: '20.00' }];
+    if (mobile) await loginMobile(page); else await login(page);
+    const card = mobile ? page.locator('.tld-card').first() : page.locator('.stats .stat').first();
+    await expect(card).toContainText('80.00');
+    await expect(card).toContainText('Sales minus returns');
+    expect(state.calls.filter(c => c.path.endsWith('/daily_refund_report'))).toHaveLength(0);
+    state.data.daily_net_sales_report[0] = { store_id: ids.store, report_date: today, gross_sales: '0', returns_total: '20', net_sales: '-20' };
+    if (mobile) await mobilePage(page, 'Dashboard'); else await page.getByRole('link', { name: 'Dashboard', exact: true }).click();
+    await expect(card).toContainText(/-K\s*20\.00/);
+    expect(state.errors).toEqual([]);
+  });
+}
+
+test('worker dashboard preserves personal sales scope without reading store-wide net reports', async ({ page }) => {
+  const state = await backend(page, { role: 'worker' });
+  await login(page, 'worker');
+  await expect(page.locator('.stats .stat').first()).toContainText('Your sales recorded today');
+  await expect(page.locator('.stats .stat').first()).toContainText('before returns');
+  expect(state.calls.filter(c => c.path.endsWith('/daily_net_sales_report'))).toHaveLength(0);
+});

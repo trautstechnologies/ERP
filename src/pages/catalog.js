@@ -1,22 +1,27 @@
+import Decimal from 'decimal.js';
 import { insert, patch, rpc } from '../lib/api.js';
 import { $, e, badge, options, select, field, check, button, table, row, panel, stat, note, actionForm, dateLabel } from '../lib/ui.js';
 import { businessDate, quantity, price } from '../lib/domain.js';
 import { scoped, nameOf, heading, bind, searchable, matches, searchBox, reason, itemSummary } from './shared.js';
 
 export async function overview(ctx) {
-  const [products, inventory, sales, low, saleItems] = await Promise.all([
+  const [products, inventory, sales, low, saleItems, netSales] = await Promise.all([
     scoped(ctx, 'products'), scoped(ctx, 'sellable_inventory'), scoped(ctx, 'sales'),
     ctx.manager ? scoped(ctx, 'low_stock_report') : Promise.resolve([]), scoped(ctx, 'sales_items'),
+    ctx.manager ? scoped(ctx, 'daily_net_sales_report') : [],
   ]);
   const today = businessDate(ctx.store.time_zone);
   const todays = sales.filter(s => s.status === 'completed' && businessDate(ctx.store.time_zone, new Date(s.sale_date)) === today);
+  const todaySales = ctx.manager
+    ? netSales.filter(r => r.report_date === today).reduce((sum, r) => sum.plus(r.net_sales), new Decimal(0)).toNumber()
+    : todays.reduce((sum, r) => sum.plus(r.total_amount), new Decimal(0)).toNumber();
   const days = Array.from({ length: 7 }, (_, index) => {
     const date = new Date(`${today}T12:00:00Z`); date.setUTCDate(date.getUTCDate() - 6 + index);
     const key = date.toISOString().slice(0, 10);
     return { key, value: sales.filter(s => s.status === 'completed' && businessDate(ctx.store.time_zone, new Date(s.sale_date)) === key).reduce((sum, s) => sum + Number(s.total_amount), 0) };
   });
   const max = Math.max(1, ...days.map(d => d.value));
-  ctx.mount(`${heading('Your business at a glance', ctx.manager ? 'Store activity, sales and stock availability' : 'Your sales and the store’s available products', '<a href="#/sales?action=new" class="primary-btn">Record sale</a>')}<div class="stats">${stat('Today’s gross sales', ctx.money(todays.reduce((s, r) => s + Number(r.total_amount), 0)), ctx.manager ? 'Completed store sales' : 'Your completed sales')}${stat('Today’s transactions', todays.length)}${stat('Active products', products.filter(p => p.active).length)}${stat(ctx.manager ? 'Low-stock products' : 'Products available', ctx.manager ? low.length : inventory.filter(i => Number(i.sellable_quantity) > 0).length)}</div><div class="grid-two">${panel('Sales over the last 7 days', `<div class="chart-bars">${days.map(d => `<div class="chart-column" title="${e(dateLabel(d.key, 'full'))}: ${e(ctx.money(d.value))}"><div class="chart-value" style="height:${Math.max(1, d.value / max * 125)}px"></div><span>${e(d.key === today ? 'Today' : dateLabel(d.key, 'short'))}</span></div>`).join('')}</div>`)}${panel(ctx.manager ? 'Restock alerts' : 'Available inventory', table(['Product', 'Sellable quantity'], (ctx.manager ? low : inventory).slice(0, 6).map(i => row([e(i.product_name), e(i.quantity ?? i.sellable_quantity)]))))}</div>${panel('Recent sales', table(['Items sold', 'Date', 'Status', 'Total'], [...sales].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).slice(0, 8).map(s => row([e(itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products)), e(dateLabel(businessDate(ctx.store.time_zone, new Date(s.sale_date)))), badge(s.status), e(ctx.money(s.total_amount))]))))}`, { products, inventory, sales, low, saleItems, today });
+  ctx.mount(`${heading('Your business at a glance', ctx.manager ? 'Store activity, sales and stock availability' : 'Your sales and the store’s available products', '<a href="#/sales?action=new" class="primary-btn">Record sale</a>')}<div class="stats">${stat(ctx.manager ? 'Today’s Sales' : 'Your sales recorded today', ctx.money(todaySales), ctx.manager ? 'Sales minus returns' : 'Your completed sales before returns')}${stat('Today’s transactions', todays.length)}${stat('Active products', products.filter(p => p.active).length)}${stat(ctx.manager ? 'Low-stock products' : 'Products available', ctx.manager ? low.length : inventory.filter(i => Number(i.sellable_quantity) > 0).length)}</div><div class="grid-two">${panel('Gross sales over the last 7 days', `<div class="chart-bars">${days.map(d => `<div class="chart-column" title="${e(dateLabel(d.key, 'full'))}: ${e(ctx.money(d.value))}"><div class="chart-value" style="height:${Math.max(1, d.value / max * 125)}px"></div><span>${e(d.key === today ? 'Today' : dateLabel(d.key, 'short'))}</span></div>`).join('')}</div>`)}${panel(ctx.manager ? 'Restock alerts' : 'Available inventory', table(['Product', 'Sellable quantity'], (ctx.manager ? low : inventory).slice(0, 6).map(i => row([e(i.product_name), e(i.quantity ?? i.sellable_quantity)]))))}</div>${panel('Recent sales', table(['Items sold', 'Date', 'Status', 'Total'], [...sales].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).slice(0, 8).map(s => row([e(itemSummary(saleItems.filter(i => i.sale_id === s.sale_id), products)), e(dateLabel(businessDate(ctx.store.time_zone, new Date(s.sale_date)))), badge(s.status), e(ctx.money(s.total_amount))]))))}`, { products, inventory, sales, low, saleItems, today, todaySales });
 }
 
 export async function products(ctx) {

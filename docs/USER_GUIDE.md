@@ -96,12 +96,12 @@ The Dashboard gives a quick view of activity. A worker sees their own completed 
 
 ### What you can see
 
-- **Today's gross sales:** value of completed sales today, before customer returns are deducted.
+- **Today's Sales (managers and owners):** completed store sales minus active returns recorded today, using the store's business date. Paying the refund does not subtract the amount a second time. Returns from earlier sales can make today's total negative. Workers instead see **Your sales recorded today**, their own completed sales before returns.
 - **Today's transactions:** number of completed sales today.
 - **Active products:** products currently available in the catalog.
 - **Low-stock products:** manager alert count based on stock that can actually be sold.
 - **Products available:** the worker's count of products with sellable stock.
-- A sales chart for the last seven days. Dates use labels such as **12 Oct** and **Today**, based on your store timezone.
+- A gross-sales chart, before returns, for the last seven days. Dates use labels such as **12 Oct** and **Today**, based on your store timezone.
 - Restock alerts for managers, or available inventory for workers.
 - A short list of recent sales.
 
